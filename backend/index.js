@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
-  res.send('Hello from Express Backend!');
+  res.send('Prueba 1');
 });
 
 // Example route using Supabase (if needed directly)
