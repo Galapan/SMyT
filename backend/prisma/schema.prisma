@@ -1,15 +1,91 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+// Enum para los 3 tipos de rol
+enum Rol {
+  SUPER_USUARIO
+  ADMINISTRADOR_SMYT
+  USUARIO_CONCESIONARIO
+}
+
+// Tabla de usuarios (todos los roles)
+model Usuario {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  password        String
+  nombre          String
+  apellido        String
+  rol             Rol
+  activo          Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relación: Usuario Concesionario pertenece a un depósito
+  depositoId      String?
+  deposito        Deposito? @relation(fields: [depositoId], references: [id])
+
+  // Relación: Administrador que creó este usuario
+  creadoPorId     String?
+  creadoPor       Usuario?  @relation("UsuarioCreador", fields: [creadoPorId], references: [id])
+  usuariosCreados Usuario[] @relation("UsuarioCreador")
+
+  // Vehículos registrados por este usuario
+  vehiculos       Vehiculo[]
+
+  @@map("usuarios")
+}
+
+// Depósitos vehiculares
+model Deposito {
+  id          String    @id @default(uuid())
+  nombre      String
+  direccion   String
+  activo      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Usuarios asignados a este depósito
+  usuarios    Usuario[]
+  
+  // Vehículos en este depósito
+  vehiculos   Vehiculo[]
+
+  @@map("depositos")
+}
+
+// Vehículos (inventario)
+model Vehiculo {
+  id                String    @id @default(uuid())
+  placa             String    @unique
+  vin               String    @unique
+  tipoServicio      String
+  fechaIngreso      DateTime  @default(now())
+  fechaSalida       DateTime?
+  activo            Boolean   @default(true)
+
+  // Datos de baja (obligatorios para salida)
+  justificacionBaja String?
+  documentoPdfUrl   String?
+
+  // Depósito donde está el vehículo
+  depositoId        String
+  deposito          Deposito  @relation(fields: [depositoId], references: [id])
+
+  // Usuario que registró el vehículo
+  registradoPorId   String
+  registradoPor     Usuario   @relation(fields: [registradoPorId], references: [id])
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@map("vehiculos")
 }

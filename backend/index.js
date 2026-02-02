@@ -2,25 +2,36 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-// Import routes or other modules here
-// const { supabase } = require('./supabaseClient');
+// Import routes
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 
+// Routes
 app.get('/', (req, res) => {
-  res.send('Prueba 1');
+  res.json({ 
+    message: 'SMyT API - Sistema de Gestión de Depósitos Vehiculares',
+    version: '1.0.0'
+  });
 });
 
-// Example route using Supabase (if needed directly)
-// app.get('/api/test', async (req, res) => {
-//   const { data, error } = await supabase.from('test').select('*');
-//   res.json({ data, error });
-// });
+// Auth routes
+app.use('/api/auth', authRoutes);
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    message: 'Error interno del servidor'
+  });
+});
 
 app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
