@@ -4,6 +4,7 @@ require('dotenv').config();
 
 // Import routes
 const authRoutes = require('./routes/authRoutes');
+const vehicleRoutes = require('./routes/vehicleRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,6 +24,9 @@ app.get('/', (req, res) => {
 // Auth routes
 app.use('/api/auth', authRoutes);
 
+// Vehicle routes
+app.use('/api/vehiculos', vehicleRoutes);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
@@ -33,5 +37,5 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Server running on http://localhost:${PORT}`);
 });

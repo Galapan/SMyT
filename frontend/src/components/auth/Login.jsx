@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 function Login() {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -32,13 +34,18 @@ function Login() {
         throw new Error(data.message || 'Error al iniciar sesión');
       }
 
-      // Guardar token
+      // Guardar token y usuario
       const storage = rememberMe ? localStorage : sessionStorage;
       storage.setItem('token', data.data.token);
       storage.setItem('user', JSON.stringify(data.data.usuario));
 
-      console.log('Login exitoso:', data.data.usuario);
-      alert(`¡Bienvenido, ${data.data.usuario.nombre}!`);
+      // Redirigir según rol
+      const usuario = data.data.usuario;
+      if (usuario.rol === 'SUPER_USUARIO' || usuario.rol === 'ADMINISTRADOR_SMYT') {
+        navigate('/admin');
+      } else {
+        navigate('/concesionario'); // Futuro: dashboard de concesionario
+      }
 
     } catch (err) {
       setError(err.message);

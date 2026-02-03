@@ -17,6 +17,26 @@ enum Rol {
   USUARIO_CONCESIONARIO
 }
 
+// Enum para estatus legal del vehículo
+enum EstatusLegal {
+  ROBADO
+  DECOMISADO
+  OBSOLETO
+  SINIESTRADO
+}
+
+// Enum para tipo de servicio
+enum TipoServicio {
+  PARTICULAR
+  PUBLICO
+}
+
+// Enum para tipo de transmisión
+enum TipoTransmision {
+  MANUAL
+  AUTOMATICA
+}
+
 // Tabla de usuarios (todos los roles)
 model Usuario {
   id              String    @id @default(uuid())
@@ -62,17 +82,67 @@ model Deposito {
   @@map("depositos")
 }
 
-// Vehículos (inventario)
+// Vehículos (inventario) - Expandido para 4 pasos del formulario
 model Vehiculo {
   id                String    @id @default(uuid())
-  placa             String    @unique
-  vin               String    @unique
-  tipoServicio      String
-  fechaIngreso      DateTime  @default(now())
-  fechaSalida       DateTime?
-  activo            Boolean   @default(true)
 
-  // Datos de baja (obligatorios para salida)
+  // ===== PASO 1: DATOS ADMINISTRATIVOS =====
+  folioProceso        String    @unique
+  fechaIngreso        DateTime  @default(now())
+  autoridad           String
+  documentosAdjuntos  String[]  // URLs de archivos subidos
+
+  // ===== PASO 2: DATOS DEL VEHÍCULO =====
+  noInventario        String    @unique
+  marcaTipo           String
+  anio                Int
+  tipoServicio        TipoServicio
+  vin                 String    @unique
+  placa               String    @unique
+  noMotor             String
+  colorOriginal       String
+  colorActual         String
+  odometro            Int
+
+  // ===== PASO 3: ESTATUS LEGAL =====
+  estatusLegal        EstatusLegal
+  tieneActaBaja       Boolean   @default(false)
+  noOficio            String?
+  fechaActaBaja       DateTime?
+  tieneTituloFactura  Boolean   @default(false)
+
+  // ===== PASO 4: INSPECCIÓN FÍSICA =====
+  // Carrocería
+  estadoCarroceria          String?
+  estadoCristales           String?
+  estadoEspejos             String?
+  estadoLlantasDelanteras   String?
+  estadoLlantasTraseras     String?
+  
+  // Mecánica
+  motorCompleto             Boolean?
+  bateriaPresente           Boolean?
+  tipoTransmision           TipoTransmision?
+  
+  // Interior
+  estadoAsientos            String?
+  estadoCinturones          String?
+  estadoVolanteTablero      String?
+  
+  // Sistemas
+  estadoFrenos              String?
+  aireAcondicionadoFunciona Boolean?
+  
+  // Ambiental (CRÍTICO)
+  liquidosDrenados          Boolean   @default(false)
+  estadoBolsasAire          String?
+  
+  // Observaciones
+  observacionesInspector    String?
+
+  // ===== CONTROL =====
+  activo            Boolean   @default(true)
+  fechaSalida       DateTime?
   justificacionBaja String?
   documentoPdfUrl   String?
 
