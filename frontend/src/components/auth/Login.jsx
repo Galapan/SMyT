@@ -33,13 +33,9 @@ function Login() {
       }
 
       // Guardar token
-      if (rememberMe) {
-        localStorage.setItem('token', data.data.token);
-        localStorage.setItem('user', JSON.stringify(data.data.usuario));
-      } else {
-        sessionStorage.setItem('token', data.data.token);
-        sessionStorage.setItem('user', JSON.stringify(data.data.usuario));
-      }
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem('token', data.data.token);
+      storage.setItem('user', JSON.stringify(data.data.usuario));
 
       console.log('Login exitoso:', data.data.usuario);
       alert(`¡Bienvenido, ${data.data.usuario.nombre}!`);
@@ -52,275 +48,188 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex">
+    <div className="min-h-screen w-full flex bg-white overflow-hidden">
       {/* Panel izquierdo - Imagen */}
-      <div 
-        className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
-        style={{ 
-          background: 'linear-gradient(135deg, #572671 0%, #3d1a50 100%)'
-        }}
-      >
-        {/* Imagen de fondo con overlay */}
+      <div className="hidden lg:block lg:w-1/2 relative">
         <div 
-          className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+          className="absolute inset-0 bg-cover bg-center"
           style={{ 
-            backgroundImage: `url('https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&q=80')`,
+            backgroundImage: `url('')`,
           }}
         />
-        <div 
-          className="absolute inset-0"
-          style={{ 
-            background: 'linear-gradient(135deg, rgba(87, 38, 113, 0.85) 0%, rgba(170, 3, 101, 0.7) 100%)'
-          }}
-        />
-        
-        {/* Contenido sobre la imagen */}
-        <div className="relative z-10 flex flex-col justify-end p-12 text-white">
-          <div className="animate-fade-in">
-            <h2 className="text-4xl font-light mb-4" style={{ color: '#FEE6C4' }}>
-              Sistema de Gestión
-            </h2>
-            <h1 className="text-5xl font-bold mb-6">
-              Depósitos Vehiculares
-            </h1>
-            <p className="text-lg opacity-80 max-w-md" style={{ color: '#91ABA5' }}>
-              Plataforma integral para el control y administración de inventarios vehiculares del Estado de Tlaxcala.
-            </p>
-          </div>
-        </div>
+        {/* Overlay degradado sutil para dar elegancia */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent"></div>
       </div>
 
       {/* Panel derecho - Formulario */}
-      <div 
-        className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16"
-        style={{ backgroundColor: '#FAFAFA' }}
-      >
-        <div className="w-full max-w-md animate-slide-up">
-          {/* Logo / Header */}
-          <div className="text-center mb-10">
-            <h1 
-              className="text-3xl font-light mb-2"
-              style={{ color: '#572671' }}
-            >
+      <div className="w-full lg:w-1/2 flex flex-col justify-center items-center px-8 lg:px-24 h-screen">
+        <div className="w-full max-w-[420px] mx-auto flex flex-col justify-center h-full max-h-[800px]">
+          
+          {/* Header del Formulario */}
+          <div className="mb-10">
+            <h1 className="text-3xl font-normal text-[#572671] leading-tight">
               Sistema de Control de
             </h1>
-            <h2 
-              className="text-3xl font-bold"
-              style={{ color: '#572671' }}
-            >
-              Inventarios SMyT
-            </h2>
+            <div className="inline-block relative">
+              <h2 className="text-3xl font-bold text-[#572671] pb-2">
+                Inventarios SMT
+              </h2>
+              {/* Línea morada gruesa bajo el título */}
+              <div className="absolute bottom-0 left-0 w-24 h-1.5 bg-[#AA0365] rounded-full"></div>
+            </div>
           </div>
 
-          {/* Tabs */}
-          <div className="flex mb-8 border-b" style={{ borderColor: '#E5E5E5' }}>
+          {/* Tabs Login/Registro */}
+          <div className="flex w-full mb-8 border-b border-gray-200">
             <button
               onClick={() => setIsLogin(true)}
-              className="flex-1 pb-4 text-center font-medium transition-all duration-300 relative"
-              style={{ 
-                color: isLogin ? '#572671' : '#999',
-              }}
+              className={`pb-3 px-4 text-base font-medium transition-colors relative ${
+                isLogin ? 'text-[#572671]' : 'text-gray-400 hover:text-gray-600'
+              }`}
             >
               Iniciar Sesión
               {isLogin && (
-                <span 
-                  className="absolute bottom-0 left-0 w-full h-0.5 transition-all duration-300"
-                  style={{ backgroundColor: '#572671' }}
-                />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#572671]"></div>
               )}
             </button>
             <button
               onClick={() => setIsLogin(false)}
-              className="flex-1 pb-4 text-center font-medium transition-all duration-300 relative"
-              style={{ 
-                color: !isLogin ? '#572671' : '#999',
-              }}
+              className={`pb-3 px-4 text-base font-medium transition-colors relative ${
+                !isLogin ? 'text-[#572671]' : 'text-gray-400 hover:text-gray-600'
+              }`}
             >
               Registrarse
               {!isLogin && (
-                <span 
-                  className="absolute bottom-0 left-0 w-full h-0.5 transition-all duration-300"
-                  style={{ backgroundColor: '#572671' }}
-                />
+                <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#572671]"></div>
               )}
             </button>
           </div>
 
-          {/* Formulario */}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Campos de registro */}
-            {!isLogin && (
-              <div className="grid grid-cols-2 gap-4 animate-fade-in">
-                <div>
-                  <label 
-                    className="block text-sm font-medium mb-2"
-                    style={{ color: '#333' }}
-                  >
-                    Nombre
-                  </label>
-                  <input
-                    type="text"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none"
-                    style={{ 
-                      borderColor: '#DDD',
-                      backgroundColor: '#FFF'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#572671'}
-                    onBlur={(e) => e.target.style.borderColor = '#DDD'}
-                    placeholder="Juan"
-                    required={!isLogin}
-                  />
+          {/* Formulario con animación de cambio */}
+          <div className="relative overflow-visible w-full">
+            <form 
+              key={isLogin ? 'login' : 'register'}
+              onSubmit={handleSubmit} 
+              className={`space-y-5 w-full ${isLogin ? 'animate-slide-right' : 'animate-slide-left'}`}
+            >
+              
+              {!isLogin && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                      Nombre
+                    </label>
+                    <input
+                      type="text"
+                      value={nombre}
+                      onChange={(e) => setNombre(e.target.value)}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-sm"
+                      required={!isLogin}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-gray-600 mb-1">
+                      Apellido
+                    </label>
+                    <input
+                      type="text"
+                      value={apellido}
+                      onChange={(e) => setApellido(e.target.value)}
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-sm"
+                      required={!isLogin}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label 
-                    className="block text-sm font-medium mb-2"
-                    style={{ color: '#333' }}
-                  >
-                    Apellido
-                  </label>
-                  <input
-                    type="text"
-                    value={apellido}
-                    onChange={(e) => setApellido(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none"
-                    style={{ 
-                      borderColor: '#DDD',
-                      backgroundColor: '#FFF'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#572671'}
-                    onBlur={(e) => e.target.style.borderColor = '#DDD'}
-                    placeholder="Pérez"
-                    required={!isLogin}
-                  />
-                </div>
-              </div>
-            )}
+              )}
 
-            {/* Email */}
-            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
-              <label 
-                className="block text-sm font-medium mb-2"
-                style={{ color: '#333' }}
-              >
-                Correo Institucional
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none"
-                style={{ 
-                  borderColor: '#DDD',
-                  backgroundColor: '#FFF'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#572671'}
-                onBlur={(e) => e.target.style.borderColor = '#DDD'}
-                placeholder="usuario@tlaxcala.gob.mx"
-                required
-              />
-            </div>
-
-            {/* Password */}
-            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
-              <label 
-                className="block text-sm font-medium mb-2"
-                style={{ color: '#333' }}
-              >
-                Contraseña
-              </label>
-              <input
-                type="password"
-                id="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border transition-all duration-300 focus:outline-none"
-                style={{ 
-                  borderColor: '#DDD',
-                  backgroundColor: '#FFF'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#572671'}
-                onBlur={(e) => e.target.style.borderColor = '#DDD'}
-                placeholder="••••••••"
-                required
-              />
-            </div>
-
-            {/* Remember me y Forgot password */}
-            {isLogin && (
-              <div className="flex items-center justify-between animate-fade-in" style={{ animationDelay: '0.3s' }}>
-                <label className="flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 mr-2 cursor-pointer"
-                    style={{ accentColor: '#572671' }}
-                  />
-                  <span className="text-sm" style={{ color: '#666' }}>Recordarme</span>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Correo Institucional
                 </label>
-                <a 
-                  href="#" 
-                  className="text-sm hover:underline transition-colors"
-                  style={{ color: '#572671' }}
-                >
-                  ¿Olvidaste tu contraseña?
-                </a>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="usuario@tlaxcala.gob.mx"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
+                  required
+                />
               </div>
-            )}
 
-            {/* Error message */}
-            {error && (
-              <div 
-                className="p-3 rounded-lg text-sm animate-fade-in"
-                style={{ 
-                  backgroundColor: 'rgba(170, 3, 101, 0.1)',
-                  border: '1px solid rgba(170, 3, 101, 0.3)',
-                  color: '#AA0365'
-                }}
-              >
-                {error}
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                  Contraseña
+                </label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
+                  required
+                />
               </div>
-            )}
 
-            {/* Submit button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 rounded-lg font-medium text-white transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              style={{ 
-                backgroundColor: '#572671',
-              }}
-              onMouseEnter={(e) => e.target.style.backgroundColor = '#6b2f8a'}
-              onMouseLeave={(e) => e.target.style.backgroundColor = '#572671'}
-            >
-              {loading ? (
-                <>
-                  <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" 
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  Procesando...
-                </>
-              ) : (
-                isLogin ? 'Iniciar Sesión' : 'Registrarse'
+              {isLogin && (
+                <div className="flex items-center justify-between pt-1">
+                  <label className="flex items-center cursor-pointer">
+                    <div className="relative flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="peer h-4 w-4 cursor-pointer appearance-none rounded-sm border border-gray-400 checked:border-[#572671] checked:bg-[#572671] transition-all"
+                      />
+                      <svg
+                        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white opacity-0 peer-checked:opacity-100 transition-opacity"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        width="12"
+                        height="12"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                      </svg>
+                    </div>
+                    <span className="ml-2 text-xs font-medium text-gray-600">Recordarme</span>
+                  </label>
+                  <a href="#" className="text-xs font-medium text-[#572671] hover:underline">
+                    ¿Olvidaste tu contraseña?
+                  </a>
+                </div>
               )}
-            </button>
-          </form>
 
-          {/* Footer */}
-          <div className="mt-10 text-center">
-            <a 
-              href="#" 
-              className="text-sm hover:underline transition-colors"
-              style={{ color: '#572671' }}
-            >
-              Gobierno del Estado de Tlaxcala
-            </a>
+              {error && (
+                <div className="text-red-500 text-sm bg-red-50 p-3 rounded border border-red-100">
+                  {error}
+                </div>
+              )}
+
+              <div className="pt-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-[#572671] text-white py-3 rounded hover:bg-[#451e5a] transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg transform active:scale-95 duration-200"
+                >
+                  {loading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    isLogin ? 'Iniciar Sesión' : 'Registrarse'
+                  )}
+                </button>
+              </div>
+
+            </form>
           </div>
+          
+          {/* Footer fijo al fondo del container */}
+          <div className="mt-12 text-center pt-8">
+            <p className="text-xs text-gray-400 hover:text-[#572671] transition-colors cursor-pointer">
+              Gobierno del Estado de Tlaxcala
+            </p>
+          </div>
+
         </div>
       </div>
     </div>
