@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import logoGob from '../../assets/GOB DE TLAXCALA CUADRADO.png';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -56,16 +57,13 @@ function Login() {
 
   return (
     <div className="min-h-screen w-full flex bg-white overflow-hidden">
-      {/* Panel izquierdo - Imagen */}
-      <div className="hidden lg:block lg:w-1/2 relative">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ 
-            backgroundImage: `url('')`,
-          }}
+      {/* Panel izquierdo - Logo centrado */}
+      <div className="hidden lg:flex lg:w-1/2 items-center justify-center bg-white">
+        <img 
+          src={logoGob} 
+          alt="Gobierno del Estado de Tlaxcala"
+          className="max-w-[80%] max-h-[80%] object-contain"
         />
-        {/* Overlay degradado sutil para dar elegancia */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black/10 to-transparent"></div>
       </div>
 
       {/* Panel derecho - Formulario */}

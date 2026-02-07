@@ -28,7 +28,7 @@ const DepotTable = () => {
               <tr key={depot.id} className="hover:bg-gray-50 transition-colors group">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
-                    <div className="h-10 w-10 rounded-full bg-[var(--color-secondary)] flex items-center justify-center text-[var(--color-primary)] font-bold text-lg">
+                    <div className="h-10 w-10 rounded-full bg-(--color-secondary) flex items-center justify-center text-(--color-primary) font-bold text-lg">
                       {depot.name.charAt(0)}
                     </div>
                     <div className="ml-4">
@@ -54,10 +54,10 @@ const DepotTable = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                   <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button className="p-1.5 text-[var(--color-primary)] hover:bg-gray-100 rounded-md transition-colors">
+                    <button className="p-1.5 text-(--color-primary) hover:bg-gray-100 rounded-md transition-colors">
                       <Edit2 size={16} />
                     </button>
-                    <button className="p-1.5 text-[var(--color-rosa)] hover:bg-red-50 rounded-md transition-colors">
+                    <button className="p-1.5 text-(--color-rosa) hover:bg-red-50 rounded-md transition-colors">
                       <Trash2 size={16} />
                     </button>
                   </div>

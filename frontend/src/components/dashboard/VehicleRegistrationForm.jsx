@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   X, 
   ChevronLeft, 
@@ -209,9 +210,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
     }
   };
 
-  if (!isOpen) return null;
-
-  // Input styles with error handling
+  // Helper styles
   const getInputClass = (fieldName) => {
     const baseClass = "w-full px-4 py-2.5 bg-white border rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all text-sm";
     return errors[fieldName] 
@@ -223,23 +222,25 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
   const checkboxClass = "h-4 w-4 rounded border-gray-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]";
   const errorTextClass = "text-xs text-red-500 mt-1";
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+  if (!isOpen) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
         onClick={onClose}
       />
 
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-fade-in">
+      {/* Modal Container */}
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-fade-in flex flex-col">
         {/* Header */}
         <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold text-[var(--color-primary)]">Registro de Ingreso Vehicular</h2>
+              <h2 className="text-2xl font-bold text-(--color-primary)">Registro de Ingreso Vehicular</h2>
               <p className="text-sm text-gray-500">Sistema de Control de Inventarios SMT</p>
-              <div className="w-16 h-1 bg-[var(--color-rosa)] rounded-full mt-2"></div>
+              <div className="w-16 h-1 bg-(--color-rosa) rounded-full mt-2"></div>
             </div>
             <button 
               onClick={onClose}
@@ -250,29 +251,30 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
           </div>
 
           {/* Stepper */}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between px-2 sm:px-6">
             {steps.map((step, index) => {
               const isActive = currentStep === step.id;
               const isCompleted = currentStep > step.id;
               
               return (
-                <div key={step.id} className="flex items-center flex-1">
-                  <div className="flex flex-col items-center">
+                <div key={step.id} className="flex items-center" style={{ flex: index < steps.length - 1 ? '1 0 auto' : '0 0 auto' }}>
+                  <div className="flex flex-col items-center shrink-0">
                     <div className={`
-                      w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
-                      ${isCompleted ? 'bg-[var(--color-primary)] text-white' : 
-                        isActive ? 'bg-[var(--color-primary)] text-white ring-4 ring-violet-100' : 
+                      w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center transition-all duration-300
+                      ${isCompleted ? 'bg-(--color-primary) text-white' : 
+                        isActive ? 'bg-(--color-primary) text-white ring-4 ring-violet-100' : 
                         'bg-gray-100 text-gray-400'}
                     `}>
-                      {isCompleted ? <Check size={20} /> : step.id}
+                      {isCompleted ? <Check size={16} className="sm:w-5 sm:h-5" /> : <span className="text-sm sm:text-base">{step.id}</span>}
                     </div>
-                    <span className={`text-xs mt-2 text-center max-w-[80px] ${isActive ? 'text-[var(--color-primary)] font-medium' : 'text-gray-500'}`}>
+                    {/* Hide labels on mobile as they are redundant with the step title below */}
+                    <span className={`hidden sm:block text-[10px] sm:text-xs mt-2 text-center w-full max-w-20 leading-tight ${isActive ? 'text-(--color-primary) font-medium' : 'text-gray-500'}`}>
                       {step.name}
                     </span>
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`flex-1 h-1 mx-2 rounded transition-all duration-300 ${
-                      isCompleted ? 'bg-[var(--color-primary)]' : 'bg-gray-200'
+                    <div className={`flex-1 h-0.5 sm:h-1 mx-2 sm:mx-4 rounded transition-all duration-300 min-w-2.5 ${
+                      isCompleted ? 'bg-(--color-primary)' : 'bg-gray-200'
                     }`} />
                   )}
                 </div>
@@ -298,7 +300,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
             {/* PASO 1: Datos Administrativos */}
             {currentStep === 1 && (
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-4">
+                <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
                   Paso 1: Datos Administrativos
                 </h3>
                 
@@ -344,7 +346,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
 
                 <div>
                   <label className={labelClass}>Documentos Adjuntos</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-[var(--color-primary)] transition-colors cursor-pointer">
+                  <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-(--color-primary) transition-colors cursor-pointer">
                     <Upload className="w-10 h-10 mx-auto text-gray-400 mb-3" />
                     <p className="text-sm text-gray-600">Haz clic para cargar archivos o arrástralos aquí</p>
                     <p className="text-xs text-gray-400 mt-1">PDF, JPG, PNG, DOC (máx. 10MB cada uno)</p>
@@ -356,7 +358,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
             {/* PASO 2: Datos del Vehículo */}
             {currentStep === 2 && (
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-4">
+                <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
                   Paso 2: Datos del Vehículo
                 </h3>
                 
@@ -506,7 +508,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
             {/* PASO 3: Estatus Legal */}
             {currentStep === 3 && (
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-4">
+                <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
                   Paso 3: Estatus Legal
                 </h3>
                 
@@ -589,14 +591,14 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
             {/* PASO 4: Inspección Física */}
             {currentStep === 4 && (
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-[var(--color-primary)] mb-4">
+                <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
                   Paso 4: Inspección Física
                 </h3>
                 
                 {/* Carrocería */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <Truck size={18} className="text-[var(--color-primary)]" />
+                    <Truck size={18} className="text-(--color-primary)" />
                     Carrocería
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -650,7 +652,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
                 {/* Mecánica */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <Cog size={18} className="text-[var(--color-primary)]" />
+                    <Cog size={18} className="text-(--color-primary)" />
                     Mecánica
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -676,7 +678,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
                 {/* Interior */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <Armchair size={18} className="text-[var(--color-primary)]" />
+                    <Armchair size={18} className="text-(--color-primary)" />
                     Interior
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -712,7 +714,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
                 {/* Sistemas */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <Wrench size={18} className="text-[var(--color-primary)]" />
+                    <Wrench size={18} className="text-(--color-primary)" />
                     Sistemas
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -795,7 +797,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
           {currentStep < 4 ? (
             <button
               onClick={nextStep}
-              className="px-6 py-2.5 bg-[var(--color-primary)] hover:bg-violet-900 text-white rounded-lg font-medium flex items-center gap-2 transition-all shadow-md hover:shadow-lg"
+              className="px-6 py-2.5 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg font-medium flex items-center gap-2 transition-all shadow-md hover:shadow-lg"
             >
               Siguiente
               <ChevronRight size={18} />
@@ -821,7 +823,8 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.getElementById('modal-root')
   );
 };
 

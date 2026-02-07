@@ -70,13 +70,11 @@ const AdminLayout = () => {
       `}>
         <div className="h-full flex flex-col">
           {/* Logo / Header */}
-          <div className="h-24 flex items-center justify-between px-6 border-b border-gray-100">
-            <div className="flex items-center">
-              <img src="/src/assets/logo_smyt.png" alt="SMyT Logo" className="h-16 w-auto" />
-            </div>
+          <div className="h-24 flex items-center justify-center px-6 border-b border-gray-100 relative">
+            <img src="/src/assets/logo_smyt.png" alt="SMyT Logo" className="h-16 w-auto object-contain" />
             <button 
               onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden p-1 text-gray-500 hover:text-gray-700"
+              className="lg:hidden p-1 text-gray-500 hover:text-gray-700 absolute right-4"
             >
               <X size={24} />
             </button>
@@ -95,8 +93,8 @@ const AdminLayout = () => {
                   className={`
                     flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors
                     ${isActive 
-                      ? 'bg-[var(--color-primary)] text-white' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-[var(--color-primary)]'}
+                      ? 'bg-(--color-primary) text-white' 
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-(--color-primary)'}
                   `}
                 >
                   <Icon size={20} className="mr-3" />

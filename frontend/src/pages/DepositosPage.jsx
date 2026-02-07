@@ -88,7 +88,7 @@ const DepositosPage = () => {
           </button>
           <button 
             onClick={() => setIsFormOpen(true)}
-            className="px-4 py-2 bg-[var(--color-primary)] hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
+            className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
           >
             <Plus size={20} className="mr-2" />
             Nuevo Registro Vehicular
@@ -101,7 +101,7 @@ const DepositosPage = () => {
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
             <div className="p-3 bg-violet-100 rounded-lg">
-              <Car className="w-6 h-6 text-[var(--color-primary)]" />
+              <Car className="w-6 h-6 text-(--color-primary)" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.totalVehiculos}</p>
@@ -156,7 +156,7 @@ const DepositosPage = () => {
                 placeholder="Buscar por placa, VIN, marca..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none w-full md:w-80"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none w-full md:w-80"
               />
             </div>
           </div>
@@ -197,7 +197,7 @@ const DepositosPage = () => {
                 {filteredVehiculos.map((vehiculo) => (
                   <tr key={vehiculo.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-[var(--color-primary)]">{vehiculo.folioProceso}</span>
+                      <span className="text-sm font-medium text-(--color-primary)">{vehiculo.folioProceso}</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm font-semibold text-gray-900">{vehiculo.placa}</span>
@@ -221,7 +221,7 @@ const DepositosPage = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-gray-400 hover:text-[var(--color-primary)] hover:bg-gray-100 rounded-lg transition-colors">
+                        <button className="p-2 text-gray-400 hover:text-(--color-primary) hover:bg-gray-100 rounded-lg transition-colors">
                           <Eye size={16} />
                         </button>
                         <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">

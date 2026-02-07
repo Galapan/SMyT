@@ -32,7 +32,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 placeholder="Ej. Grúas del Valle"
-                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
               />
               <Building size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             </div>
@@ -44,7 +44,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 placeholder="Calle, Número, Colonia..."
-                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
               />
               <MapPin size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             </div>
@@ -56,7 +56,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
               <input
                 type="text"
                 placeholder="Nombre del encargado"
-                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all"
+                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
               />
               <User size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             </div>
@@ -68,7 +68,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
                 <input
                     type="tel"
                     placeholder="555-000-0000"
-                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
                 />
              </div>
              <div className="w-1/2">
@@ -76,7 +76,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
                 <input
                     type="number"
                     placeholder="200"
-                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all"
+                    className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
                 />
              </div>
           </div>
@@ -90,7 +90,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
           >
             Cancelar
           </button>
-          <button className="px-4 py-2 text-sm font-medium text-white bg-[var(--color-primary)] hover:bg-violet-900 rounded-lg shadow-sm flex items-center transition-all active:scale-95">
+          <button className="px-4 py-2 text-sm font-medium text-white bg-(--color-primary) hover:bg-violet-900 rounded-lg shadow-sm flex items-center transition-all active:scale-95">
             <Save size={16} className="mr-2" />
             Guardar Depósito
           </button>
