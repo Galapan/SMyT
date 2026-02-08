@@ -2,7 +2,7 @@ import { Search, Filter, Calendar } from 'lucide-react';
 
 const AuditSearch = () => {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
       <div className="flex items-center mb-6">
         <div className="p-2 bg-(--color-secondary)/30 rounded-lg mr-3">
           <Search className="text-(--color-primary)" size={24} />

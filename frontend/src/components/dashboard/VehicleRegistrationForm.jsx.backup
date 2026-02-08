@@ -59,19 +59,43 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
     // Paso 4: Inspección Física
     estadoCarroceria: '',
     estadoCristales: '',
+    obsCristales: '',
     estadoEspejos: '',
+    obsEspejos: '',
+    
+    // Llantas
+    cantLlantasDelanteras: '2',
     estadoLlantasDelanteras: '',
+    cantLlantasTraseras: '2',
     estadoLlantasTraseras: '',
-    motorCompleto: false,
-    bateriaPresente: false,
+    
+    // Mecánica
+    estadoMotor: '', // Bueno, Malo, Faltante
+    estadoBateria: '', // Bueno, Malo, Faltante
     tipoTransmision: '',
-    estadoAsientos: '',
-    estadoCinturones: '',
-    estadoVolanteTablero: '',
     estadoFrenos: '',
     aireAcondicionadoFunciona: false,
-    liquidosDrenados: false,
+    
+    // Interior
+    estadoAsientos: '',
+    obsAsientos: '',
+    estadoCinturones: '',
+    obsCinturones: '',
+    estadoVolanteTablero: '',
+    obsVolanteTablero: '',
     estadoBolsasAire: '',
+    obsBolsasAire: '',
+    
+    // Ambiental
+    estatusAceite: '', // Drenado, Presente
+    cantAceite: '',
+    estatusAnticongelante: '', // Drenado, Presente
+    cantAnticongelante: '',
+    estatusCombustible: '', // Drenado, Presente
+    cantCombustible: '',
+    
+    // Inventario
+    objetosPersonales: [], // Array de tags
     observacionesInspector: ''
   });
 
@@ -115,17 +139,82 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
       }
     }
     
+    if (step === 4) {
+      if (!formData.estadoCarroceria) newErrors.estadoCarroceria = 'Seleccione estado de carrocería';
+      if (!formData.estadoCristales) newErrors.estadoCristales = 'Seleccione estado de cristales';
+      if (!formData.estadoEspejos) newErrors.estadoEspejos = 'Seleccione estado de espejos';
+      if (!formData.estadoLlantasDelanteras) newErrors.estadoLlantasDelanteras = 'Seleccione estado llantas delanteras';
+      if (!formData.estadoLlantasTraseras) newErrors.estadoLlantasTraseras = 'Seleccione estado llantas traseras';
+      
+      // Conditional observations validation
+      if ((formData.estadoCristales === 'DAÑADOS' || formData.estadoCristales === 'INCOMPLETOS') && !formData.obsCristales?.trim()) {
+        newErrors.obsCristales = 'Especifique el daño en cristales';
+      }
+      if (formData.estadoEspejos === 'INCOMPLETOS' && !formData.obsEspejos?.trim()) {
+        newErrors.obsEspejos = 'Especifique el estado de espejos';
+      }
+
+      // Ambiental validation
+      if (!formData.estatusAceite) newErrors.estatusAceite = 'Seleccione estatus de aceite';
+      if (!formData.estatusAnticongelante) newErrors.estatusAnticongelante = 'Seleccione estatus de anticongelante';
+      if (!formData.estatusCombustible) newErrors.estatusCombustible = 'Seleccione estatus de combustible';
+    }
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleNumericKeyDown = (e) => {
+    if (['e', 'E', '+', '-', '.'].includes(e.key)) {
+      e.preventDefault();
+    }
+  };
+
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+    let { name, value, type, checked } = e.target;
+    
+    // --- Prevención de Errores: Filtrado de Datos ---
+    
+    // 1. Campos que deben ser Mayúsculas y Alfanuméricos
+    if (['vin', 'placa', 'noInventario', 'folioProceso', 'noOficio', 'noMotor'].includes(name)) {
+      value = value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
+    }
+
+    // 2. Limitar VIN a 17 caracteres
+    if (name === 'vin' && value.length > 17) return;
+
+    // 3. Lógica para Ambiental: Desactivar/Limpiar cantidad si está DRENADO
+    if (name === 'estatusAceite') {
+      setFormData(prev => ({ 
+        ...prev, 
+        estatusAceite: value, 
+        cantAceite: value === 'DRENADO' ? '0% (DRENADO)' : '' 
+      }));
+      return;
+    }
+    if (name === 'estatusAnticongelante') {
+      setFormData(prev => ({ 
+        ...prev, 
+        estatusAnticongelante: value, 
+        cantAnticongelante: value === 'DRENADO' ? '0% (DRENADO)' : '' 
+      }));
+      return;
+    }
+    if (name === 'estatusCombustible') {
+      setFormData(prev => ({ 
+        ...prev, 
+        estatusCombustible: value, 
+        cantCombustible: value === 'DRENADO' ? '0% (DRENADO)' : '' 
+      }));
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    // Clear error when field is modified
+    
+    // Limpiar error al modificar campo
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
     }
@@ -153,10 +242,13 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
       noInventario: '', marcaTipo: '', anio: '', tipoServicio: '', vin: '', placa: '',
       noMotor: '', colorOriginal: '', colorActual: '', odometro: '',
       estatusLegal: '', tieneActaBaja: false, noOficio: '', fechaActaBaja: '', tieneTituloFactura: false,
-      estadoCarroceria: '', estadoCristales: '', estadoEspejos: '', estadoLlantasDelanteras: '',
-      estadoLlantasTraseras: '', motorCompleto: false, bateriaPresente: false, tipoTransmision: '',
-      estadoAsientos: '', estadoCinturones: '', estadoVolanteTablero: '', estadoFrenos: '',
-      aireAcondicionadoFunciona: false, liquidosDrenados: false, estadoBolsasAire: '', observacionesInspector: ''
+      estadoCarroceria: '', estadoCristales: '', obsCristales: '', estadoEspejos: '', obsEspejos: '',
+      cantLlantasDelanteras: '2', estadoLlantasDelanteras: '', cantLlantasTraseras: '2', estadoLlantasTraseras: '',
+      estadoMotor: '', estadoBateria: '', tipoTransmision: '', estadoFrenos: '', aireAcondicionadoFunciona: false,
+      estadoAsientos: '', obsAsientos: '', estadoCinturones: '', obsCinturones: '',
+      estadoVolanteTablero: '', obsVolanteTablero: '', estadoBolsasAire: '', obsBolsasAire: '',
+      estatusAceite: '', cantAceite: '', estatusAnticongelante: '', cantAnticongelante: '',
+      estatusCombustible: '', cantCombustible: '', objetosPersonales: [], observacionesInspector: ''
     });
     setCurrentStep(1);
     setErrors({});
@@ -397,6 +489,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
                       name="anio"
                       value={formData.anio}
                       onChange={handleChange}
+                      onKeyDown={handleNumericKeyDown}
                       placeholder="Ej. 2020"
                       min="1900"
                       max="2030"
@@ -496,6 +589,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
                     name="odometro"
                     value={formData.odometro}
                     onChange={handleChange}
+                    onKeyDown={handleNumericKeyDown}
                     placeholder="Ej. 85000"
                     min="0"
                     className={getInputClass('odometro')}
@@ -591,184 +685,294 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
             {/* PASO 4: Inspección Física */}
             {currentStep === 4 && (
               <div className="space-y-6">
-                <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
-                  Paso 4: Inspección Física
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-(--color-primary)">
+                    Paso 4: Inspección Física
+                  </h3>
+                  <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase tracking-wider">
+                    Cumplimiento Normativo Estricto
+                  </span>
+                </div>
                 
-                {/* Carrocería */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
+                {/* Exterior y Llantas */}
+                <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                  <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
                     <Truck size={18} className="text-(--color-primary)" />
-                    Carrocería
+                    Exterior y Neumáticos
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div>
-                      <label className={labelClass}>Estado General</label>
-                      <select name="estadoCarroceria" value={formData.estadoCarroceria} onChange={handleChange} className={getInputClass('estadoCarroceria')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="BUENO">Bueno</option>
-                        <option value="REGULAR">Regular</option>
-                        <option value="MALO">Malo</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Cristales</label>
-                      <select name="estadoCristales" value={formData.estadoCristales} onChange={handleChange} className={getInputClass('estadoCristales')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="COMPLETOS">Completos</option>
-                        <option value="INCOMPLETOS">Incompletos</option>
-                        <option value="DAÑADOS">Dañados</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Espejos</label>
-                      <select name="estadoEspejos" value={formData.estadoEspejos} onChange={handleChange} className={getInputClass('estadoEspejos')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="COMPLETOS">Completos</option>
-                        <option value="INCOMPLETOS">Incompletos</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Llantas Delanteras</label>
-                      <select name="estadoLlantasDelanteras" value={formData.estadoLlantasDelanteras} onChange={handleChange} className={getInputClass('estadoLlantasDelanteras')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="BUENAS">Buenas</option>
-                        <option value="REGULARES">Regulares</option>
-                        <option value="MALAS">Malas</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Llantas Traseras</label>
-                      <select name="estadoLlantasTraseras" value={formData.estadoLlantasTraseras} onChange={handleChange} className={getInputClass('estadoLlantasTraseras')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="BUENAS">Buenas</option>
-                        <option value="REGULARES">Regulares</option>
-                        <option value="MALAS">Malas</option>
-                      </select>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Componentes con lógica condicional */}
+                    {[
+                      { label: 'Estado Carrocería', name: 'estadoCarroceria', options: ['BUENO', 'REGULAR', 'MALO'] },
+                      { label: 'Cristales', name: 'estadoCristales', options: ['COMPLETOS', 'INCOMPLETOS', 'DAÑADOS'], obsName: 'obsCristales' },
+                      { label: 'Espejos', name: 'estadoEspejos', options: ['COMPLETOS', 'INCOMPLETOS'], obsName: 'obsEspejos' }
+                    ].map((item) => (
+                      <div key={item.name} className="space-y-2">
+                        <label className={labelClass}>{item.label}</label>
+                        <select 
+                          name={item.name} 
+                          value={formData[item.name]} 
+                          onChange={handleChange} 
+                          className={getInputClass(item.name)}
+                        >
+                          <option value="">Seleccionar...</option>
+                          {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                        </select>
+                        {(formData[item.name] === 'DAÑADOS' || formData[item.name] === 'INCOMPLETOS' || formData[item.name] === 'MALO') && item.obsName && (
+                          <textarea
+                            name={item.obsName}
+                            value={formData[item.obsName]}
+                            onChange={handleChange}
+                            placeholder={`Describa el daño en ${item.label.toLowerCase()}...`}
+                            className={`${getInputClass(item.obsName)} mt-2 h-20 resize-none`}
+                            required
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Llantas - Refactorizado por eje */}
+                  <div className="mt-6 border-t pt-4">
+                    <label className="block text-sm font-bold text-gray-700 mb-3 uppercase tracking-wider">Detalle de Neumáticos</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {/* Eje Delantero */}
+                      <div className="p-4 bg-white rounded-lg border border-gray-200">
+                        <p className="text-xs font-bold text-(--color-primary) mb-3">EJE DELANTERO</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-500 uppercase">Cantidad</label>
+                            <input 
+                              type="number" 
+                              name="cantLlantasDelanteras" 
+                              value={formData.cantLlantasDelanteras} 
+                              onChange={handleChange}
+                              onKeyDown={handleNumericKeyDown}
+                              className={getInputClass('cantLlantasDelanteras')}
+                              min="0"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-500 uppercase">Condición</label>
+                            <select 
+                              name="estadoLlantasDelanteras" 
+                              value={formData.estadoLlantasDelanteras} 
+                              onChange={handleChange}
+                              className={getInputClass('estadoLlantasDelanteras')}
+                            >
+                              <option value="">Estado...</option>
+                              <option value="NUEVAS">Nuevas</option>
+                              <option value="MEDIA_VIDA">Media Vida</option>
+                              <option value="LISAS">Lisas/Dañadas</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      {/* Eje Trasero */}
+                      <div className="p-4 bg-white rounded-lg border border-gray-200">
+                        <p className="text-xs font-bold text-(--color-primary) mb-3">EJE TRASERO</p>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-500 uppercase">Cantidad</label>
+                            <input 
+                              type="number" 
+                              name="cantLlantasTraseras" 
+                              value={formData.cantLlantasTraseras} 
+                              onChange={handleChange}
+                              onKeyDown={handleNumericKeyDown}
+                              className={getInputClass('cantLlantasTraseras')}
+                              min="0"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-500 uppercase">Condición</label>
+                            <select 
+                              name="estadoLlantasTraseras" 
+                              value={formData.estadoLlantasTraseras} 
+                              onChange={handleChange}
+                              className={getInputClass('estadoLlantasTraseras')}
+                            >
+                              <option value="">Estado...</option>
+                              <option value="NUEVAS">Nuevas</option>
+                              <option value="MEDIA_VIDA">Media Vida</option>
+                              <option value="LISAS">Lisas/Dañadas</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Mecánica */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <Cog size={18} className="text-(--color-primary)" />
-                    Mecánica
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="flex items-center">
-                      <input type="checkbox" name="motorCompleto" id="motorCompleto" checked={formData.motorCompleto} onChange={handleChange} className={checkboxClass} />
-                      <label htmlFor="motorCompleto" className="ml-2 text-sm text-gray-700">Motor Completo</label>
+                {/* Mecánica e Interior */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Mecánica */}
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                    <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                      <Cog size={18} className="text-(--color-primary)" />
+                      Mecánica
+                    </h4>
+                    <div className="space-y-4">
+                      <div>
+                        <label className={labelClass}>Estado del Motor</label>
+                        <select name="estadoMotor" value={formData.estadoMotor} onChange={handleChange} className={getInputClass('estadoMotor')}>
+                          <option value="">Seleccionar...</option>
+                          <option value="BUENO">Bueno / Completo</option>
+                          <option value="MALO">Malo / Incompleto</option>
+                          <option value="FALTANTE">Faltante</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className={labelClass}>Batería</label>
+                        <select name="estadoBateria" value={formData.estadoBateria} onChange={handleChange} className={getInputClass('estadoBateria')}>
+                          <option value="">Seleccionar...</option>
+                          <option value="BUENO">Presente / Funciona</option>
+                          <option value="MALO">Dañada</option>
+                          <option value="FALTANTE">Faltante</option>
+                        </select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className={labelClass}>Transmisión</label>
+                          <select name="tipoTransmision" value={formData.tipoTransmision} onChange={handleChange} className={getInputClass('tipoTransmision')}>
+                            <option value="">Tipo...</option>
+                            <option value="MANUAL">Manual</option>
+                            <option value="AUTOMATICA">Auto</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className={labelClass}>Frenos</label>
+                          <select name="estadoFrenos" value={formData.estadoFrenos} onChange={handleChange} className={getInputClass('estadoFrenos')}>
+                            <option value="">Estado...</option>
+                            <option value="FUNCIONAL">Funcional</option>
+                            <option value="FALLA">Con Falla</option>
+                          </select>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex items-center">
-                      <input type="checkbox" name="bateriaPresente" id="bateriaPresente" checked={formData.bateriaPresente} onChange={handleChange} className={checkboxClass} />
-                      <label htmlFor="bateriaPresente" className="ml-2 text-sm text-gray-700">Batería Presente</label>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Transmisión</label>
-                      <select name="tipoTransmision" value={formData.tipoTransmision} onChange={handleChange} className={getInputClass('tipoTransmision')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="MANUAL">Manual</option>
-                        <option value="AUTOMATICA">Automática</option>
-                      </select>
+                  </div>
+
+                  {/* Interior */}
+                  <div className="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                    <h4 className="font-bold text-gray-800 mb-4 flex items-center gap-2 border-b pb-2">
+                      <Armchair size={18} className="text-(--color-primary)" />
+                      Interior
+                    </h4>
+                    <div className="space-y-4 max-h-75 overflow-y-auto pr-2 custom-scrollbar">
+                      {[
+                        { label: 'Asientos', name: 'estadoAsientos', options: ['BUENO', 'REGULAR', 'MALO'], obsName: 'obsAsientos' },
+                        { label: 'Cinturones', name: 'estadoCinturones', options: ['COMPLETOS', 'INCOMPLETOS'], obsName: 'obsCinturones' },
+                        { label: 'Volante/Tablero', name: 'estadoVolanteTablero', options: ['BUENO', 'REGULAR', 'MALO'], obsName: 'obsVolanteTablero' },
+                        { label: 'Bolsas de Aire', name: 'estadoBolsasAire', options: ['PRESENTES', 'DESPLEGADAS', 'AUSENTES'], obsName: 'obsBolsasAire' }
+                      ].map((item) => (
+                        <div key={item.name} className="py-2 border-b border-gray-200 last:border-0">
+                          <label className={labelClass}>{item.label}</label>
+                          <select name={item.name} value={formData[item.name]} onChange={handleChange} className={getInputClass(item.name)}>
+                            <option value="">Seleccionar...</option>
+                            {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+                          </select>
+                          {(formData[item.name] === 'MALO' || formData[item.name] === 'INCOMPLETOS' || formData[item.name] === 'DESPLEGADAS' || formData[item.name] === 'AUSENTES') && (
+                            <input
+                              type="text"
+                              name={item.obsName}
+                              value={formData[item.obsName]}
+                              onChange={handleChange}
+                              placeholder="Observaciones..."
+                              className={`${getInputClass(item.obsName)} mt-1 h-9 py-1!`}
+                            />
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Interior */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <Armchair size={18} className="text-(--color-primary)" />
-                    Interior
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className={labelClass}>Asientos</label>
-                      <select name="estadoAsientos" value={formData.estadoAsientos} onChange={handleChange} className={getInputClass('estadoAsientos')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="BUENO">Bueno</option>
-                        <option value="REGULAR">Regular</option>
-                        <option value="MALO">Malo</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Cinturones</label>
-                      <select name="estadoCinturones" value={formData.estadoCinturones} onChange={handleChange} className={getInputClass('estadoCinturones')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="COMPLETOS">Completos</option>
-                        <option value="INCOMPLETOS">Incompletos</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Volante/Tablero</label>
-                      <select name="estadoVolanteTablero" value={formData.estadoVolanteTablero} onChange={handleChange} className={getInputClass('estadoVolanteTablero')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="BUENO">Bueno</option>
-                        <option value="REGULAR">Regular</option>
-                        <option value="MALO">Malo</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Sistemas */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-semibold text-gray-700 mb-4 flex items-center gap-2">
-                    <Wrench size={18} className="text-(--color-primary)" />
-                    Sistemas
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className={labelClass}>Frenos</label>
-                      <select name="estadoFrenos" value={formData.estadoFrenos} onChange={handleChange} className={getInputClass('estadoFrenos')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="FUNCIONAL">Funcional</option>
-                        <option value="NO_FUNCIONAL">No Funcional</option>
-                      </select>
-                    </div>
-                    <div className="flex items-center pt-6">
-                      <input type="checkbox" name="aireAcondicionadoFunciona" id="aireAcondicionadoFunciona" checked={formData.aireAcondicionadoFunciona} onChange={handleChange} className={checkboxClass} />
-                      <label htmlFor="aireAcondicionadoFunciona" className="ml-2 text-sm text-gray-700">Aire Acondicionado Funciona</label>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Ambiental (CRÍTICO) */}
-                <div className="bg-red-50 rounded-lg p-4 border border-red-200">
-                  <h4 className="font-semibold text-red-700 mb-4 flex items-center gap-2">
+                {/* Ambiental - Desglosado */}
+                <div className="bg-red-50 rounded-xl p-6 border border-red-200">
+                  <h4 className="font-bold text-red-700 mb-4 flex items-center gap-2 border-b border-red-200 pb-2">
                     <AlertTriangle size={18} />
-                    Ambiental (CRÍTICO)
+                    Control Ambiental (Crítico)
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center p-3 bg-white rounded-lg border border-red-200">
-                      <input type="checkbox" name="liquidosDrenados" id="liquidosDrenados" checked={formData.liquidosDrenados} onChange={handleChange} className="h-5 w-5 rounded border-red-300 text-red-600 focus:ring-red-500" />
-                      <label htmlFor="liquidosDrenados" className="ml-3 text-sm font-medium text-red-700">
-                        Líquidos Drenados (Aceite/Combustible)
-                      </label>
-                    </div>
-                    <div>
-                      <label className={labelClass}>Estado Bolsas de Aire</label>
-                      <select name="estadoBolsasAire" value={formData.estadoBolsasAire} onChange={handleChange} className={getInputClass('estadoBolsasAire')}>
-                        <option value="">Seleccionar...</option>
-                        <option value="PRESENTES">Presentes</option>
-                        <option value="DESPLEGADAS">Desplegadas</option>
-                        <option value="AUSENTES">Ausentes</option>
-                      </select>
-                    </div>
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Aceite de Motor', statusKey: 'estatusAceite', cantKey: 'cantAceite' },
+                      { label: 'Anticongelante', statusKey: 'estatusAnticongelante', cantKey: 'cantAnticongelante' },
+                      { label: 'Combustible', statusKey: 'estatusCombustible', cantKey: 'cantCombustible' }
+                    ].map((row) => {
+                      const isDisabled = formData[row.statusKey] === 'DRENADO';
+                      return (
+                        <div key={row.label} className={`grid grid-cols-1 md:grid-cols-3 gap-4 items-center bg-white/50 p-3 rounded-lg transition-opacity ${isDisabled ? 'opacity-60' : ''}`}>
+                          <span className="text-sm font-bold text-gray-700">{row.label}</span>
+                          <select 
+                            name={row.statusKey} 
+                            value={formData[row.statusKey]} 
+                            onChange={handleChange} 
+                            className={getInputClass(row.statusKey)}
+                          >
+                            <option value="">Estatus...</option>
+                            <option value="DRENADO">Drenado</option>
+                            <option value="PRESENTE">Presente</option>
+                          </select>
+                          <input 
+                            type="text" 
+                            name={row.cantKey} 
+                            value={formData[row.cantKey]} 
+                            onChange={handleChange} 
+                            disabled={isDisabled}
+                            placeholder={isDisabled ? "N/A - Drenado" : "Cantidad Estimada (ej. 25%, 2L)"}
+                            className={`${getInputClass(row.cantKey)} ${isDisabled ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+                          />
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* Observaciones */}
-                <div>
-                  <label className={labelClass}>Observaciones del Inspector</label>
-                  <textarea
-                    name="observacionesInspector"
-                    value={formData.observacionesInspector}
-                    onChange={handleChange}
-                    rows={4}
-                    placeholder="Ingrese cualquier observación adicional sobre el estado del vehículo..."
-                    className={`${getInputClass('observacionesInspector')} resize-none`}
-                  />
+                {/* Inventario de Objetos Personales */}
+                <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
+                  <h4 className="font-bold text-blue-800 mb-4 flex items-center gap-2 border-b border-blue-100 pb-2">
+                    <Wrench size={18} />
+                    Inventario de Objetos y Herramientas
+                  </h4>
+                  <div className="space-y-4">
+                    <label className={labelClass}>Tags de Inventario (Seleccione lo presente)</label>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {['Gato Hidráulico', 'Llave de Cruz', 'Estéreo', 'Rueda de Refacción', 'Triángulos de Seg.', 'Extinguidor', 'Herramientas', 'Documentos'].map(tag => {
+                        const isSelected = formData.objetosPersonales.includes(tag);
+                        return (
+                          <button
+                            key={tag}
+                            type="button"
+                            onClick={() => {
+                              const newTags = isSelected
+                                ? formData.objetosPersonales.filter(t => t !== tag)
+                                : [...formData.objetosPersonales, tag];
+                              setFormData(prev => ({ ...prev, objetosPersonales: newTags }));
+                            }}
+                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                              isSelected 
+                                ? 'bg-blue-600 text-white shadow-md scale-105' 
+                                : 'bg-white border border-blue-200 text-blue-600 hover:bg-blue-100'
+                            }`}
+                          >
+                            {isSelected && <Check size={12} className="inline mr-1" />}
+                            {tag}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div>
+                      <label className={labelClass}>Observaciones Adicionales / Otros Objetos</label>
+                      <textarea
+                        name="observacionesInspector"
+                        value={formData.observacionesInspector}
+                        onChange={handleChange}
+                        rows={3}
+                        placeholder="Describa otros objetos personales o detalles adicionales..."
+                        className={`${getInputClass('observacionesInspector')} resize-none`}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             )}

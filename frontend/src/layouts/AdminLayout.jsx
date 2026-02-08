@@ -54,7 +54,7 @@ const AdminLayout = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="h-screen bg-gray-50 flex overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
@@ -65,12 +65,12 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out
+        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out h-full
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="h-full flex flex-col">
           {/* Logo / Header */}
-          <div className="h-24 flex items-center justify-center px-6 border-b border-gray-100 relative">
+          <div className="h-24 flex items-center justify-center px-6 border-b border-gray-100 relative shrink-0">
             <img src="/src/assets/logo_smyt.png" alt="SMyT Logo" className="h-16 w-auto object-contain" />
             <button 
               onClick={() => setIsSidebarOpen(false)}
@@ -81,7 +81,7 @@ const AdminLayout = () => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1">
+          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
@@ -105,7 +105,7 @@ const AdminLayout = () => {
           </nav>
 
           {/* User Profile / Logout */}
-          <div className="p-4 border-t border-gray-100">
+          <div className="p-4 border-t border-gray-100 shrink-0">
             <div className="flex items-center p-4 bg-gray-50 rounded-lg">
               <UserCircle size={40} className="text-gray-400" />
               <div className="ml-3 overflow-hidden">
@@ -129,9 +129,9 @@ const AdminLayout = () => {
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         {/* Mobile Header */}
-        <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 lg:hidden">
+        <header className="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-4 lg:hidden shrink-0">
           <button 
             onClick={() => setIsSidebarOpen(true)}
             className="p-2 text-gray-600 hover:bg-gray-100 rounded-md"
@@ -144,11 +144,12 @@ const AdminLayout = () => {
 
         {/* Page Content */}
         <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto animate-fade-in">
+          <div className="max-w-7xl mx-auto h-full animate-fade-in">
             <Outlet />
           </div>
         </main>
       </div>
+
     </div>
   );
 };

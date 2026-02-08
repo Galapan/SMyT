@@ -40,9 +40,9 @@ const AdminDashboard = () => {
   }, []);
 
   return (
-    <div className="space-y-8 pb-10">
+    <div className="h-full flex flex-col space-y-4 overflow-hidden">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Panel de Administración</h1>
           <p className="text-gray-500">Bienvenido de vuelta, gestiona los depósitos e inventario.</p>
@@ -66,40 +66,48 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0">
         <StatCard 
           title="Total de Vehículos" 
-          value={loading ? '...' : stats.totalVehiculos.toString()} 
+          value={stats.totalVehiculos.toString()} 
           icon={Warehouse}
           color="bg-[var(--color-primary)]"
           trend="up"
           trendValue={`${stats.totalDepositos} depósitos`}
+          loading={loading}
         />
         <StatCard 
           title="Vehículos Ingresados Hoy" 
-          value={loading ? '...' : stats.ingresosHoy.toString()} 
+          value={stats.ingresosHoy.toString()} 
           icon={Car}
           color="bg-[var(--color-verde)]"
           trend="up"
           trendValue="Nuevos hoy"
+          loading={loading}
         />
         <StatCard 
           title="Vehículos Liberados" 
-          value={loading ? '...' : stats.liberadosMes.toString()} 
+          value={stats.liberadosMes.toString()} 
           icon={Key}
           color="bg-[var(--color-rosa)]"
           trend="down"
           trendValue="Este mes"
+          loading={loading}
         />
       </div>
 
       {/* Global Search Section */}
-      <AuditSearch />
+      <div className="shrink-0">
+        <AuditSearch />
+      </div>
 
       {/* Depot Management Section */}
-      <DepotTable />
+      <div className="flex-1 min-h-0">
+        <DepotTable loading={loading} />
+      </div>
     </div>
   );
+
 };
 
 export default AdminDashboard;

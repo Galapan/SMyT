@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Car, RefreshCw, Search, Eye, MoreVertical, ArrowUpDown } from 'lucide-react';
 import VehicleRegistrationForm from '../components/dashboard/VehicleRegistrationForm';
+import TableSkeleton from '../components/common/TableSkeleton';
+import StatsSkeleton from '../components/common/StatsSkeleton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -97,52 +99,56 @@ const DepositosPage = () => {
       </div>
 
       {/* Stats Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-violet-100 rounded-lg">
-              <Car className="w-6 h-6 text-(--color-primary)" />
+      {loading ? (
+        <StatsSkeleton cards={4} />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-violet-100 rounded-lg">
+                <Car className="w-6 h-6 text-(--color-primary)" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalVehiculos}</p>
+                <p className="text-sm text-gray-500">Vehículos Activos</p>
+              </div>
             </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalVehiculos}</p>
-              <p className="text-sm text-gray-500">Vehículos Activos</p>
+          </div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-green-100 rounded-lg">
+                <Car className="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.ingresosHoy}</p>
+                <p className="text-sm text-gray-500">Ingresos Hoy</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-orange-100 rounded-lg">
+                <Car className="w-6 h-6 text-orange-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalDepositos}</p>
+                <p className="text-sm text-gray-500">Depósitos</p>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-red-100 rounded-lg">
+                <Car className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-gray-900">{stats.liberadosMes}</p>
+                <p className="text-sm text-gray-500">Bajas Este Mes</p>
+              </div>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <Car className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.ingresosHoy}</p>
-              <p className="text-sm text-gray-500">Ingresos Hoy</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-orange-100 rounded-lg">
-              <Car className="w-6 h-6 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalDepositos}</p>
-              <p className="text-sm text-gray-500">Depósitos</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-red-100 rounded-lg">
-              <Car className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{stats.liberadosMes}</p>
-              <p className="text-sm text-gray-500">Bajas Este Mes</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Vehicles Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -163,10 +169,7 @@ const DepositosPage = () => {
         </div>
 
         {loading ? (
-          <div className="p-12 text-center">
-            <RefreshCw className="w-8 h-8 mx-auto text-gray-400 animate-spin mb-4" />
-            <p className="text-gray-500">Cargando vehículos...</p>
-          </div>
+          <TableSkeleton rows={5} columns={7} />
         ) : filteredVehiculos.length === 0 ? (
           <div className="p-12 text-center">
             <Car className="w-16 h-16 mx-auto text-gray-300 mb-4" />
@@ -176,6 +179,7 @@ const DepositosPage = () => {
             <p className="text-sm text-gray-400">Haz clic en "Nuevo Registro Vehicular" para comenzar.</p>
           </div>
         ) : (
+
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead className="bg-gray-50">
