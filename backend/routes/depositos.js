@@ -131,8 +131,8 @@ router.post('/', authenticateToken, async (req, res) => {
 
       // Separar nombre y apellido
       const nombreParts = nombrePropietario.trim().split(' ');
-      const nombre = nombreParts[0];
-      const apellido = nombreParts.slice(1).join(' ') || nombre;
+      const userFirstName = nombreParts[0];
+      const userLastName = nombreParts.slice(1).join(' ') || userFirstName;
 
       // Hash de la contraseña
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -142,8 +142,8 @@ router.post('/', authenticateToken, async (req, res) => {
         data: {
           email,
           password: hashedPassword,
-          nombre,
-          apellido,
+          nombre: userFirstName,
+          apellido: userLastName,
           rol: 'USUARIO_CONCESIONARIO',
           depositoId: deposito.id,
           creadoPorId: req.user.id
