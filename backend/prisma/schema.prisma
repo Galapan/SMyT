@@ -66,12 +66,21 @@ model Usuario {
 
 // Depósitos vehiculares
 model Deposito {
-  id          String    @id @default(uuid())
-  nombre      String
-  direccion   String
-  activo      Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                    String    @id @default(uuid())
+  nombre                String
+  municipio             String
+  direccion             String
+  capacidad             Int       // Capacidad máxima de vehículos
+  telefono              String
+  
+  // Datos del propietario/concesionario
+  nombrePropietario     String
+  rfc                   String
+  telefonoPropietario   String
+  
+  activo                Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 
   // Usuarios asignados a este depósito
   usuarios    Usuario[]

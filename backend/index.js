@@ -5,6 +5,7 @@ require('dotenv').config();
 // Import routes
 const authRoutes = require('./routes/authRoutes');
 const vehicleRoutes = require('./routes/vehicleRoutes');
+const depositosRoutes = require('./routes/depositos');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,9 @@ app.use('/api/auth', authRoutes);
 
 // Vehicle routes
 app.use('/api/vehiculos', vehicleRoutes);
+
+// Depositos routes
+app.use('/api/depositos', depositosRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

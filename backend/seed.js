@@ -39,18 +39,60 @@ async function main() {
   });
   console.log('✅ Administrador creado:', admin.email);
 
-  // Crear un Depósito de prueba
-  const deposito = await prisma.deposito.upsert({
+  // Crear Depósitos de prueba
+  const deposito1 = await prisma.deposito.upsert({
     where: { id: 'deposito-test-001' },
     update: {},
     create: {
       id: 'deposito-test-001',
       nombre: 'Depósito Central Tlaxcala',
-      direccion: 'Av. Principal #123, Centro, Tlaxcala',
+      municipio: 'Tlaxcala',
+      direccion: 'Av. Principal #123, Centro, Tlaxcala, 90000',
+      capacidad: 100,
+      telefono: '246 123 4567',
+      nombrePropietario: 'José González García',
+      rfc: 'GOGJ850315ABC',
+      telefonoPropietario: '246 123 4568',
       activo: true,
     },
   });
-  console.log('✅ Depósito creado:', deposito.nombre);
+  console.log('✅ Depósito creado:', deposito1.nombre);
+
+  const deposito2 = await prisma.deposito.upsert({
+    where: { id: 'deposito-test-002' },
+    update: {},
+    create: {
+      id: 'deposito-test-002',
+      nombre: 'Depósito Vehicular Huamantla',
+      municipio: 'Huamantla',
+      direccion: 'Reforma 101, Centro, Huamantla, 90500',
+      capacidad: 50,
+      telefono: '247 456 7890',
+      nombrePropietario: 'María Ramírez López',
+      rfc: 'RALM900520XYZ',
+      telefonoPropietario: '247 456 7891',
+      activo: true,
+    },
+  });
+  console.log('✅ Depósito creado:', deposito2.nombre);
+
+  const deposito3 = await prisma.deposito.upsert({
+    where: { id: 'deposito-test-003' },
+    update: {},
+    create: {
+      id: 'deposito-test-003',
+      nombre: 'Depósito Apizaco',
+      municipio: 'Apizaco',
+      direccion: 'Carretera Federal 136 Km 5, Apizaco, 90300',
+      capacidad: 75,
+      telefono: '241 789 0123',
+      nombrePropietario: 'Carlos Hernández Sánchez',
+      rfc: 'HESC750810DEF',
+      telefonoPropietario: '241 789 0124',
+      activo: true,
+    },
+  });
+  console.log('✅ Depósito creado:', deposito3.nombre);
 
   // Crear Usuario Concesionario
   const userPassword = await bcrypt.hash('user123', 10);
@@ -65,7 +107,7 @@ async function main() {
       rol: 'USUARIO_CONCESIONARIO',
       activo: true,
       creadoPorId: admin.id,
-      depositoId: deposito.id,
+      depositoId: deposito1.id,
     },
   });
   console.log('✅ Usuario Concesionario creado:', user.email);

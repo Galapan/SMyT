@@ -6,7 +6,7 @@ import StatsSkeleton from '../components/common/StatsSkeleton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-const DepositosPage = () => {
+const VehiclesPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [vehiculos, setVehiculos] = useState([]);
   const [stats, setStats] = useState({
@@ -260,4 +260,4 @@ const DepositosPage = () => {
   );
 };
 
-export default DepositosPage;
+export default VehiclesPage;

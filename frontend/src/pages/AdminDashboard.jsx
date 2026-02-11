@@ -56,7 +56,7 @@ const AdminDashboard = () => {
             Actualizar
           </button>
           <button 
-            onClick={() => navigate('/admin/depositos')}
+            onClick={() => navigate('/admin/vehicles')}
             className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
           >
             <Plus size={20} className="mr-2" />

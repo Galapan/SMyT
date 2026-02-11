@@ -2,7 +2,7 @@ import { X } from 'lucide-react';
 
 const ModalHeader = ({ onClose }) => {
   return (
-    <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
+    <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-bold text-(--color-primary)">Registro de Ingreso Vehicular</h2>

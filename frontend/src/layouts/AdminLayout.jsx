@@ -3,6 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Warehouse, 
+  Car,
   Search, 
   Settings, 
   Menu, 
@@ -38,7 +39,8 @@ const AdminLayout = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Depósitos', href: '/admin/depositos', icon: Warehouse },
+    { name: 'Depósitos', href: '/admin/deposits', icon: Warehouse },
+    { name: 'Vehículos', href: '/admin/vehicles', icon: Car },
     { name: 'Auditoría', href: '/admin/auditoria', icon: Search },
     { name: 'Configuración', href: '/admin/settings', icon: Settings },
   ];
