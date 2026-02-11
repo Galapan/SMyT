@@ -77,7 +77,7 @@ const DepositosPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Gestión de Depósitos</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Gestión de Vehículos</h1>
           <p className="text-gray-500">Registra y administra vehículos en depósito.</p>
         </div>
         <div className="flex gap-3">
