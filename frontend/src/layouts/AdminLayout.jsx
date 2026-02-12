@@ -18,15 +18,29 @@ const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Leer usuario del storage al montar
+  // Helper para imagen
+  const getAvatarUrl = (u) => {
+    if (!u) return '';
+    if (u.fotoUrl) return u.fotoUrl;
+    return `https://ui-avatars.com/api/?background=random&color=fff&name=${u.nombre}+${u.apellido}`;
+  };
+
+  // Leer usuario del storage al montar y escuchar cambios
   useEffect(() => {
-    const storedUser = sessionStorage.getItem('user') || localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      // Si no hay usuario, redirigir a login
-      navigate('/login');
-    }
+    const loadUser = () => {
+      const storedUser = sessionStorage.getItem('user') || localStorage.getItem('user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      } else {
+        navigate('/login');
+      }
+    };
+
+    loadUser();
+
+    // Escuchar evento de storage para actualizar avatar si cambia en otra pestaña o componente
+    window.addEventListener('storage', loadUser);
+    return () => window.removeEventListener('storage', loadUser);
   }, [navigate]);
 
   const handleLogout = () => {
@@ -109,7 +123,17 @@ const AdminLayout = () => {
           {/* User Profile / Logout */}
           <div className="p-4 border-t border-gray-100 shrink-0">
             <div className="flex items-center p-4 bg-gray-50 rounded-lg">
-              <UserCircle size={40} className="text-gray-400" />
+              <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 border border-gray-200">
+                {user ? (
+                   <img 
+                   src={getAvatarUrl(user)} 
+                   alt="Profile" 
+                   className="h-full w-full object-cover"
+                 />
+                ) : (
+                  <UserCircle size={40} className="text-gray-400" />
+                )}
+              </div>
               <div className="ml-3 overflow-hidden">
                 <p className="text-sm font-medium text-gray-700 truncate">
                   {user ? `${user.nombre} ${user.apellido}` : 'Cargando...'}

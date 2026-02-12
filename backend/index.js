@@ -6,13 +6,15 @@ require('dotenv').config();
 const authRoutes = require('./routes/authRoutes');
 const vehicleRoutes = require('./routes/vehicleRoutes');
 const depositosRoutes = require('./routes/depositos');
+const userRoutes = require('./routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
 // Routes
 app.get('/', (req, res) => {
@@ -30,6 +32,9 @@ app.use('/api/vehiculos', vehicleRoutes);
 
 // Depositos routes
 app.use('/api/depositos', depositosRoutes);
+
+// User routes
+app.use('/api/users', userRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

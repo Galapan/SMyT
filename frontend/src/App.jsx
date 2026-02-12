@@ -4,6 +4,7 @@ import AdminLayout from './layouts/AdminLayout';
 import AdminDashboard from './pages/AdminDashboard';
 import VehiclesPage from './pages/VehiclesPage';
 import DepositsPage from './pages/DepositsPage';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
           {/* Vehicles with multi-step form */}
           <Route path="vehicles" element={<VehiclesPage />} />
           <Route path="auditoria" element={<div className="p-8"><h2 className="text-2xl font-bold mb-4">Auditoría Global</h2><p>Módulo en desarrollo...</p></div>} />
-          <Route path="settings" element={<div className="p-8"><h2 className="text-2xl font-bold mb-4">Configuración</h2><p>Módulo en desarrollo...</p></div>} />
+          <Route path="settings" element={<SettingsPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
