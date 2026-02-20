@@ -76,6 +76,43 @@ router.get('/stats', authenticateToken, async (req, res) => {
   }
 });
 
+// GET /api/depositos/audit - Obtener depositos para auditoria (concesionarios) con sus usuarios
+router.get('/audit', authenticateToken, async (req, res) => {
+  try {
+    const depositos = await prisma.deposito.findMany({
+      where: { activo: true },
+      include: {
+        usuarios: {
+          select: {
+            id: true,
+            nombre: true,
+            apellido: true,
+            email: true,
+            rol: true,
+            fotoUrl: true,
+            activo: true
+          }
+        },
+        _count: {
+          select: { vehiculos: true }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    res.json({
+      success: true,
+      data: depositos
+    });
+  } catch (error) {
+    console.error('Error fetching audit depositos:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al obtener la información de auditoría'
+    });
+  }
+});
+
 // POST /api/depositos - Crear nuevo depósito
 router.post('/', authenticateToken, async (req, res) => {
   try {

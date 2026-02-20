@@ -13,12 +13,12 @@ const InventorySection = ({ formData, setFormData, errors, onChange, getInputCla
   ];
 
   return (
-    <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
-      <h4 className="font-bold text-blue-800 mb-4 flex items-center gap-2 border-b border-blue-100 pb-2">
-        <Wrench size={18} />
-        Inventario de Objetos y Herramientas
-      </h4>
-      <div className="space-y-4">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+        <Wrench size={20} className="text-gray-700" />
+        <h4 className="font-semibold text-gray-800">Inventario de Objetos y Herramientas</h4>
+      </div>
+      <div className="p-6 space-y-6">
         <label className="block text-sm font-medium text-gray-700 mb-1">Tags de Inventario (Seleccione lo presente)</label>
         <div className="flex flex-wrap gap-2 mb-4">
           {inventoryTags.map(tag => {
@@ -35,8 +35,8 @@ const InventorySection = ({ formData, setFormData, errors, onChange, getInputCla
                 }}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                   isSelected 
-                    ? 'bg-blue-600 text-white shadow-md scale-105' 
-                    : 'bg-white border border-blue-200 text-blue-600 hover:bg-blue-100'
+                    ? 'bg-gray-800 text-white shadow-sm' 
+                    : 'bg-white border text-gray-600 hover:bg-gray-50 border-gray-200'
                 }`}
               >
                 {isSelected && <Check size={12} className="inline mr-1" />}

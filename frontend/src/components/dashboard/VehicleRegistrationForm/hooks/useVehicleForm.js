@@ -143,6 +143,20 @@ export const useVehicleForm = (onClose, onSuccess) => {
     }
   };
 
+  const scrollToFirstError = (errorsObj) => {
+    const firstErrorKey = Object.keys(errorsObj)[0];
+    if (firstErrorKey) {
+      setTimeout(() => {
+        const errorElement = document.querySelector(`[name="${firstErrorKey}"]`);
+        if (errorElement) {
+          errorElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          errorElement.focus();
+        }
+      }, 100); // Small timeout to ensure DOM updates
+    }
+  };
+
+
   const handleChange = (e) => {
     let { name, value, type, checked } = e.target;
     
@@ -152,6 +166,13 @@ export const useVehicleForm = (onClose, onSuccess) => {
     }
 
     if (name === 'vin' && value.length > 17) return;
+
+    if ((name === 'cantLlantasDelanteras' || name === 'cantLlantasTraseras')) {
+      // Prevención de errores en llantas: max 2
+      if (value !== '' && (isNaN(parseInt(value)) || parseInt(value) < 0 || parseInt(value) > 2)) {
+         return;
+      }
+    }
 
     // Lógica para Ambiental: Desactivar/Limpiar cantidad si está DRENADO
     if (name === 'estatusAceite') {
@@ -196,6 +217,9 @@ export const useVehicleForm = (onClose, onSuccess) => {
         setDirection('right');
         setCurrentStep(prev => prev + 1);
       }
+    } else {
+      // Scroll to error if validation fails on Next Step
+      scrollToFirstError(errors);
     }
   };
 
@@ -226,7 +250,10 @@ export const useVehicleForm = (onClose, onSuccess) => {
   };
 
   const handleSubmit = async () => {
-    if (!validateStep(currentStep)) return;
+    if (!validateStep(currentStep)) {
+      scrollToFirstError(errors);
+      return;
+    }
     
     setLoading(true);
     setError('');

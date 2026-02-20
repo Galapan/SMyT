@@ -10,23 +10,18 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
     { label: 'Espejos', name: 'estadoEspejos', options: ['COMPLETOS', 'INCOMPLETOS'], obsName: 'obsEspejos' }
   ];
 
-  const getStatusColor = (status) => {
-    switch(status) {
-      case 'BUENO': case 'COMPLETOS': case 'NUEVAS': return 'bg-green-100 text-green-700 border-green-200';
-      case 'REGULAR': case 'MEDIA_VIDA': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'MALO': case 'DAÑADOS': case 'INCOMPLETOS': case 'LISAS': return 'bg-red-100 text-red-700 border-red-200';
-      default: return 'bg-gray-50 text-gray-600 border-gray-200';
-    }
+  const getStatusColor = (status, fieldName) => {
+    if (errors[fieldName]) return 'border-red-500';
+    if (!status) return 'border-gray-200 text-gray-500';
+    return 'border-gray-200 text-gray-900';
   };
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center gap-3">
-          <div className="p-2 bg-white rounded-lg shadow-sm">
-            <Truck size={20} className="text-(--color-primary)" />
-          </div>
-          <h4 className="font-bold text-gray-800 text-lg">Exterior y Carrocería</h4>
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+          <Truck size={20} className="text-gray-700" />
+          <h4 className="font-semibold text-gray-800">Exterior y Carrocería</h4>
         </div>
         
         <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -38,15 +33,16 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                   name={item.name}
                   value={formData[item.name]}
                   onChange={onChange}
-                  className={`w-full h-11 px-4 rounded-xl border-2 appearance-none focus:outline-none focus:ring-2 focus:ring-(--color-primary)/20 transition-all cursor-pointer font-medium ${getStatusColor(formData[item.name])} ${errors[item.name] ? 'border-red-300' : 'border-current'}`}
+                  className={`w-full h-10 px-3 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${getStatusColor(formData[item.name], item.name)}`}
                 >
-                  <option value="">Seleccionar estado...</option>
+                  <option value="">Seleccionar...</option>
                   {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                 </select>
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
               </div>
+              {errors[item.name] && <span className="text-xs text-red-500 font-medium">{errors[item.name]}</span>}
               
               {(formData[item.name] === 'DAÑADOS' || formData[item.name] === 'INCOMPLETOS' || formData[item.name] === 'MALO') && item.obsName && (
                  <ConditionalTextarea
@@ -65,105 +61,102 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
       </div>
 
       {/* Llantas - Diseño Visual */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
             <div className="flex items-center gap-3">
-                <div className="p-2 bg-white rounded-lg shadow-sm">
-                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-(--color-primary)"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/></svg>
-                </div>
-                <h4 className="font-bold text-gray-800 text-lg">Neumáticos</h4>
-            </div>
-            <div className="text-xs font-medium text-gray-500 bg-gray-200 px-2 py-1 rounded">
-                Revisión por eje
+                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-700"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 1 0 10 10"/></svg>
+                <h4 className="font-semibold text-gray-800">Neumáticos</h4>
             </div>
         </div>
 
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Eje Delantero */}
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-transparent rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
-            <div className="relative p-5 border-2 border-dashed border-blue-200 rounded-2xl hover:border-blue-400 transition-colors">
+          <div className="relative">
+            <div className={`p-5 border rounded-xl transition-colors ${errors.cantLlantasDelanteras || errors.estadoLlantasDelanteras ? 'border-red-300' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between mb-4">
-                 <p className="text-sm font-bold text-blue-800 uppercase tracking-wider">Eje Delantero</p>
-                 <span className="text-xs text-blue-600 font-medium">Frontal</span>
+                 <p className="text-sm font-semibold text-gray-800">Eje Delantero</p>
+                 <span className="text-xs text-gray-500">Frontal</span>
               </div>
               
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Cantidad</label>
+                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Cantidad (Máx. 2)</label>
                   <input 
                     type="number" 
                     name="cantLlantasDelanteras" 
                     value={formData.cantLlantasDelanteras} 
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    className="w-full h-10 px-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 transition-colors font-medium text-center"
+                    className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors.cantLlantasDelanteras ? 'border-red-500' : 'border-gray-300'}`}
                     min="0"
+                    max="2"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Condición</label>
+                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Condición</label>
                    <div className="relative">
                         <select 
                             name="estadoLlantasDelanteras" 
                             value={formData.estadoLlantasDelanteras} 
                             onChange={onChange}
-                            className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-blue-100 transition-all font-medium text-sm ${getStatusColor(formData.estadoLlantasDelanteras)}`}
+                            className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${getStatusColor(formData.estadoLlantasDelanteras, 'estadoLlantasDelanteras')}`}
                         >
                             <option value="">Seleccionar...</option>
                             <option value="NUEVAS">Nuevas</option>
                             <option value="MEDIA_VIDA">Media Vida</option>
                             <option value="LISAS">Lisas/Dañadas</option>
                         </select>
-                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </div>
                    </div>
+                   {errors.estadoLlantasDelanteras && <span className="text-xs text-red-500 font-medium mt-1 block">{errors.estadoLlantasDelanteras}</span>}
                 </div>
               </div>
             </div>
           </div>
           
           {/* Eje Trasero */}
-          <div className="relative group">
-             <div className="absolute inset-0 bg-gradient-to-br from-gray-50 to-transparent rounded-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
-             <div className="relative p-5 border-2 border-dashed border-gray-300 rounded-2xl hover:border-gray-400 transition-colors">
+          <div className="relative">
+             <div className={`p-5 border rounded-xl transition-colors ${errors.cantLlantasTraseras || errors.estadoLlantasTraseras ? 'border-red-300' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between mb-4">
-                 <p className="text-sm font-bold text-gray-800 uppercase tracking-wider">Eje Trasero</p>
-                 <span className="text-xs text-gray-500 font-medium">Posterior</span>
+                 <p className="text-sm font-semibold text-gray-800">Eje Trasero</p>
+                 <span className="text-xs text-gray-500">Posterior</span>
               </div>
               
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Cantidad</label>
+                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Cantidad (Máx. 2)</label>
                   <input 
                     type="number" 
                     name="cantLlantasTraseras" 
                     value={formData.cantLlantasTraseras} 
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    className="w-full h-10 px-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-gray-400 transition-colors font-medium text-center"
+                    className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors.cantLlantasTraseras ? 'border-red-500' : 'border-gray-300'}`}
                     min="0"
+                    max="2"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase mb-1 block">Condición</label>
+                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Condición</label>
                    <div className="relative">
                         <select 
                             name="estadoLlantasTraseras" 
                             value={formData.estadoLlantasTraseras} 
                             onChange={onChange}
-                            className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-2 focus:ring-gray-100 transition-all font-medium text-sm ${getStatusColor(formData.estadoLlantasTraseras)}`}
+                            className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${getStatusColor(formData.estadoLlantasTraseras, 'estadoLlantasTraseras')}`}
                         >
                             <option value="">Seleccionar...</option>
                             <option value="NUEVAS">Nuevas</option>
                             <option value="MEDIA_VIDA">Media Vida</option>
                             <option value="LISAS">Lisas/Dañadas</option>
                         </select>
-                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none opacity-50">
+                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </div>
                    </div>
+                   {errors.estadoLlantasTraseras && <span className="text-xs text-red-500 font-medium mt-1 block">{errors.estadoLlantasTraseras}</span>}
                 </div>
               </div>
             </div>

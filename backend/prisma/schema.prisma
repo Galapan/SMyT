@@ -63,6 +63,10 @@ model Usuario {
   // Vehículos registrados por este usuario
   vehiculos       Vehiculo[]
 
+  // Solicitudes de Edición de Expedientes
+  solicitudesCreadas   SolicitudEdicion[] @relation("UsuarioSolicitante")
+  solicitudesResueltas SolicitudEdicion[] @relation("UsuarioResolutor")
+
   @@map("usuarios")
 }
 
@@ -166,8 +170,34 @@ model Vehiculo {
   registradoPorId   String
   registradoPor     Usuario   @relation(fields: [registradoPorId], references: [id])
 
+  // Solicitudes de Edición recibidas
+  solicitudesEdicion SolicitudEdicion[]
+
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
 
   @@map("vehiculos")
+}
+
+// Solicitudes de Edición de Expedientes por parte del SMyT
+model SolicitudEdicion {
+  id              String   @id @default(uuid())
+  motivo          String   @db.Text
+  estatus         String   @default("PENDIENTE") // PENDIENTE, RESUELTA, CANCELADA
+  fechaSolicitud  DateTime @default(now())
+  fechaResolucion DateTime?
+
+  // Vehículo afectado
+  vehiculoId      String
+  vehiculo        Vehiculo @relation(fields: [vehiculoId], references: [id])
+
+  // Admin SMyT que solicita el cambio
+  solicitanteId   String
+  solicitante     Usuario  @relation("UsuarioSolicitante", fields: [solicitanteId], references: [id])
+
+  // Usuario (Concesionario o Admin) que resolvió la solicitud
+  resolutorId     String?
+  resolutor       Usuario? @relation("UsuarioResolutor", fields: [resolutorId], references: [id])
+
+  @@map("solicitudes_edicion")
 }
