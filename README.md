@@ -1,76 +1,130 @@
-Sistema Integral de Gestión - SMyT
-Plataforma web desarrollada para la gestión, control y auditoría de vehículos, concesionarios y depósitos para la Secretaría de Movilidad y Transporte. El proyecto está dividido en dos aplicaciones principales: una API RESTful para el backend y una interfaz de usuario interactiva para el frontend.
+# 🚍 Sistema Integral de Gestión - SMyT
 
-Tecnologías Principales
-Frontend: React.js, Vite, Tailwind CSS.
+[![React](https://img.shields.io/badge/React-19-blue?logo=react)](https://reactjs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-LTS-green?logo=node.js)](https://nodejs.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-black?logo=prisma)](https://www.prisma.io/)
+[![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?logo=supabase)](https://supabase.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)
 
-Backend: Node.js, Express.js.
+Plataforma integral diseñada para la Secretaría de Movilidad y Transporte (SMyT) destinada a la **digitalización, control y auditoría de depósitos vehiculares, concesionarios y gestión de inventarios**. Este sistema centraliza la operación administrativa y técnica, asegurando el cumplimiento normativo y la transparencia en cada proceso.
 
-Base de Datos / ORM: Prisma, PostgreSQL (Supabase).
+---
 
-Estructura del Proyecto
-El repositorio está organizado en dos directorios principales:
+## 🔥 Características Principales
 
-/backend: Contiene la lógica de negocio, configuración de base de datos, rutas (autenticación, vehículos, depósitos, solicitudes) y controladores.
+### 📋 Gestión de Inventario Vehicular
 
-/frontend: Contiene la interfaz de usuario, componentes de React, vistas de administrador y configuración de estilos.
+- **Registro Multietapa**: Formulario dinámico de 4 pasos (Datos Administrativos, Vehículo, Estatus Legal e Inspección Física).
+- **Inspección Técnica**: Control detallado de estado de carrocería, mecánica, interior y sistemas.
+- **Cumplimiento Ambiental**: Registro crítico de drenado de líquidos y estado de bolsas de aire.
+- **Expediente Digital**: Almacenamiento de documentos adjuntos y galería de fotos por vehículo.
 
-Requisitos Previos
-Asegúrese de tener instalados los siguientes componentes en su entorno de desarrollo local:
+### 🏢 Administración de Depósitos y Concesionarios
 
-Node.js (v16 o superior)
+- **Control de Capacidad**: Monitoreo de cupo máximo por depósito.
+- **Datos Legales**: Gestión de RFC, representantes y contactos operativos.
+- **Auditoría**: Sistema de revisión de concesionarios con visualización de estatus y cumplimiento.
 
-npm (v7 o superior)
+### 🔐 Seguridad y Roles (RBAC)
 
-Acceso a la base de datos de PostgreSQL/Supabase.
+- **Super Usuario**: Control total del sistema.
+- **Administrador SMyT**: Supervisión de depósitos y gestión de solicitudes de edición.
+- **Usuario Concesionario**: Operación diaria de registros y salidas de vehículos.
 
-Instalación y Configuración
-Siga estos pasos para ejecutar el proyecto en un entorno de desarrollo local.
+### 📧 Sistema de Solicitudes
 
-1. Configuración del Backend
-   Navegue al directorio del backend:
+- Flujo de solicitudes para la edición de expedientes ya registrados, permitiendo un control estricto sobre la integridad de los datos originales.
 
-Bash
+---
+
+## 🛠️ Stack Tecnológico
+
+| Capa              | Tecnologías                                                                  |
+| :---------------- | :--------------------------------------------------------------------------- |
+| **Frontend**      | React 19, Vite, Tailwind CSS v4, Framer Motion, Lucide React, React Router 7 |
+| **Backend**       | Node.js, Express.js, Prisma ORM                                              |
+| **Base de Datos** | PostgreSQL (Supabase), Supabase Auth & Storage                               |
+| **Herramientas**  | JWT, Bcrypt.js, Multer, Day.js                                               |
+
+---
+
+## 🏗️ Arquitectura del Proyecto
+
+El proyecto está organizado en una estructura monorepo para facilitar la sincronización entre capas:
+
+```text
+/
+├── backend/                # API RESTful & Lógica de Negocio
+│   ├── controllers/        # Controladores de rutas
+│   ├── routes/             # Definición de endpoints
+│   ├── prisma/             # Schema y migraciones de base de datos
+│   └── middleware/         # Validaciones y Auth (JWT)
+├── frontend/               # Interfaz de Usuario (SPA)
+│   ├── src/
+│   │   ├── components/     # Componentes reutilizables y UI
+│   │   ├── pages/          # Vistas principales de la aplicación
+│   │   ├── assets/         # Recursos estáticos y logotipos
+│   │   └── hooks/          # Lógica compartida
+└── README.md
+```
+
+---
+
+## 🚥 Instalación y Configuración
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/Galapan/SMyT.git
+cd smyt-project
+```
+
+### 2. Configuración del Backend
+
+```bash
 cd backend
-Instale las dependencias del proyecto:
-
-Bash
 npm install
-Cree un archivo .env en la raíz de la carpeta backend y configure las variables de entorno necesarias (ej. DATABASE_URL, JWT_SECRET).
+```
 
-Ejecute las migraciones y genere el cliente de Prisma:
+Configure su archivo `.env` basándose en las variables requeridas:
 
-Bash
+- `DATABASE_URL`: Conexión de Prisma con PostgreSQL.
+- `DIRECT_URL`: Conexión directa para migraciones.
+- `SUPABASE_URL` & `SUPABASE_SERVICE_KEY`: Para gestión de archivos y auth.
+
+**Sincronizar base de datos:**
+
+```bash
 npx prisma generate
 npx prisma migrate dev
-Inicie el servidor de desarrollo:
-
-Bash
 npm run dev
-El backend se ejecutará por defecto en el puerto configurado en sus variables de entorno.
+```
 
-2. Configuración del Frontend
-   Abra una nueva terminal y navegue al directorio del frontend:
+### 3. Configuración del Frontend
 
-Bash
-cd frontend
-Instale las dependencias del proyecto:
-
-Bash
+```bash
+cd ../frontend
 npm install
-Cree un archivo .env en la raíz de la carpeta frontend y establezca las variables necesarias (ej. la URL de la API del backend, como VITE_API_URL).
-
-Inicie la aplicación de React:
-
-Bash
 npm run dev
-La interfaz estará disponible habitualmente en http://localhost:5173.
+```
 
-Uso del Sistema
-Una vez que ambas partes del sistema estén en ejecución:
+---
 
-Acceda a la URL del frontend desde su navegador web.
+## 📉 Modelo de Datos
 
-Utilice credenciales válidas para iniciar sesión a través del módulo de autenticación.
+El sistema utiliza un esquema relacional optimizado que incluye:
 
-Dependiendo de su rol, tendrá acceso a los paneles de administración, registro de vehículos, gestión de depósitos vehiculares y herramientas de auditoría de concesionarios.
+- **Usuarios**: Identidad y roles.
+- **Depósitos**: Ubicaciones físicas y capacidades.
+- **Vehículos**: Datos técnicos, legales e inspecciones.
+- **Solicitudes de Edición**: Trazabilidad de cambios en expedientes.
+
+---
+
+## 🏛️ Identidad Institucional
+
+El sistema integra la identidad visual oficial del **Gobierno de Tlaxcala** y la **Secretaría de Movilidad y Transporte**, asegurando una experiencia profesional y oficial para los usuarios finales.
+
+---
+
+© 2025 SMyT - Sistema Integral de Gestión. Todos los derechos reservados.
