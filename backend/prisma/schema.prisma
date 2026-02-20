@@ -8,6 +8,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // Enum para los 3 tipos de rol
@@ -101,6 +102,7 @@ model Vehiculo {
   fechaIngreso        DateTime  @default(now())
   autoridad           String
   documentosAdjuntos  String[]  // URLs de archivos subidos
+  fotos               String[]  // URLs de fotos del vehículo
 
   // ===== PASO 2: DATOS DEL VEHÍCULO =====
   noInventario        String    @unique

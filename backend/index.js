@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const vehicleRoutes = require('./routes/vehicleRoutes');
 const depositosRoutes = require('./routes/depositos');
 const userRoutes = require('./routes/userRoutes');
+const uploadRoutes = require('./routes/uploadRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -35,6 +36,9 @@ app.use('/api/depositos', depositosRoutes);
 
 // User routes
 app.use('/api/users', userRoutes);
+
+// Upload routes
+app.use('/api/upload', uploadRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

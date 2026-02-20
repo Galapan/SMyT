@@ -15,6 +15,7 @@ export const useVehicleForm = (onClose, onSuccess) => {
     fechaIngreso: '',
     autoridad: '',
     documentosAdjuntos: [],
+    fotos: [],
 
     // Paso 2: Datos del Vehículo
     noInventario: '',
@@ -207,7 +208,7 @@ export const useVehicleForm = (onClose, onSuccess) => {
 
   const resetForm = () => {
     setFormData({
-      folioProceso: '', fechaIngreso: '', autoridad: '', documentosAdjuntos: [],
+      folioProceso: '', fechaIngreso: '', autoridad: '', documentosAdjuntos: [], fotos: [],
       noInventario: '', marcaTipo: '', anio: '', tipoServicio: '', vin: '', placa: '',
       noMotor: '', colorOriginal: '', colorActual: '', odometro: '',
       estatusLegal: '', tieneActaBaja: false, noOficio: '', fechaActaBaja: '', tieneTituloFactura: false,

@@ -10,6 +10,7 @@ const createVehicle = async (req, res) => {
       fechaIngreso,
       autoridad,
       documentosAdjuntos,
+      fotos,
       // Paso 2
       noInventario,
       marcaTipo,
@@ -116,6 +117,7 @@ const createVehicle = async (req, res) => {
         fechaIngreso: new Date(fechaIngreso),
         autoridad,
         documentosAdjuntos: documentosAdjuntos || [],
+        fotos: fotos || [],
         // Paso 2
         noInventario,
         marcaTipo,
