@@ -44,8 +44,16 @@ const createVehicle = async (req, res) => {
       aireAcondicionadoFunciona,
       liquidosDrenados,
       estadoBolsasAire,
+      estatusAceite,
+      cantAceite,
+      estatusAnticongelante,
+      cantAnticongelante,
+      estatusCombustible,
+      cantCombustible,
+      objetosPersonales,
       observacionesInspector,
       // Control
+      depositoId,
       registradoPorId
     } = req.body;
 
@@ -96,16 +104,17 @@ const createVehicle = async (req, res) => {
       });
     }
 
-    // Obtener el primer depósito disponible (temporal - después se puede mejorar)
-    let deposito = await prisma.deposito.findFirst();
-    
+    let deposito = null;
+    if (depositoId) {
+      deposito = await prisma.deposito.findUnique({ where: { id: depositoId } });
+    } else if (req.user && req.user.depositoId) {
+      deposito = await prisma.deposito.findUnique({ where: { id: req.user.depositoId } });
+    }
+
     if (!deposito) {
-      // Crear un depósito por defecto si no existe ninguno
-      deposito = await prisma.deposito.create({
-        data: {
-          nombre: 'Depósito Principal',
-          direccion: 'Tlaxcala, Tlax.'
-        }
+      return res.status(400).json({
+        success: false,
+        message: 'Debe especificar el depósito (concesionario) del vehículo'
       });
     }
 
@@ -151,6 +160,13 @@ const createVehicle = async (req, res) => {
         aireAcondicionadoFunciona: aireAcondicionadoFunciona || false,
         liquidosDrenados: liquidosDrenados || false,
         estadoBolsasAire: estadoBolsasAire || null,
+        estatusAceite: estatusAceite || null,
+        cantAceite: cantAceite || null,
+        estatusAnticongelante: estatusAnticongelante || null,
+        cantAnticongelante: cantAnticongelante || null,
+        estatusCombustible: estatusCombustible || null,
+        cantCombustible: cantCombustible || null,
+        objetosPersonales: objetosPersonales || [],
         observacionesInspector: observacionesInspector || null,
         // Relaciones
         depositoId: deposito.id,

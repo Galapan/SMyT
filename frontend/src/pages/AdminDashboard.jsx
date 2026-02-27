@@ -15,32 +15,57 @@ const AdminDashboard = () => {
     liberadosMes: 0,
     totalDepositos: 0
   });
+  const [depositos, setDepositos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/vehiculos/stats`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setStats(data.data);
+      
+      const [statsRes, depositosRes] = await Promise.all([
+        fetch(`${API_URL}/api/vehiculos/stats`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        }),
+        fetch(`${API_URL}/api/depositos`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+      ]);
+
+      const statsData = await statsRes.json();
+      const depositosData = await depositosRes.json();
+
+      if (statsData.success) {
+        setStats(statsData.data);
+      }
+      if (depositosData.success) {
+        setDepositos(depositosData.data);
       }
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStats();
+    fetchData();
   }, []);
 
+  const handleSearch = (searchParams) => {
+    // Navigate to vehicles page with search params
+    const queryParams = new URLSearchParams();
+    if (searchParams.placa) queryParams.append('placa', searchParams.placa);
+    if (searchParams.vin) queryParams.append('vin', searchParams.vin);
+    if (searchParams.fechaInicio) queryParams.append('fechaInicio', searchParams.fechaInicio);
+    if (searchParams.fechaFin) queryParams.append('fechaFin', searchParams.fechaFin);
+    if (searchParams.tipoServicio) queryParams.append('tipoServicio', searchParams.tipoServicio);
+    
+    navigate(`/admin/vehicles?${queryParams.toString()}`);
+  };
+
   return (
-    <div className="h-full flex flex-col space-y-4 overflow-hidden">
+    <div className="h-full flex flex-col space-y-4 overflow-y-auto pb-4">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div>
@@ -49,7 +74,7 @@ const AdminDashboard = () => {
         </div>
         <div className="flex gap-3">
           <button 
-            onClick={fetchStats}
+            onClick={fetchData}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center font-medium"
           >
             <RefreshCw size={18} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -98,12 +123,12 @@ const AdminDashboard = () => {
 
       {/* Global Search Section */}
       <div className="shrink-0">
-        <AuditSearch />
+        <AuditSearch onSearch={handleSearch} />
       </div>
 
       {/* Depot Management Section */}
-      <div className="flex-1 min-h-0">
-        <DepotTable loading={loading} />
+      <div className="flex-1 min-h-[400px] md:min-h-0">
+        <DepotTable loading={loading} depots={depositos} />
       </div>
     </div>
   );

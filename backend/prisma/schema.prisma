@@ -152,6 +152,15 @@ model Vehiculo {
   // Ambiental (CRÍTICO)
   liquidosDrenados          Boolean   @default(false)
   estadoBolsasAire          String?
+  estatusAceite             String?
+  cantAceite                String?
+  estatusAnticongelante     String?
+  cantAnticongelante        String?
+  estatusCombustible        String?
+  cantCombustible           String?
+  
+  // Inventario
+  objetosPersonales         String[]
   
   // Observaciones
   observacionesInspector    String?

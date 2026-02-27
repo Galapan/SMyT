@@ -10,6 +10,7 @@ const AuditConcesionarioDetail = () => {
   const navigate = useNavigate();
   const [deposito, setDeposito] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Helper de ocupación
   const ocupacion = deposito && deposito.capacidad > 0 
@@ -129,7 +130,7 @@ const AuditConcesionarioDetail = () => {
 
           {/* Card Cuentas Digitales Vinculadas */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-             <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={18} className="text-(--color-primary)" />
                 <h3 className="font-semibold text-gray-800">Cuentas Digitales</h3>
@@ -167,13 +168,23 @@ const AuditConcesionarioDetail = () => {
         {/* Columna Derecha: Inventario de Vehículos */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm h-full flex flex-col overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-100 flex justify-between items-center bg-gray-50/30">
+            <div className="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-gray-50/30">
               <div className="flex items-center gap-2">
                 <Car size={20} className="text-gray-700" />
                 <h3 className="text-lg font-bold text-gray-900">Inventario Registrado</h3>
+                <span className="text-sm text-gray-500 font-medium ml-2">
+                  <span className="text-gray-900 font-bold">{deposito.vehiculos?.length || 0}</span> / {deposito.capacidad} max
+                </span>
               </div>
-              <div className="text-sm text-gray-500 font-medium">
-                <span className="text-gray-900 font-bold">{deposito.vehiculos?.length || 0}</span> / {deposito.capacidad} max
+              <div className="relative w-full sm:w-64">
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input 
+                  type="text"
+                  placeholder="Buscar por placa, VIN o marca..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-(--color-primary)/20 focus:border-(--color-primary) transition-all"
+                />
               </div>
             </div>
             
@@ -200,7 +211,14 @@ const AuditConcesionarioDetail = () => {
                       </td>
                     </tr>
                   ) : (
-                    deposito.vehiculos.map(v => (
+                    deposito.vehiculos
+                      .filter(v => 
+                        (v.placa && v.placa.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                        (v.vin && v.vin.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                        (v.marcaTipo && v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                        (v.folioProceso && v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase()))
+                      )
+                      .map(v => (
                       <tr key={v.id} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-6 py-4">
                           <span className="inline-flex font-mono text-sm font-medium text-gray-900 bg-gray-100 px-2 py-1 border border-gray-200 rounded">

@@ -14,6 +14,7 @@ export const useVehicleForm = (onClose, onSuccess) => {
     folioProceso: '',
     fechaIngreso: '',
     autoridad: '',
+    depositoId: '',
     documentosAdjuntos: [],
     fotos: [],
 
@@ -87,6 +88,11 @@ export const useVehicleForm = (onClose, onSuccess) => {
       if (!formData.folioProceso.trim()) newErrors.folioProceso = 'El folio es requerido';
       if (!formData.fechaIngreso) newErrors.fechaIngreso = 'La fecha es requerida';
       if (!formData.autoridad.trim()) newErrors.autoridad = 'La autoridad es requerida';
+      
+      const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
+      if ((user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR_SMYT') && !formData.depositoId) {
+        newErrors.depositoId = 'Debe seleccionar un concesionario';
+      }
     }
     
     if (step === 2) {
@@ -232,7 +238,7 @@ export const useVehicleForm = (onClose, onSuccess) => {
 
   const resetForm = () => {
     setFormData({
-      folioProceso: '', fechaIngreso: '', autoridad: '', documentosAdjuntos: [], fotos: [],
+      folioProceso: '', fechaIngreso: '', autoridad: '', depositoId: '', documentosAdjuntos: [], fotos: [],
       noInventario: '', marcaTipo: '', anio: '', tipoServicio: '', vin: '', placa: '',
       noMotor: '', colorOriginal: '', colorActual: '', odometro: '',
       estatusLegal: '', tieneActaBaja: false, noOficio: '', fechaActaBaja: '', tieneTituloFactura: false,

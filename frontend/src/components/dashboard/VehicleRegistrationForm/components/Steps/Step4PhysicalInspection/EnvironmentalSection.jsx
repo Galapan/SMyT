@@ -16,6 +16,7 @@ const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => 
       <div className="p-6 space-y-4">
         {environmentalItems.map((row) => {
           const isDisabled = formData[row.statusKey] === 'DRENADO';
+          return (
             <div key={row.label} className={`grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-4 border rounded-xl transition-colors ${errors[row.statusKey] || errors[row.cantKey] ? 'border-red-300' : 'border-gray-200'} ${isDisabled ? 'opacity-70 bg-gray-50' : 'bg-white'}`}>
               <span className="text-sm font-semibold text-gray-700 mt-2">{row.label}</span>
               <div className="w-full">
@@ -50,6 +51,7 @@ const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => 
                 {errors[row.cantKey] && <span className="text-xs text-red-500 font-medium mt-1 block">{errors[row.cantKey]}</span>}
               </div>
             </div>
+          );
         })}
       </div>
     </div>

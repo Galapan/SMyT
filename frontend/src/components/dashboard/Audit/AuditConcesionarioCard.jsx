@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Warehouse, Car, Users, User, ShieldCheck, X, Eye } from 'lucide-react';
+import { Warehouse, Car, Users, User, ShieldCheck, X, Eye, Plus } from 'lucide-react';
+import AddAccountModal from './AddAccountModal';
 
-const AuditConcesionarioCard = ({ deposito }) => {
+const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isAddAccountOpen, setIsAddAccountOpen] = useState(false);
   const navigate = useNavigate();
   // Helpers
   const ocupacion = deposito.capacidad > 0 
@@ -79,10 +81,17 @@ const AuditConcesionarioCard = ({ deposito }) => {
                 <ShieldCheck size={16} className="text-(--color-primary)" />
                 Cuentas Autorizadas
             </h4>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <span className="text-xs bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-600 font-medium hidden sm:inline-block">
                   {deposito.usuarios?.length || 0} vinculadas
               </span>
+              <button
+                onClick={(e) => { e.stopPropagation(); setIsAddAccountOpen(true); }}
+                className="p-1 px-2 text-white bg-(--color-primary) hover:bg-violet-900 rounded-md transition-colors text-xs font-semibold flex items-center gap-1 shadow-sm h-6.5"
+                title="Añadir Cuenta"
+              >
+                <Plus size={14} /> Añadir
+              </button>
               <button 
                 onClick={(e) => { e.stopPropagation(); setIsFlipped(false); }}
                 className="p-1 text-gray-400 hover:text-gray-700 hover:bg-white rounded-md transition-colors"
@@ -145,6 +154,17 @@ const AuditConcesionarioCard = ({ deposito }) => {
         </div>
       </div>
 
+      {isAddAccountOpen && (
+        <AddAccountModal
+          isOpen={isAddAccountOpen}
+          onClose={() => setIsAddAccountOpen(false)}
+          depositoId={deposito.id}
+          depositoNombre={deposito.nombre}
+          onSuccess={() => {
+            if (onUpdate) onUpdate();
+          }}
+        />
+      )}
     </div>
   );
 };

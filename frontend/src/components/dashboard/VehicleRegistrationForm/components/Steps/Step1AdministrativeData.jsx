@@ -1,10 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import FormInput from '../FormFields/FormInput';
+import FormSelect from '../FormFields/FormSelect';
 import { Upload } from 'lucide-react';
 
 const Step1AdministrativeData = ({ formData, errors, onChange }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
+  const [depositos, setDepositos] = useState([]);
+  
+  const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
+  const isAdmin = user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR_SMYT';
+
+  useEffect(() => {
+    if (isAdmin) {
+      const fetchDepositos = async () => {
+        try {
+          const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+          const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+          const res = await fetch(`${API_URL}/api/depositos`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          const result = await res.json();
+          if (result.success) {
+            setDepositos(result.data.map(d => ({ value: d.id, label: `${d.nombre} - ${d.municipio}` })));
+          }
+        } catch (err) {
+          console.error('Error fetching depositos:', err);
+        }
+      };
+      fetchDepositos();
+    }
+  }, [isAdmin]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -108,6 +134,18 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
         error={errors.autoridad}
         placeholder="Ej. Fiscalía General del Estado de Tlaxcala"
       />
+
+      {isAdmin && (
+        <FormSelect
+          label="Asignar a Concesionario / Corralón *"
+          name="depositoId"
+          value={formData.depositoId}
+          onChange={onChange}
+          options={depositos}
+          error={errors.depositoId}
+          placeholder={depositos.length === 0 ? "Cargando corralones..." : "Seleccione un concesionario"}
+        />
+      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Fotografías del Vehículo</label>
