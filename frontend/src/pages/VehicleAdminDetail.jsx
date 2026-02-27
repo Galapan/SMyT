@@ -39,6 +39,7 @@ const VehicleAdminDetail = () => {
   const navigate = useNavigate();
   const [vehiculo, setVehiculo] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userRol, setUserRol] = useState('');
 
   // Modal y Toast State para Solicitud de Edición
   const [showEditModal, setShowEditModal] = useState(false);
@@ -67,6 +68,10 @@ const VehicleAdminDetail = () => {
       setLoading(true);
       try {
         const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+        const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+        const user = userStr ? JSON.parse(userStr) : null;
+        setUserRol(user?.rol || '');
+
         const response = await fetch(`${API_URL}/api/vehiculos/${id}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -146,14 +151,16 @@ const VehicleAdminDetail = () => {
           </div>
         </div>
 
-        {/* Action Button */}
-        <button 
-          onClick={() => setShowEditModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 hover:shadow-sm border border-red-200 rounded-lg text-sm font-semibold transition-all"
-        >
-          <AlertTriangle size={16} />
-          Solicitar Corrección de Datos
-        </button>
+        {/* Action Button - Oculto para Super Usuario */}
+        {userRol !== 'SUPER_USUARIO' && (
+          <button 
+            onClick={() => setShowEditModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 hover:shadow-sm border border-red-200 rounded-lg text-sm font-semibold transition-all"
+          >
+            <AlertTriangle size={16} />
+            Solicitar Corrección de Datos
+          </button>
+        )}
       </div>
 
       {/* Grid de Expediente */}

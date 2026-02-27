@@ -5,7 +5,8 @@ const {
   createVehicle,
   getAllVehicles,
   getVehicleStats,
-  getVehicleById
+  getVehicleById,
+  updateVehicle
 } = require('../controllers/vehicleController');
 
 // Todas las rutas requieren autenticación
@@ -22,5 +23,8 @@ router.get('/stats', getVehicleStats);
 
 // GET /api/vehiculos/:id - Obtener vehículo por ID
 router.get('/:id', getVehicleById);
+
+// PUT /api/vehiculos/:id - Actualizar vehículo por ID
+router.put('/:id', updateVehicle);
 
 module.exports = router;

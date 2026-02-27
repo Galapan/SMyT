@@ -319,9 +319,95 @@ const getVehicleById = async (req, res) => {
   }
 };
 
+// Actualizar vehículo por ID
+const updateVehicle = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Obtener datos del body (similar a createVehicle)
+    const {
+      folioProceso, fechaIngreso, autoridad, documentosAdjuntos, fotos,
+      noInventario, marcaTipo, anio, tipoServicio, vin, placa, noMotor, colorOriginal, colorActual, odometro,
+      estatusLegal, tieneActaBaja, noOficio, fechaActaBaja, tieneTituloFactura,
+      estadoCarroceria, estadoCristales, estadoEspejos, estadoLlantasDelanteras, estadoLlantasTraseras,
+      motorCompleto, bateriaPresente, tipoTransmision, estadoAsientos, estadoCinturones, estadoVolanteTablero,
+      estadoFrenos, aireAcondicionadoFunciona, liquidosDrenados, estadoBolsasAire,
+      estatusAceite, cantAceite, estatusAnticongelante, cantAnticongelante, estatusCombustible, cantCombustible,
+      objetosPersonales, observacionesInspector,
+      depositoId
+    } = req.body;
+
+    // Verificar que el vehículo exista
+    const vehiculoExistente = await prisma.vehiculo.findUnique({ where: { id } });
+    if (!vehiculoExistente) {
+      return res.status(404).json({ success: false, message: 'Vehículo no encontrado' });
+    }
+
+    // Preparar objeto de actualización
+    const updateData = {
+      folioProceso,
+      fechaIngreso: fechaIngreso ? new Date(fechaIngreso) : undefined,
+      autoridad,
+      documentosAdjuntos: documentosAdjuntos || undefined,
+      fotos: fotos || undefined,
+      noInventario,
+      marcaTipo,
+      anio: anio ? parseInt(anio) : undefined,
+      tipoServicio,
+      vin: vin ? vin.toUpperCase() : undefined,
+      placa: placa ? placa.toUpperCase() : undefined,
+      noMotor,
+      colorOriginal,
+      colorActual,
+      odometro: odometro ? parseInt(odometro) : undefined,
+      estatusLegal,
+      tieneActaBaja: tieneActaBaja !== undefined ? tieneActaBaja : undefined,
+      noOficio: noOficio !== undefined ? noOficio : undefined,
+      fechaActaBaja: fechaActaBaja ? new Date(fechaActaBaja) : undefined,
+      tieneTituloFactura: tieneTituloFactura !== undefined ? tieneTituloFactura : undefined,
+      estadoCarroceria, estadoCristales, estadoEspejos, estadoLlantasDelanteras, estadoLlantasTraseras,
+      motorCompleto, bateriaPresente, tipoTransmision, estadoAsientos, estadoCinturones, estadoVolanteTablero,
+      estadoFrenos, aireAcondicionadoFunciona, liquidosDrenados, estadoBolsasAire,
+      estatusAceite, cantAceite, estatusAnticongelante, cantAnticongelante, estatusCombustible, cantCombustible,
+      objetosPersonales: objetosPersonales || undefined,
+      observacionesInspector,
+    };
+
+    if (depositoId) {
+       updateData.depositoId = depositoId;
+    }
+
+    // Filtrar campos undefined
+    Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
+    const vehiculoActualizado = await prisma.vehiculo.update({
+      where: { id },
+      data: updateData,
+      include: {
+        deposito: true,
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Vehículo actualizado exitosamente',
+      data: vehiculoActualizado
+    });
+
+  } catch (error) {
+    console.error('Error al actualizar vehículo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al actualizar el vehículo',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createVehicle,
   getAllVehicles,
   getVehicleStats,
-  getVehicleById
+  getVehicleById,
+  updateVehicle
 };

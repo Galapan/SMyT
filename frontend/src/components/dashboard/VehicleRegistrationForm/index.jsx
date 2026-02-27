@@ -13,7 +13,7 @@ import Step2VehicleData from './components/Steps/Step2VehicleData';
 import Step3LegalStatus from './components/Steps/Step3LegalStatus';
 import Step4PhysicalInspection from './components/Steps/Step4PhysicalInspection';
 
-const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
+const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) => {
   const {
     currentStep,
     direction,
@@ -28,7 +28,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
     prevStep,
     handleSubmit,
     getInputClass
-  } = useVehicleForm(onClose, onSuccess);
+  } = useVehicleForm(onClose, onSuccess, initialData);
 
   const steps = [
     { id: 1, name: 'Datos Administrativos', icon: FileText },
@@ -48,7 +48,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
       />
 
       {/* Modal Container */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-fade-in flex flex-col">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-slide-up-fade flex flex-col">
         {/* Header */}
         <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
           <ModalHeader onClose={onClose} />

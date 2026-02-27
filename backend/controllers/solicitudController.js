@@ -53,13 +53,21 @@ const createSolicitud = async (req, res) => {
 // Obtener todas las solicitudes pendientes para un Concesionario (o General si es SMyT)
 const getSolicitudes = async (req, res) => {
   try {
-    const { depositoId, vehiculoId } = req.query;
+    const { depositoId, vehiculoId, estatus, solicitanteId } = req.query;
 
     const whereClause = {};
     if (vehiculoId) {
       whereClause.vehiculoId = vehiculoId;
     } else if (depositoId) {
       whereClause.vehiculo = { depositoId };
+    }
+    
+    if (estatus) {
+      whereClause.estatus = estatus;
+    }
+
+    if (solicitanteId) {
+      whereClause.solicitanteId = solicitanteId;
     }
 
     const solicitudes = await prisma.solicitudEdicion.findMany({
@@ -85,7 +93,61 @@ const getSolicitudes = async (req, res) => {
   }
 };
 
+// Resolver Solicitud (Aprobar o Rechazar)
+const resolveSolicitud = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estatus } = req.body; // 'RESUELTA' o 'CANCELADA' (o 'RECHAZADA')
+    const resolutorId = req.user.id;
+
+    if (!['RESUELTA', 'RECHAZADA', 'COMPLETADA'].includes(estatus)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Estatus inválido. Debe ser RESUELTA, RECHAZADA o COMPLETADA.'
+      });
+    }
+
+    // Verificar si existe la solicitud
+    const solicitud = await prisma.solicitudEdicion.findUnique({ where: { id } });
+    
+    if (!solicitud) {
+      return res.status(404).json({ success: false, message: 'Solicitud no encontrada.' });
+    }
+
+    if (estatus === 'COMPLETADA' && solicitud.estatus !== 'RESUELTA') {
+      return res.status(400).json({ success: false, message: 'Solo se pueden completar solicitudes resueltas.' });
+    } else if (estatus !== 'COMPLETADA' && solicitud.estatus !== 'PENDIENTE') {
+      return res.status(400).json({ success: false, message: 'La solicitud ya fue procesada anteriormente.' });
+    }
+
+    // Actualizar la solicitud
+    const solicitudActualizada = await prisma.solicitudEdicion.update({
+      where: { id },
+      data: {
+        estatus,
+        fechaResolucion: new Date(),
+        resolutorId
+      }
+    });
+
+    res.json({
+      success: true,
+      message: `Solicitud ${estatus.toLowerCase()} correctamente.`,
+      data: solicitudActualizada
+    });
+
+  } catch (error) {
+    console.error('Error al resolver solicitud:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno al resolver la solicitud.',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createSolicitud,
-  getSolicitudes
+  getSolicitudes,
+  resolveSolicitud
 };

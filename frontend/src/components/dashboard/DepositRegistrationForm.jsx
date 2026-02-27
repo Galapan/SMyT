@@ -228,7 +228,7 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
       />
 
       {/* Modal Container */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-fade-in flex flex-col">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-slide-up-fade flex flex-col">
         {/* Header Style from Vehicle Form */}
         <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
           <div className="flex items-center justify-between mb-6">

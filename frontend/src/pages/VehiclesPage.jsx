@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Plus, Car, RefreshCw, Search, Eye, MoreVertical, ArrowUpDown } from 'lucide-react';
 import VehicleRegistrationForm from '../components/dashboard/VehicleRegistrationForm';
 import TableSkeleton from '../components/common/TableSkeleton';
@@ -55,12 +55,14 @@ const VehiclesPage = () => {
     fetchData();
   };
 
-  const filteredVehiculos = vehiculos.filter(v => 
-    v.placa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    v.vin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredVehiculos = useMemo(() => {
+    return vehiculos.filter(v => 
+      v.placa.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.vin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [vehiculos, searchTerm]);
 
   const getStatusColor = (status) => {
     const colors = {

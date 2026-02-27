@@ -1,27 +1,52 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import logoTlax from '../../assets/LogoTlax.png';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import logoTlax from "../../assets/LogoTlax.png";
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
+
+  // Redirigir automáticamente si hay una sesión activa
+  useEffect(() => {
+    const storedUser =
+      localStorage.getItem("user") || sessionStorage.getItem("user");
+    const storedToken =
+      localStorage.getItem("token") || sessionStorage.getItem("token");
+
+    if (storedUser && storedToken) {
+      try {
+        const usuario = JSON.parse(storedUser);
+        if (
+          usuario.rol === "SUPER_USUARIO" ||
+          usuario.rol === "ADMINISTRADOR_SMYT"
+        ) {
+          navigate("/admin");
+        } else {
+          navigate("/concesionario");
+        }
+      } catch (err) {
+        // Si hay error en el parseo, el usuario se queda en el login
+        console.error("Error parseando usuario guardado:", err);
+      }
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, password }),
       });
@@ -29,22 +54,24 @@ function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error al iniciar sesión');
+        throw new Error(data.message || "Error al iniciar sesión");
       }
 
       // Guardar token y usuario
       const storage = rememberMe ? localStorage : sessionStorage;
-      storage.setItem('token', data.data.token);
-      storage.setItem('user', JSON.stringify(data.data.usuario));
+      storage.setItem("token", data.data.token);
+      storage.setItem("user", JSON.stringify(data.data.usuario));
 
       // Redirigir según rol
       const usuario = data.data.usuario;
-      if (usuario.rol === 'SUPER_USUARIO' || usuario.rol === 'ADMINISTRADOR_SMYT') {
-        navigate('/admin');
+      if (
+        usuario.rol === "SUPER_USUARIO" ||
+        usuario.rol === "ADMINISTRADOR_SMYT"
+      ) {
+        navigate("/admin");
       } else {
-        navigate('/concesionario'); // Futuro: dashboard de concesionario
+        navigate("/concesionario"); // Futuro: dashboard de concesionario
       }
-
     } catch (err) {
       setError(err.message);
     } finally {
@@ -54,14 +81,13 @@ function Login() {
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
-
       {/* Card Formulario */}
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
         <div className="flex flex-col items-center mb-10">
           <div className="w-24 h-24 mb-4 flex items-center justify-center">
-            <img 
-              src={logoTlax} 
-              alt="Logo Tlaxcala" 
+            <img
+              src={logoTlax}
+              alt="Logo Tlaxcala"
               className="w-full h-full object-contain"
             />
           </div>
@@ -71,15 +97,13 @@ function Login() {
           <h2 className="text-2xl font-bold text-[#572671] text-center">
             Inventarios SMyT
           </h2>
-          <p className="text-xs text-gray-500 mt-2">Gobierno del Estado de Tlaxcala</p>
+          <p className="text-xs text-gray-500 mt-2">
+            Gobierno del Estado de Tlaxcala
+          </p>
         </div>
 
         {/* Formulario */}
-        <form 
-          onSubmit={handleSubmit} 
-          className="space-y-4"
-        >
-          
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">
               Correo Institucional
@@ -126,12 +150,21 @@ function Login() {
                   stroke="currentColor"
                   strokeWidth="3"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.5 12.75l6 6 9-13.5"
+                  />
                 </svg>
               </div>
-              <span className="ml-2 text-xs font-medium text-gray-600">Recordarme</span>
+              <span className="ml-2 text-xs font-medium text-gray-600">
+                Recordarme
+              </span>
             </label>
-            <a href="#" className="text-xs font-medium text-[#572671] hover:underline">
+            <a
+              href="#"
+              className="text-xs font-medium text-[#572671] hover:underline"
+            >
               ¿Olvidaste tu contraseña?
             </a>
           </div>
@@ -151,17 +184,16 @@ function Login() {
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
               ) : (
-                'Iniciar Sesión'
+                "Iniciar Sesión"
               )}
             </button>
           </div>
-
         </form>
-        
+
         <div className="mt-8 text-center">
-            <p className="text-[10px] text-gray-400">
-               © 2026 Gobierno del Estado de Tlaxcala
-            </p>
+          <p className="text-[10px] text-gray-400">
+            © 2026 Gobierno del Estado de Tlaxcala
+          </p>
         </div>
       </div>
     </div>

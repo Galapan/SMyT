@@ -22,6 +22,9 @@ const SettingsPage = () => {
     confirmPassword: ''
   });
 
+  // Helper para obtener el token esté donde esté guardado
+  const getToken = () => localStorage.getItem('token') || sessionStorage.getItem('token');
+
   useEffect(() => {
     fetchProfile();
   }, []);
@@ -30,7 +33,7 @@ const SettingsPage = () => {
     try {
       const response = await fetch('http://localhost:3000/api/users/profile', {
         headers: {
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${getToken()}`
         }
       });
       const result = await response.json();
@@ -52,7 +55,7 @@ const SettingsPage = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${getToken()}`
         },
         body: JSON.stringify({
           nombre: profile.nombre,
@@ -97,7 +100,7 @@ const SettingsPage = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+          'Authorization': `Bearer ${getToken()}`
         },
         body: JSON.stringify({
           currentPassword: passwords.currentPassword,

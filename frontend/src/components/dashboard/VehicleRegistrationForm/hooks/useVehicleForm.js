@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export const useVehicleForm = (onClose, onSuccess) => {
+export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState('right');
   const [loading, setLoading] = useState(false);
@@ -79,6 +79,39 @@ export const useVehicleForm = (onClose, onSuccess) => {
     objetosPersonales: [],
     observacionesInspector: ''
   });
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(prev => ({
+        ...prev,
+        ...initialData,
+        fechaIngreso: initialData.fechaIngreso ? new Date(initialData.fechaIngreso).toISOString().split('T')[0] : '',
+        fechaActaBaja: initialData.fechaActaBaja ? new Date(initialData.fechaActaBaja).toISOString().split('T')[0] : '',
+        // Ensure some fields that may be null are set to empty string
+        noOficio: initialData.noOficio || '',
+        estadoCarroceria: initialData.estadoCarroceria || '',
+        estadoCristales: initialData.estadoCristales || '',
+        estadoEspejos: initialData.estadoEspejos || '',
+        estadoLlantasDelanteras: initialData.estadoLlantasDelanteras || '',
+        estadoLlantasTraseras: initialData.estadoLlantasTraseras || '',
+        tipoTransmision: initialData.tipoTransmision || '',
+        estadoAsientos: initialData.estadoAsientos || '',
+        estadoCinturones: initialData.estadoCinturones || '',
+        estadoVolanteTablero: initialData.estadoVolanteTablero || '',
+        estadoFrenos: initialData.estadoFrenos || '',
+        estadoBolsasAire: initialData.estadoBolsasAire || '',
+        estatusAceite: initialData.estatusAceite || '',
+        cantAceite: initialData.cantAceite || '',
+        estatusAnticongelante: initialData.estatusAnticongelante || '',
+        cantAnticongelante: initialData.cantAnticongelante || '',
+        estatusCombustible: initialData.estatusCombustible || '',
+        cantCombustible: initialData.cantCombustible || '',
+        observacionesInspector: initialData.observacionesInspector || '',
+        cantLlantasDelanteras: initialData.cantLlantasDelanteras || '2',
+        cantLlantasTraseras: initialData.cantLlantasTraseras || '2',
+      }));
+    }
+  }, [initialData]);
 
   // Validation rules per step
   const validateStep = (step) => {
@@ -272,8 +305,15 @@ export const useVehicleForm = (onClose, onSuccess) => {
         throw new Error('Sesión expirada. Inicie sesión nuevamente.');
       }
 
-      const response = await fetch(`${API_URL}/api/vehiculos`, {
-        method: 'POST',
+      const isEditMode = !!(initialData && initialData.id);
+      const url = isEditMode 
+        ? `${API_URL}/api/vehiculos/${initialData.id}`
+        : `${API_URL}/api/vehiculos`;
+
+      const method = isEditMode ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
@@ -291,7 +331,7 @@ export const useVehicleForm = (onClose, onSuccess) => {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Error al registrar el vehículo');
+        throw new Error(data.message || `Error al ${isEditMode ? 'actualizar' : 'registrar'} el vehículo`);
       }
 
       resetForm();
