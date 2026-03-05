@@ -391,7 +391,7 @@ const AccountsPage = () => {
       {createPortal(
         <AnimatePresence>
           {confirmModal.isOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
             <LazyMotion features={domAnimation}>
               <m.div 
                 initial={{ opacity: 0 }} 
@@ -447,7 +447,7 @@ const AccountsPage = () => {
       {createPortal(
         <AnimatePresence>
           {deleteModal.isOpen && (
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
             <LazyMotion features={domAnimation}>
               <m.div 
                 initial={{ opacity: 0 }} 

@@ -294,7 +294,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
   );
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
+    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
