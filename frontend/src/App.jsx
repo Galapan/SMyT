@@ -10,6 +10,7 @@ const VehicleAdminDetail = lazy(() => import('./pages/VehicleAdminDetail'));
 const VehiclesPage = lazy(() => import('./pages/VehiclesPage'));
 const DepositsPage = lazy(() => import('./pages/DepositsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const AccountsPage = lazy(() => import('./pages/AccountsPage'));
 
 function App() {
   const suspenseFallback = (
@@ -37,6 +38,7 @@ function App() {
             <Route path="auditoria" element={<AuditDashboard />} />
             <Route path="auditoria/:id" element={<AuditConcesionarioDetail />} />
             <Route path="auditoria/vehiculo/:id" element={<VehicleAdminDetail />} />
+            <Route path="accounts" element={<AccountsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>

@@ -147,7 +147,9 @@ const AuditConcesionarioDetail = () => {
                    <div key={user.id} className="flex items-center p-3 rounded-lg border border-gray-100 bg-gray-50/50">
                     <div className="h-10 w-10 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden">
                       <img 
-                        src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) ? user.fotoUrl : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`} 
+                        src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) 
+                          ? user.fotoUrl 
+                          : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`} 
                         alt="avatar" 
                         className="w-full h-full object-cover"
                       />

@@ -114,10 +114,11 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
             deposito.usuarios.map(user => (
               <div key={user.id} className="group/user flex items-center p-2.5 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors">
                 
-                {/* Avatar */}
                 <div className="h-10 w-10 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden shadow-sm">
                   <img 
-                    src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) ? user.fotoUrl : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`} 
+                    src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) 
+                      ? user.fotoUrl 
+                      : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`} 
                     alt="avatar" 
                     className="w-full h-full object-cover"
                   />

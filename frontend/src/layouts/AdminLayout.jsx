@@ -9,7 +9,8 @@ import {
   Menu, 
   X, 
   LogOut,
-  UserCircle
+  UserCircle,
+  Users
 } from 'lucide-react';
 
 const AdminLayout = () => {
@@ -56,6 +57,7 @@ const AdminLayout = () => {
     { name: 'Depósitos', href: '/admin/deposits', icon: Warehouse },
     { name: 'Vehículos', href: '/admin/vehicles', icon: Car },
     { name: 'Auditoría', href: '/admin/auditoria', icon: Search },
+    { name: 'Cuentas', href: '/admin/accounts', icon: Users, roles: ['SUPER_USUARIO'] },
     { name: 'Configuración', href: '/admin/settings', icon: Settings },
   ];
 
@@ -86,11 +88,13 @@ const AdminLayout = () => {
       `}>
         <div className="h-full flex flex-col">
           {/* Logo / Header */}
-          <div className="h-24 flex items-center justify-center px-6 border-b border-gray-100 relative shrink-0">
-            <img src="/src/assets/logo_smyt.png" alt="SMyT Logo" className="h-16 w-auto object-contain" />
+          <div className="h-24 flex items-center justify-between px-6 border-b border-gray-100 shrink-0">
+            <div className="flex-1 flex justify-center lg:justify-start">
+              <img src="/src/assets/logo_smyt.png" alt="SMyT Logo" className="h-16 w-auto object-contain" />
+            </div>
             <button 
               onClick={() => setIsSidebarOpen(false)}
-              className="lg:hidden p-1 text-gray-500 hover:text-gray-700 absolute right-4"
+              className="lg:hidden p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors ml-2"
             >
               <X size={24} />
             </button>
@@ -99,6 +103,8 @@ const AdminLayout = () => {
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
             {navigation.map((item) => {
+              if (item.roles && user && !item.roles.includes(user.rol)) return null;
+
               const Icon = item.icon;
               const isActive = location.pathname === item.href;
               return (
