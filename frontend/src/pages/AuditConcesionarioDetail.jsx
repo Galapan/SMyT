@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Warehouse, Users, Car, Phone, Mail, User, ShieldCheck, MapPin, Search } from 'lucide-react';
 import dayjs from 'dayjs';
@@ -8,8 +9,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const AuditConcesionarioDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [deposito, setDeposito] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Helper de ocupación
@@ -23,29 +22,25 @@ const AuditConcesionarioDetail = () => {
     return 'text-green-600 bg-green-50 border-green-200';
   };
 
-  useEffect(() => {
-    const fetchDepositoInfo = async () => {
-      setLoading(true);
-      try {
-        const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-        const response = await fetch(`${API_URL}/api/depositos/${id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (data.success) {
-          setDeposito(data.data);
-        } else {
-          navigate('/admin/auditoria');
-        }
-      } catch (error) {
-        console.error('Error fetching deposito detail:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchDepositoInfo = async () => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/depositos/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.success) {
+      return data.data;
+    } else {
+      navigate('/admin/auditoria');
+      throw new Error('Deposito no encontrado');
+    }
+  };
 
-    if (id) fetchDepositoInfo();
-  }, [id, navigate]);
+  const { data: deposito, isLoading: loading } = useQuery({
+    queryKey: ['deposito', id],
+    queryFn: fetchDepositoInfo,
+    enabled: !!id,
+  });
 
   if (loading) {
     return (

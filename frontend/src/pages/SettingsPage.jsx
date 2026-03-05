@@ -1,19 +1,16 @@
 import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, Lock, Save, Camera, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 
 const SettingsPage = () => {
+  const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('profile');
-  const [loading, setLoading] = useState(false);
+  const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
+  const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
   const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: '' }
   
-  // Profile State
-  const [profile, setProfile] = useState({
-    nombre: '',
-    apellido: '',
-    email: '',
-    rol: '',
-    fotoUrl: ''
-  });
+  // Profile Editable State (Photo)
+  const [fotoUrl, setFotoUrl] = useState(null);
 
   // Password State
   const [passwords, setPasswords] = useState({
@@ -25,29 +22,37 @@ const SettingsPage = () => {
   // Helper para obtener el token esté donde esté guardado
   const getToken = () => localStorage.getItem('token') || sessionStorage.getItem('token');
 
-  useEffect(() => {
-    fetchProfile();
-  }, []);
-
   const fetchProfile = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/api/users/profile', {
-        headers: {
-          'Authorization': `Bearer ${getToken()}`
-        }
-      });
-      const result = await response.json();
-      if (result.success) {
-        setProfile(result.data);
+    const response = await fetch('http://localhost:3000/api/users/profile', {
+      headers: {
+        'Authorization': `Bearer ${getToken()}`
       }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
+    });
+    const result = await response.json();
+    if (result.success) {
+      return result.data;
     }
+    throw new Error('Error fetching profile');
   };
+
+  const { data: profile = { nombre: '', apellido: '', email: '', rol: '', fotoUrl: '' }, isLoading: loading } = useQuery({
+    queryKey: ['userProfile'],
+    queryFn: fetchProfile,
+  });
+
+  // Keep local generic editable states synchronized with profile if needed
+  const [editData, setEditData] = useState({ nombre: '', apellido: '' });
+
+  useEffect(() => {
+    if (profile.nombre) {
+      setEditData({ nombre: profile.nombre, apellido: profile.apellido });
+      setFotoUrl(profile.fotoUrl);
+    }
+  }, [profile]);
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    setIsSubmittingProfile(true);
     setMessage(null);
 
     try {
@@ -58,9 +63,9 @@ const SettingsPage = () => {
           'Authorization': `Bearer ${getToken()}`
         },
         body: JSON.stringify({
-          nombre: profile.nombre,
-          apellido: profile.apellido,
-          fotoUrl: profile.fotoUrl
+          nombre: editData.nombre,
+          apellido: editData.apellido,
+          fotoUrl: fotoUrl
         })
       });
 
@@ -73,6 +78,8 @@ const SettingsPage = () => {
         sessionStorage.setItem('user', JSON.stringify(updatedUser));
         localStorage.setItem('user', JSON.stringify(updatedUser));
         
+        queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+        
         // Disparar evento para actualizar layout
         window.dispatchEvent(new Event('storage'));
       } else {
@@ -81,7 +88,7 @@ const SettingsPage = () => {
     } catch (error) {
       setMessage({ type: 'error', text: 'Error de conexión' });
     } finally {
-      setLoading(false);
+      setIsSubmittingProfile(false);
     }
   };
 
@@ -92,7 +99,7 @@ const SettingsPage = () => {
       return;
     }
     
-    setLoading(true);
+    setIsSubmittingPassword(true);
     setMessage(null);
 
     try {
@@ -119,7 +126,7 @@ const SettingsPage = () => {
     } catch (error) {
       setMessage({ type: 'error', text: 'Error de conexión' });
     } finally {
-      setLoading(false);
+      setIsSubmittingPassword(false);
     }
   };
 
@@ -128,7 +135,7 @@ const SettingsPage = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProfile({ ...profile, fotoUrl: reader.result });
+        setFotoUrl(reader.result);
       };
       reader.readAsDataURL(file);
     }
@@ -188,7 +195,7 @@ const SettingsPage = () => {
                 <div className="relative group">
                   <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-50 shadow-inner">
                     <img 
-                      src={profile.fotoUrl || `https://ui-avatars.com/api/?background=random&color=fff&name=${profile.nombre}+${profile.apellido}`} 
+                      src={fotoUrl || profile.fotoUrl || `https://ui-avatars.com/api/?background=random&color=fff&name=${profile.nombre}+${profile.apellido}`} 
                       alt="Profile" 
                       className="w-full h-full object-cover"
                     />
@@ -212,8 +219,8 @@ const SettingsPage = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
                     <input
                       type="text"
-                      value={profile.nombre}
-                      onChange={(e) => setProfile({...profile, nombre: e.target.value})}
+                      value={editData.nombre}
+                      onChange={(e) => setEditData({...editData, nombre: e.target.value})}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent transition-shadow outline-none"
                     />
                   </div>
@@ -221,8 +228,8 @@ const SettingsPage = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
                     <input
                       type="text"
-                      value={profile.apellido}
-                      onChange={(e) => setProfile({...profile, apellido: e.target.value})}
+                      value={editData.apellido}
+                      onChange={(e) => setEditData({...editData, apellido: e.target.value})}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent transition-shadow outline-none"
                     />
                   </div>
@@ -252,10 +259,10 @@ const SettingsPage = () => {
                 <div className="pt-4 flex justify-end">
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={isSubmittingProfile}
                     className="flex items-center space-x-2 bg-(--color-primary) text-white px-8 py-2.5 rounded-lg hover:bg-violet-900 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
                   >
-                    {loading ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
+                    {isSubmittingProfile ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                     <span>Guardar Cambios</span>
                   </button>
                 </div>
@@ -307,10 +314,10 @@ const SettingsPage = () => {
             <div className="pt-4 flex justify-end">
               <button
                 type="submit"
-                disabled={loading}
+                disabled={isSubmittingPassword}
                 className="flex items-center space-x-2 bg-(--color-primary) text-white px-8 py-2.5 rounded-lg hover:bg-violet-900 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
               >
-                {loading ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
+                {isSubmittingPassword ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                 <span>Actualizar Contraseña</span>
               </button>
             </div>

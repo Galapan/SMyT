@@ -1,35 +1,29 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, Search, Warehouse, Users, Car } from 'lucide-react';
 import AuditConcesionarioCard from '../components/dashboard/Audit/AuditConcesionarioCard';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const AuditDashboard = () => {
-  const [depositos, setDepositos] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   const fetchAuditData = async () => {
-    setLoading(true);
-    try {
-      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/depositos/audit`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setDepositos(data.data);
-      }
-    } catch (error) {
-      console.error('Error fetching audit data:', error);
-    } finally {
-      setLoading(false);
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/depositos/audit`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (!data.success) {
+      throw new Error(data.message || 'Error fetching audit data');
     }
+    return data.data;
   };
 
-  useEffect(() => {
-    fetchAuditData();
-  }, []);
+  const { data: depositos = [], isLoading: loading, refetch } = useQuery({
+    queryKey: ['depositosAudit'],
+    queryFn: fetchAuditData,
+  });
 
   const filteredDepositos = depositos.filter(dep => 
     dep.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -57,7 +51,7 @@ const AuditDashboard = () => {
             />
           </div>
           <button 
-            onClick={fetchAuditData}
+            onClick={() => refetch()}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center font-medium shadow-sm active:scale-95"
           >
             <RefreshCw size={18} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />

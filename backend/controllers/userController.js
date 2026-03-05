@@ -448,6 +448,58 @@ const toggleStatus = async (req, res) => {
   }
 };
 
+// Eliminar usuario permanentemente
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Solo Super Usuario puede eliminar cuentas (puedes agregar ADMINS si quieres)
+    if (req.user.rol !== "SUPER_USUARIO") {
+      return res.status(403).json({
+        success: false,
+        message: "Solo los Super Usuarios pueden eliminar cuentas",
+      });
+    }
+
+    // No se puede eliminar a uno mismo
+    if (req.user.id === id) {
+      return res.status(400).json({
+         success: false,
+         message: "No puedes eliminar tu propia cuenta",
+      });
+    }
+
+    // Verificar si existe primero
+    const usuarioActual = await prisma.usuario.findUnique({
+      where: { id },
+      select: { id: true }
+    });
+
+    if (!usuarioActual) {
+      return res.status(404).json({
+        success: false,
+        message: "Usuario no encontrado",
+      });
+    }
+
+    // Eliminar
+    await prisma.usuario.delete({
+      where: { id }
+    });
+
+    res.json({
+      success: true,
+      message: "Usuario eliminado de forma permanente",
+    });
+  } catch (error) {
+    console.error("Error al eliminar cuenta:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error al eliminar la cuenta de usuario",
+    });
+  }
+};
+
 module.exports = {
   getProfile,
   updateProfile,
@@ -457,4 +509,5 @@ module.exports = {
   getAvailableConcesionarios,
   assignDeposito,
   toggleStatus,
+  deleteUser,
 };

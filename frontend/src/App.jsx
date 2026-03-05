@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Login from './components/auth/Login';
 import AdminLayout from './layouts/AdminLayout';
 
@@ -12,6 +13,16 @@ const DepositsPage = lazy(() => import('./pages/DepositsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
 const AccountsPage = lazy(() => import('./pages/AccountsPage'));
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false, // Prevent refetching when switching tabs
+      retry: 1, // Optional: only retry once
+      staleTime: 5 * 60 * 1000, // Optional: data is fresh for 5 mins
+    },
+  },
+});
+
 function App() {
   const suspenseFallback = (
     <div className="flex h-screen w-screen items-center justify-center bg-gray-50">
@@ -20,8 +31,9 @@ function App() {
   );
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={suspenseFallback}>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <Suspense fallback={suspenseFallback}>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
@@ -44,6 +56,7 @@ function App() {
         </Routes>
       </Suspense>
     </BrowserRouter>
+    </QueryClientProvider>
   );
 }
 

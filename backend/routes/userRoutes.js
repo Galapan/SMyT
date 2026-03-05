@@ -33,4 +33,7 @@ router.post('/', userController.createUser);
 // El AddAccountModal usa /concesionario, así que vamos a darle alias a createUser por si acaso
 router.post('/concesionario', userController.createUser);
 
+// DELETE /api/users/:id - Eliminar usuario
+router.delete('/:id', userController.deleteUser);
+
 module.exports = router;

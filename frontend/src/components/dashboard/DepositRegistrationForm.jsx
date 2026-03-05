@@ -220,10 +220,10 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto overflow-x-hidden">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto overflow-x-hidden">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
         onClick={handleClose}
       />
 

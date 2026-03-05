@@ -1,7 +1,9 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Users, RefreshCw, Search, Eye, MoreVertical, Shield, Power, Check, AlertCircle, X, AlertTriangle } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { Plus, Users, RefreshCw, Search, Eye, MoreVertical, Shield, Power, Check, AlertCircle, X, AlertTriangle, Trash2 } from 'lucide-react';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import AccountWizard from '../components/dashboard/AccountWizard';
 import AccountDetailsModal from '../components/dashboard/AccountDetailsModal';
 import TableSkeleton from '../components/common/TableSkeleton';
@@ -13,8 +15,6 @@ const AccountsPage = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
   // Custom Toast State
@@ -22,8 +22,11 @@ const AccountsPage = () => {
   
   // Custom Confirm Modal State
   const [confirmModal, setConfirmModal] = useState({ isOpen: false, userId: null, currentStatus: null });
+  // Custom Delete Modal State
+  const [deleteModal, setDeleteModal] = useState({ isOpen: false, userId: null });
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const showToast = (message, type = 'success') => {
     setToast({ show: true, message, type });
@@ -43,32 +46,25 @@ const AccountsPage = () => {
     }
   }, [navigate]);
 
-  const fetchData = useCallback(async () => {
-    try {
-      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-      
-      const res = await fetch(`${API_URL}/api/users`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-      });
-
-      const usersData = await res.json();
-
-      if (usersData.success) {
-        setUsers(usersData.data);
-      }
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
+  const fetchUsers = async () => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const res = await fetch(`${API_URL}/api/users`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const usersData = await res.json();
+    if (!usersData.success) {
+      throw new Error(usersData.message || 'Error fetching users');
     }
-  }, []);
+    return usersData.data;
+  };
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  const { data: users = [], isLoading: loading, refetch } = useQuery({
+    queryKey: ['users'],
+    queryFn: fetchUsers,
+  });
 
   const handleFormSuccess = () => {
-    fetchData();
+    queryClient.invalidateQueries({ queryKey: ['users'] });
   };
 
   const openConfirmModal = (userId, currentStatus) => {
@@ -95,14 +91,49 @@ const AccountsPage = () => {
       const data = await res.json();
 
       if (data.success) {
+        await refetch(); // Force an immediate refresh
         showToast(data.message, 'success');
-        fetchData(); // Refresh the list
       } else {
         showToast(data.message || 'Error al cambiar estado de la cuenta', 'error');
       }
     } catch (error) {
       console.error('Error toggling status:', error);
       showToast('Error de conexión al cambiar estado', 'error');
+    }
+  };
+
+  const openDeleteModal = (userId) => {
+    setDeleteModal({ isOpen: true, userId });
+  };
+
+  const closeDeleteModal = () => {
+    setDeleteModal({ isOpen: false, userId: null });
+  };
+
+  const handleDeleteUser = async () => {
+    if (!deleteModal.userId) return;
+    
+    const { userId } = deleteModal;
+    closeDeleteModal();
+
+    try {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/users/${userId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        await refetch(); // Refresh the list
+        showToast(data.message, 'success');
+      } else {
+        showToast(data.message || 'Error al eliminar la cuenta', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      showToast('Error de conexión al intentar eliminar', 'error');
     }
   };
 
@@ -153,7 +184,7 @@ const AccountsPage = () => {
         </div>
         <div className="flex gap-3">
           <button 
-            onClick={fetchData}
+            onClick={() => refetch()}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center font-medium"
           >
             <RefreshCw size={18} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
@@ -313,6 +344,13 @@ const AccountsPage = () => {
                         >
                           <Power size={16} />
                         </button>
+                        <button 
+                          onClick={() => openDeleteModal(user.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Eliminar Cuenta Permanente"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                         <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                           <MoreVertical size={16} />
                         </button>
@@ -350,69 +388,133 @@ const AccountsPage = () => {
       />
 
       {/* Custom Confirmation Modal */}
-      <AnimatePresence>
-        {confirmModal.isOpen && (
-          <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
-              exit={{ opacity: 0 }} 
-              className="absolute inset-0 bg-black/40 backdrop-blur-sm"
-              onClick={closeConfirmModal}
-            />
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
-            >
-              <div className="p-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${confirmModal.currentStatus ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
-                  {confirmModal.currentStatus ? <AlertTriangle size={24} /> : <Check size={24} />}
+      {createPortal(
+        <AnimatePresence>
+          {confirmModal.isOpen && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <LazyMotion features={domAnimation}>
+              <m.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }} 
+                className="absolute inset-0 bg-gray-800/40 backdrop-blur-md"
+                onClick={closeConfirmModal}
+              />
+              <m.div 
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${confirmModal.currentStatus ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                    {confirmModal.currentStatus ? <AlertTriangle size={24} /> : <Check size={24} />}
+                  </div>
+                  <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
+                    ¿{confirmModal.currentStatus ? 'Desactivar' : 'Activar'} Cuenta?
+                  </h3>
+                  <p className="text-center text-gray-500 text-sm mb-6">
+                    {confirmModal.currentStatus 
+                      ? 'El usuario no podrá acceder al sistema hasta que su cuenta sea reactivada.' 
+                      : 'El usuario recuperará su acceso al sistema de forma inmediata.'}
+                  </p>
+                  
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={closeConfirmModal}
+                      className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button 
+                      onClick={handleToggleStatus}
+                      className={`flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors ${confirmModal.currentStatus ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
+                    >
+                      {confirmModal.currentStatus ? 'Sí, Desactivar' : 'Sí, Activar'}
+                    </button>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
-                  ¿{confirmModal.currentStatus ? 'Desactivar' : 'Activar'} Cuenta?
-                </h3>
-                <p className="text-center text-gray-500 text-sm mb-6">
-                  {confirmModal.currentStatus 
-                    ? 'El usuario no podrá acceder al sistema hasta que su cuenta sea reactivada.' 
-                    : 'El usuario recuperará su acceso al sistema de forma inmediata.'}
-                </p>
-                
-                <div className="flex gap-3">
-                  <button 
-                    onClick={closeConfirmModal}
-                    className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
-                  >
-                    Cancelar
-                  </button>
-                  <button 
-                    onClick={handleToggleStatus}
-                    className={`flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors ${confirmModal.currentStatus ? 'bg-red-600 hover:bg-red-700' : 'bg-green-600 hover:bg-green-700'}`}
-                  >
-                    {confirmModal.currentStatus ? 'Sí, Desactivar' : 'Sí, Activar'}
-                  </button>
-                </div>
-              </div>
-            </motion.div>
+              </m.div>
+            </LazyMotion>
           </div>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.getElementById('modal-root') || document.body
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {createPortal(
+        <AnimatePresence>
+          {deleteModal.isOpen && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <LazyMotion features={domAnimation}>
+              <m.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }} 
+                className="absolute inset-0 bg-gray-800/40 backdrop-blur-md"
+                onClick={closeDeleteModal}
+              />
+              <m.div 
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden"
+              >
+                <div className="p-6">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 bg-red-100 text-red-600">
+                    <Trash2 size={24} />
+                  </div>
+                  <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
+                    Eliminar Cuenta
+                  </h3>
+                  <p className="text-center text-gray-500 text-sm mb-2">
+                    ¿Estás seguro de que deseas eliminar a este usuario de forma permanente?
+                  </p>
+                  <p className="text-center text-red-500 font-semibold text-xs mb-6">
+                    Esta acción no se puede deshacer.
+                  </p>
+                  
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={closeDeleteModal}
+                      className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button 
+                      onClick={handleDeleteUser}
+                      className="flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors bg-red-600 hover:bg-red-700"
+                    >
+                      Sí, Eliminar
+                    </button>
+                  </div>
+                </div>
+              </m.div>
+            </LazyMotion>
+          </div>
+        )}
+        </AnimatePresence>,
+        document.getElementById('modal-root') || document.body
+      )}
 
       {/* Custom Toast Notification */}
-      <AnimatePresence>
-        {toast.show && (
-          <motion.div 
-            initial={{ opacity: 0, y: -50, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.9 }}
-            className={`fixed top-4 right-4 z-110 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${
-              toast.type === 'success' 
-                ? 'bg-green-50 border-green-200 text-green-800' 
-                : 'bg-red-50 border-red-200 text-red-800'
-            }`}
-          >
+      {createPortal(
+        <AnimatePresence>
+          {toast.show && (
+          <LazyMotion features={domAnimation}>
+            <m.div 
+              initial={{ opacity: 0, y: -50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.9 }}
+              className={`fixed top-4 right-4 z-110 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border ${
+                toast.type === 'success' 
+                  ? 'bg-green-50 border-green-200 text-green-800' 
+                  : 'bg-red-50 border-red-200 text-red-800'
+              }`}
+            >
             <div className={`flex shrink-0 w-8 h-8 rounded-full items-center justify-center ${
                toast.type === 'success' ? 'bg-green-200/50' : 'bg-red-200/50'
             }`}>
@@ -427,9 +529,12 @@ const AccountsPage = () => {
             >
               <X size={16} />
             </button>
-          </motion.div>
+          </m.div>
+          </LazyMotion>
         )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.getElementById('modal-root') || document.body
+      )}
     </div>
   );
 };

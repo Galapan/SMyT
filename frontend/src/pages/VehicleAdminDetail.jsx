@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Car, FileText, Image as ImageIcon, 
@@ -37,9 +38,10 @@ const DataRow = ({ label, value, isHighlight }) => (
 const VehicleAdminDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [vehiculo, setVehiculo] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [userRol, setUserRol] = useState('');
+  
+  const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userRol = user?.rol || '';
 
   // Modal y Toast State para Solicitud de Edición
   const [showEditModal, setShowEditModal] = useState(false);
@@ -63,33 +65,25 @@ const VehicleAdminDetail = () => {
     }, 4000);
   };
 
-  useEffect(() => {
-    const fetchVehicleData = async () => {
-      setLoading(true);
-      try {
-        const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-        const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
-        const user = userStr ? JSON.parse(userStr) : null;
-        setUserRol(user?.rol || '');
+  const fetchVehicleData = async () => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/api/vehiculos/${id}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    if (data.success) {
+      return data.data;
+    } else {
+      navigate('/admin/auditoria');
+      throw new Error('Vehicle not found');
+    }
+  };
 
-        const response = await fetch(`${API_URL}/api/vehiculos/${id}`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        const data = await response.json();
-        if (data.success) {
-          setVehiculo(data.data);
-        } else {
-          navigate('/admin/auditoria');
-        }
-      } catch (error) {
-        console.error('Error fetching vehicle:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (id) fetchVehicleData();
-  }, [id, navigate]);
+  const { data: vehiculo, isLoading: loading } = useQuery({
+    queryKey: ['vehiculo', id],
+    queryFn: fetchVehicleData,
+    enabled: !!id,
+  });
 
   if (loading) {
     return (
@@ -177,39 +171,41 @@ const VehicleAdminDetail = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {vehiculo.fotos.map((foto, idx) => (
-                    <motion.div 
-                      layoutId={`foto-container-${foto}`}
-                      transition={springConfig}
-                      key={idx} 
-                      className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 group relative cursor-pointer"
-                      onClick={() => setSelectedImage(foto)}
-                      whileHover="hover"
-                    >
-                      {selectedImage !== foto && (
-                        <motion.img 
-                          layoutId={`foto-img-${foto}`}
-                          transition={springConfig}
-                          variants={{ hover: { scale: 1.05 } }}
-                          src={foto} 
-                          alt={`Evidencia ${idx+1}`} 
-                          className="w-full h-full object-cover" 
-                        />
-                      )}
-                      
-                      {/* Hover Overlay */}
-                      <motion.div 
-                        variants={{ hover: { opacity: 1 } }}
-                        initial={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute inset-0 bg-black/20 flex items-center justify-center"
+                <LazyMotion features={domAnimation}>
+                  {vehiculo.fotos.map((foto, idx) => (
+                      <m.div 
+                        layoutId={`foto-container-${foto}`}
+                        transition={springConfig}
+                        key={idx} 
+                        className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 group relative cursor-pointer"
+                        onClick={() => setSelectedImage(foto)}
+                        whileHover="hover"
                       >
-                        <motion.div variants={{ hover: { scale: 1.1, opacity: 1 } }} initial={{ scale: 0.9, opacity: 0 }} transition={{ duration: 0.2 }}>
-                           <ImageIcon size={28} className="text-white drop-shadow-lg" />
-                        </motion.div>
-                      </motion.div>
-                    </motion.div>
-                ))}
+                        {selectedImage !== foto && (
+                          <m.img 
+                            layoutId={`foto-img-${foto}`}
+                            transition={springConfig}
+                            variants={{ hover: { scale: 1.05 } }}
+                            src={foto} 
+                            alt={`Evidencia ${idx+1}`} 
+                            className="w-full h-full object-cover" 
+                          />
+                        )}
+                        
+                        {/* Hover Overlay */}
+                        <m.div 
+                          variants={{ hover: { opacity: 1 } }}
+                          initial={{ opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute inset-0 bg-black/20 flex items-center justify-center"
+                        >
+                          <m.div variants={{ hover: { scale: 1.1, opacity: 1 } }} initial={{ scale: 0.9, opacity: 0 }} transition={{ duration: 0.2 }}>
+                             <ImageIcon size={28} className="text-white drop-shadow-lg" />
+                          </m.div>
+                        </m.div>
+                      </m.div>
+                  ))}
+                </LazyMotion>
               </div>
             )}
           </div>
@@ -283,10 +279,10 @@ const VehicleAdminDetail = () => {
 
       {/* MODAL SOLICITUD EDICIÓN - RENDERIZADO FUERA DEL DOM TREE USANDO PORTAL */}
        {showEditModal && createPortal(
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
           {/* Backdrop */}
           <div 
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity" 
+            className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity" 
             onClick={() => setShowEditModal(false)}
           />
           {/* Modal Container */}
@@ -408,46 +404,47 @@ const VehicleAdminDetail = () => {
         </div>
       )}
 
-      {/* Fullscreen Image Viewer via Framer Motion with Persistent Portal */}
       {createPortal(
         <AnimatePresence>
           {selectedImage && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md cursor-zoom-out"
-              style={{ zIndex: 120 }}
-              onClick={() => setSelectedImage(null)}
-            >
-              <motion.button 
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ delay: 0.1 }}
-                className="absolute top-4 right-4 sm:top-8 sm:right-8 p-3 text-white/70 hover:text-white bg-black/40 hover:bg-black/80 rounded-full transition-colors backdrop-blur-sm z-10"
-                onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
+            <LazyMotion features={domAnimation}>
+              <m.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md cursor-zoom-out"
+                style={{ zIndex: 120 }}
+                onClick={() => setSelectedImage(null)}
               >
-                <X size={24} />
-              </motion.button>
-              
-              <motion.div
-                layoutId={`foto-container-${selectedImage}`}
-                transition={springConfig}
-                className="max-w-full max-h-full flex items-center justify-center cursor-default bg-transparent"
-                onClick={(e) => e.stopPropagation()}
-                style={{ width: '100%', height: '100%' }}
-              >
-                <motion.img 
-                  layoutId={`foto-img-${selectedImage}`}
+                <m.button 
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ delay: 0.1 }}
+                  className="absolute top-4 right-4 sm:top-8 sm:right-8 p-3 text-white/70 hover:text-white bg-black/40 hover:bg-black/80 rounded-full transition-colors backdrop-blur-sm z-10"
+                  onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
+                >
+                  <X size={24} />
+                </m.button>
+                
+                <m.div
+                  layoutId={`foto-container-${selectedImage}`}
                   transition={springConfig}
-                  src={selectedImage} 
-                  alt="Zoom preview" 
-                  className="max-w-full max-h-full object-contain rounded-lg shadow-2xl bg-transparent relative z-10"
-                />
-              </motion.div>
-            </motion.div>
+                  className="max-w-full max-h-full flex items-center justify-center cursor-default bg-transparent"
+                  onClick={(e) => e.stopPropagation()}
+                  style={{ width: '100%', height: '100%' }}
+                >
+                  <m.img 
+                    layoutId={`foto-img-${selectedImage}`}
+                    transition={springConfig}
+                    src={selectedImage} 
+                    alt="Zoom preview" 
+                    className="max-w-full max-h-full object-contain rounded-lg shadow-2xl bg-transparent relative z-10"
+                  />
+                </m.div>
+              </m.div>
+            </LazyMotion>
           )}
         </AnimatePresence>,
         document.getElementById('modal-root') || document.body

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Warehouse, Car, Key, Plus, RefreshCw, Bell, ChevronRight, CheckCircle, XCircle, X, AlertTriangle, Edit2 } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import StatCard from '../components/dashboard/StatCard';
 import AuditSearch from '../components/dashboard/AuditSearch';
 import DepotTable from '../components/dashboard/DepotTable';
@@ -11,16 +12,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [stats, setStats] = useState({
-    totalVehiculos: 0,
-    ingresosHoy: 0,
-    liberadosMes: 0,
-    totalDepositos: 0
-  });
-  const [depositos, setDepositos] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [userRol, setUserRol] = useState('');
-  const [notificaciones, setNotificaciones] = useState([]);
+  // Custom state for UI and Modals
   const [selectedNotif, setSelectedNotif] = useState(null);
   const [resolving, setResolving] = useState(false);
   const [loadingDetail, setLoadingDetail] = useState(false);
@@ -31,67 +23,69 @@ const AdminDashboard = () => {
   const [vehicleToEdit, setVehicleToEdit] = useState(null);
   const [editingNotifId, setEditingNotifId] = useState(null);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-      const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
-      const user = userStr ? JSON.parse(userStr) : null;
-      setUserRol(user?.rol || '');
-      
-      const fetchPromises = [
-        fetch(`${API_URL}/api/vehiculos/stats`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        }),
-        fetch(`${API_URL}/api/depositos`, {
-          headers: { 'Authorization': `Bearer ${token}` }
+  // Query Client for invalidating queries later
+  const queryClient = useQueryClient();
+
+  const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const userRol = user?.rol || '';
+
+  const fetchDashboardData = async () => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    
+    const fetchPromises = [
+      fetch(`${API_URL}/api/vehiculos/stats`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      }),
+      fetch(`${API_URL}/api/depositos`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+    ];
+
+    if (userRol === 'SUPER_USUARIO') {
+      fetchPromises.push(
+        fetch(`${API_URL}/api/solicitudes?estatus=PENDIENTE`, {
+           headers: { 'Authorization': `Bearer ${token}` }
         })
-      ];
-
-      // Fetch pending requests for Super User or approved requests for other users
-      if (user?.rol === 'SUPER_USUARIO') {
-        fetchPromises.push(
-          fetch(`${API_URL}/api/solicitudes?estatus=PENDIENTE`, {
-             headers: { 'Authorization': `Bearer ${token}` }
-          })
-        );
-      } else if (user?.id) {
-        fetchPromises.push(
-          fetch(`${API_URL}/api/solicitudes?estatus=RESUELTA&solicitanteId=${user.id}`, {
-             headers: { 'Authorization': `Bearer ${token}` }
-          })
-        );
-      }
-
-      const responses = await Promise.all(fetchPromises);
-      
-      const [statsRes, depositosRes, notificacionesRes] = responses;
-
-      const statsData = await statsRes.json();
-      const depositosData = await depositosRes.json();
-
-      if (statsData.success) {
-        setStats(statsData.data);
-      }
-      if (depositosData.success) {
-        setDepositos(depositosData.data);
-      }
-      if (notificacionesRes) {
-         const notificacionesData = await notificacionesRes.json();
-         if (notificacionesData.success) {
-             setNotificaciones(notificacionesData.data);
-         }
-      }
-    } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-    } finally {
-      setLoading(false);
+      );
+    } else if (user?.id) {
+      fetchPromises.push(
+        fetch(`${API_URL}/api/solicitudes?estatus=RESUELTA&solicitanteId=${user.id}`, {
+           headers: { 'Authorization': `Bearer ${token}` }
+        })
+      );
     }
+
+    const responses = await Promise.all(fetchPromises);
+    const [statsRes, depositosRes, notificacionesRes] = responses;
+
+    const statsData = await statsRes.json();
+    const depositosData = await depositosRes.json();
+    let notificacionesData = { data: [] };
+
+    if (notificacionesRes) {
+       notificacionesData = await notificacionesRes.json();
+    }
+
+    return {
+      stats: statsData.success ? statsData.data : {
+        totalVehiculos: 0, ingresosHoy: 0, liberadosMes: 0, totalDepositos: 0
+      },
+      depositos: depositosData.success ? depositosData.data : [],
+      notificaciones: notificacionesData.success ? notificacionesData.data : []
+    };
   };
 
-  useEffect(() => {
-    fetchData();
-  }, []);
+  const { data: dashboardData, isLoading: loading, refetch } = useQuery({
+    queryKey: ['dashboard', user?.id],
+    queryFn: fetchDashboardData,
+  });
+
+  const stats = dashboardData?.stats || {
+    totalVehiculos: 0, ingresosHoy: 0, liberadosMes: 0, totalDepositos: 0
+  };
+  const depositos = dashboardData?.depositos || [];
+  const notificaciones = dashboardData?.notificaciones || [];
 
   const handleSearch = (searchParams) => {
     // Navigate to vehicles page with search params
@@ -140,8 +134,8 @@ const AdminDashboard = () => {
       
       const result = await response.json();
       if (result.success) {
-        // Remove from list and close modal
-        setNotificaciones(prev => prev.filter(n => n.id !== notifId));
+        // Refetch queries instead of manually filtering to keep data in sync
+        queryClient.invalidateQueries({ queryKey: ['dashboard', user?.id] });
         setSelectedNotif(null);
         setVehiculoDetail(null);
       } else {
@@ -198,16 +192,8 @@ const AdminDashboard = () => {
     setVehicleToEdit(null);
     setEditingNotifId(null);
     
-    Promise.all([
-      fetch(`${API_URL}/api/vehiculos/stats`, { headers: { 'Authorization': `Bearer ${token}` } }),
-      fetch(`${API_URL}/api/solicitudes?estatus=RESUELTA&solicitanteId=${user.id}`, { headers: { 'Authorization': `Bearer ${token}` } })
-    ])
-    .then(async ([statsRes, notifRes]) => {
-      const stats = await statsRes.json();
-      const notif = await notifRes.json();
-      if (stats.success) setStats(stats.data);
-      if (notif.success) setNotificaciones(notif.data);
-    });
+    // Invalidar para recargar datos
+    queryClient.invalidateQueries({ queryKey: ['dashboard', user?.id] });
   };
 
   return (
@@ -220,14 +206,14 @@ const AdminDashboard = () => {
         </div>
         <div className="flex gap-3">
           <button 
-            onClick={fetchData}
+            onClick={() => refetch()}
             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center font-medium"
           >
             <RefreshCw size={18} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
             Actualizar
           </button>
           <button 
-            onClick={() => navigate('/admin/vehicles')}
+            onClick={() => navigate('/admin/deposits')}
             className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
           >
             <Plus size={20} className="mr-2" />
@@ -436,7 +422,7 @@ const AdminDashboard = () => {
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            className="absolute inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
             onClick={() => { if (!resolving) { setSelectedNotif(null); setVehiculoDetail(null); } }}
           />
 
