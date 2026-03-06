@@ -267,9 +267,8 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
     );
   };
 
-  // Render Step 3
   const renderStep3 = () => (
-    <div className="space-y-6 text-center py-8">
+    <div className="space-y-6 text-center py-2">
       <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
         <CheckCircle className="w-8 h-8 text-green-500" />
       </div>
@@ -309,11 +308,11 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
       <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden animate-slide-up-fade flex flex-col max-h-[90vh]">
         
         {/* Header */}
-        <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
+        <div className="shrink-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
           <ModalHeader onClose={onClose} title="Creación de Cuentas" />
 
           {/* Stepper */}
-          <div className="mt-8 mb-4">
+          <div className="mt-6">
             <StepIndicator steps={steps} currentStep={currentStep} />
           </div>
         </div>
@@ -327,7 +326,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         )}
 
         {/* Form Content */}
-        <div className="p-8 overflow-y-auto mt-8 mb-4">
+        <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6">
           <div 
             key={currentStep}
             className={`${direction === 'right' ? 'animate-slide-right' : 'animate-slide-left'}`}
@@ -339,6 +338,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         {/* Footer Navigation */}
+        <div className="shrink-0">
         <NavigationFooter 
           currentStep={currentStep}
           totalSteps={steps.length}
@@ -348,6 +348,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
           loading={loading}
           submitLabel="Crear Cuenta"
         />
+        </div>
       </div>
     </div>,
     document.getElementById('modal-root') || document.body
