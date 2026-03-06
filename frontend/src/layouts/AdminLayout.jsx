@@ -12,6 +12,7 @@ import {
   UserCircle,
   Users
 } from 'lucide-react';
+import logoSmyt from '../assets/logo_smyt.png';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -90,7 +91,7 @@ const AdminLayout = () => {
           {/* Logo / Header */}
           <div className="h-24 flex items-center justify-between px-6 border-b border-gray-100 shrink-0">
             <div className="flex-1 flex justify-center lg:justify-start">
-              <img src="/src/assets/logo_smyt.png" alt="SMyT Logo" className="h-16 w-auto object-contain" />
+              <img src={logoSmyt} alt="SMyT Logo" className="h-16 w-auto object-contain" />
             </div>
             <button 
               onClick={() => setIsSidebarOpen(false)}
