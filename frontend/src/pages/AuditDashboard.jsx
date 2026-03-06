@@ -3,7 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { RefreshCw, Search, Warehouse, Users, Car } from 'lucide-react';
 import AuditConcesionarioCard from '../components/dashboard/Audit/AuditConcesionarioCard';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL !== undefined 
+  ? import.meta.env.VITE_API_URL 
+  : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 const AuditDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');

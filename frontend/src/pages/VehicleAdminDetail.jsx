@@ -10,7 +10,9 @@ import {
 } from 'lucide-react';
 import dayjs from 'dayjs';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL !== undefined 
+  ? import.meta.env.VITE_API_URL 
+  : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 const SectionHeader = ({ icon: Icon, title, status }) => (
   <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">

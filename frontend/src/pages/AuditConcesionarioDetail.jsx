@@ -4,7 +4,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Warehouse, Users, Car, Phone, Mail, User, ShieldCheck, MapPin, Search } from 'lucide-react';
 import dayjs from 'dayjs';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL !== undefined 
+  ? import.meta.env.VITE_API_URL 
+  : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 const AuditConcesionarioDetail = () => {
   const { id } = useParams();

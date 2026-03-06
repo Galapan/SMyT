@@ -15,7 +15,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
     if (isAdmin) {
       const fetchDepositos = async () => {
         try {
-          const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+          const API_URL = import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "");
           const token = sessionStorage.getItem('token') || localStorage.getItem('token');
           const res = await fetch(`${API_URL}/api/depositos`, {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -55,7 +55,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
       const formDataUpload = new FormData();
       formDataUpload.append('file', file);
 
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+      const API_URL = import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "");
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
 
       const response = await fetch(`${API_URL}/api/upload`, {

@@ -3,7 +3,9 @@ import { createPortal } from "react-dom";
 import { X, UserPlus, Loader2, Check, AlertCircle, Search, Link as LinkIcon, User } from "lucide-react";
 import FormInput from "../VehicleRegistrationForm/components/FormFields/FormInput";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const API_URL = import.meta.env.VITE_API_URL !== undefined 
+  ? import.meta.env.VITE_API_URL 
+  : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombre }) => {
   const [activeTab, setActiveTab] = useState("nuevo"); // 'nuevo' o 'existente'

@@ -5,7 +5,9 @@ import StepIndicator from './VehicleRegistrationForm/components/UI/StepIndicator
 import ModalHeader from './VehicleRegistrationForm/components/UI/ModalHeader';
 import NavigationFooter from './VehicleRegistrationForm/components/UI/NavigationFooter';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_URL = import.meta.env.VITE_API_URL !== undefined 
+  ? import.meta.env.VITE_API_URL 
+  : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
   const [currentStep, setCurrentStep] = useState(1);
