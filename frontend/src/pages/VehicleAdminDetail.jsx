@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -173,9 +173,8 @@ const VehicleAdminDetail = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <LazyMotion features={domAnimation}>
                   {vehiculo.fotos.map((foto, idx) => (
-                      <m.div 
+                      <motion.div 
                         layoutId={`foto-container-${foto}`}
                         transition={springConfig}
                         key={idx} 
@@ -184,7 +183,7 @@ const VehicleAdminDetail = () => {
                         whileHover="hover"
                       >
                         {selectedImage !== foto && (
-                          <m.img 
+                          <motion.img 
                             layoutId={`foto-img-${foto}`}
                             transition={springConfig}
                             variants={{ hover: { scale: 1.05 } }}
@@ -195,19 +194,18 @@ const VehicleAdminDetail = () => {
                         )}
                         
                         {/* Hover Overlay */}
-                        <m.div 
+                        <motion.div 
                           variants={{ hover: { opacity: 1 } }}
                           initial={{ opacity: 0 }}
                           transition={{ duration: 0.2 }}
                           className="absolute inset-0 bg-black/20 flex items-center justify-center"
                         >
-                          <m.div variants={{ hover: { scale: 1.1, opacity: 1 } }} initial={{ scale: 0.9, opacity: 0 }} transition={{ duration: 0.2 }}>
+                          <motion.div variants={{ hover: { scale: 1.1, opacity: 1 } }} initial={{ scale: 0.9, opacity: 0 }} transition={{ duration: 0.2 }}>
                              <ImageIcon size={28} className="text-white drop-shadow-lg" />
-                          </m.div>
-                        </m.div>
-                      </m.div>
+                          </motion.div>
+                        </motion.div>
+                      </motion.div>
                   ))}
-                </LazyMotion>
               </div>
             )}
           </div>
@@ -409,8 +407,7 @@ const VehicleAdminDetail = () => {
       {createPortal(
         <AnimatePresence>
           {selectedImage && (
-            <LazyMotion features={domAnimation}>
-              <m.div 
+              <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -419,7 +416,7 @@ const VehicleAdminDetail = () => {
                 style={{ zIndex: 120 }}
                 onClick={() => setSelectedImage(null)}
               >
-                <m.button 
+                <motion.button 
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
@@ -428,25 +425,24 @@ const VehicleAdminDetail = () => {
                   onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
                 >
                   <X size={24} />
-                </m.button>
+                </motion.button>
                 
-                <m.div
+                <motion.div
                   layoutId={`foto-container-${selectedImage}`}
                   transition={springConfig}
                   className="max-w-full max-h-full flex items-center justify-center cursor-default bg-transparent"
                   onClick={(e) => e.stopPropagation()}
                   style={{ width: '100%', height: '100%' }}
                 >
-                  <m.img 
+                  <motion.img 
                     layoutId={`foto-img-${selectedImage}`}
                     transition={springConfig}
                     src={selectedImage} 
                     alt="Zoom preview" 
                     className="max-w-full max-h-full object-contain rounded-lg shadow-2xl bg-transparent relative z-10"
                   />
-                </m.div>
-              </m.div>
-            </LazyMotion>
+                </motion.div>
+              </motion.div>
           )}
         </AnimatePresence>,
         document.getElementById('modal-root') || document.body
