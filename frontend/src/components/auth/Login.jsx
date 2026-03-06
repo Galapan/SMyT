@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logoTlax from "../../assets/LogoTlax.png";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// IMPORTANTE: En producción (Vercel), VITE_API_URL estará vacío para que las peticiones vayan al mismo dominio (/api/...) 
+// En desarrollo, usará localhost:3000 si no se especifica.
+const API_URL = import.meta.env.VITE_API_URL !== undefined 
+  ? import.meta.env.VITE_API_URL 
+  : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 function Login() {
   const navigate = useNavigate();

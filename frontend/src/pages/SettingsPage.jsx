@@ -23,7 +23,7 @@ const SettingsPage = () => {
   const getToken = () => localStorage.getItem('token') || sessionStorage.getItem('token');
 
   const fetchProfile = async () => {
-    const response = await fetch('http://localhost:3000/api/users/profile', {
+    const response = await fetch(`${import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "")}/api/users/profile`, {
       headers: {
         'Authorization': `Bearer ${getToken()}`
       }
@@ -56,7 +56,7 @@ const SettingsPage = () => {
     setMessage(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/users/profile', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "")}/api/users/profile`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -103,7 +103,7 @@ const SettingsPage = () => {
     setMessage(null);
 
     try {
-      const response = await fetch('http://localhost:3000/api/users/change-password', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "")}/api/users/change-password`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
