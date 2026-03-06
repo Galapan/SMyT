@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { User, Shield, CheckCircle, X, AlertCircle, ChevronLeft, ChevronRight, Save } from 'lucide-react';
+import { User, Shield, CheckCircle, AlertCircle } from 'lucide-react';
 import StepIndicator from './VehicleRegistrationForm/components/UI/StepIndicator';
+import ModalHeader from './VehicleRegistrationForm/components/UI/ModalHeader';
+import NavigationFooter from './VehicleRegistrationForm/components/UI/NavigationFooter';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -306,19 +308,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         
         {/* Header */}
         <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold text-(--color-primary)">Creación de Cuentas</h2>
-              <p className="text-sm text-gray-500">Sistema de Control de Inventarios SMT</p>
-              <div className="w-16 h-1 bg-(--color-rosa) rounded-full mt-2"></div>
-            </div>
-            <button 
-              onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-            >
-              <X size={24} />
-            </button>
-          </div>
+          <ModalHeader onClose={onClose} title="Creación de Cuentas" />
 
           {/* Stepper */}
           <div className="mt-8 mb-4">
@@ -347,50 +337,15 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         {/* Footer Navigation */}
-        <div className="sticky bottom-0 bg-white border-t border-gray-100 p-6 flex justify-between items-center rounded-b-2xl">
-          <button
-            onClick={prevStep}
-            disabled={currentStep === 1 || loading}
-            className={`
-              flex items-center px-6 py-2.5 rounded-xl font-medium transition-all
-              ${currentStep === 1 
-                ? 'opacity-0 cursor-default' 
-                : 'text-gray-600 bg-gray-100 hover:bg-gray-200 active:scale-95'}
-            `}
-          >
-            <ChevronLeft size={20} className="mr-2" />
-            Regresar
-          </button>
-
-          {currentStep < steps.length ? (
-            <button
-              onClick={nextStep}
-              disabled={loading}
-              className="flex items-center px-8 py-2.5 bg-(--color-primary) text-white rounded-xl font-medium shadow-md hover:bg-violet-900 hover:shadow-lg transition-all active:scale-95"
-            >
-              Siguiente Paso
-              <ChevronRight size={20} className="ml-2" />
-            </button>
-          ) : (
-            <button
-              onClick={handleSubmit}
-              disabled={loading}
-              className="flex items-center px-8 py-2.5 bg-green-600 text-white rounded-xl font-medium shadow-md hover:bg-green-700 hover:shadow-lg transition-all active:scale-95 disabled:opacity-50"
-            >
-              {loading ? (
-                <div className="flex items-center">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
-                  Creando...
-                </div>
-              ) : (
-                <>
-                  <Save size={20} className="mr-2" />
-                  Crear Cuenta
-                </>
-              )}
-            </button>
-          )}
-        </div>
+        <NavigationFooter 
+          currentStep={currentStep}
+          totalSteps={steps.length}
+          onPrevious={prevStep}
+          onNext={nextStep}
+          onSubmit={handleSubmit}
+          loading={loading}
+          submitLabel="Crear Cuenta"
+        />
       </div>
     </div>,
     document.getElementById('modal-root') || document.body

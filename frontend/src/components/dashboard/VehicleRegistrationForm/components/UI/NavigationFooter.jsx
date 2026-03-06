@@ -6,7 +6,8 @@ const NavigationFooter = ({
   onPrevious, 
   onNext, 
   onSubmit, 
-  loading 
+  loading,
+  submitLabel = "Registrar Vehículo"
 }) => {
   return (
     <div className="sticky bottom-0 bg-white border-t border-gray-100 px-8 py-4 flex items-center justify-between">
@@ -49,7 +50,7 @@ const NavigationFooter = ({
           ) : (
             <>
               <Check size={18} />
-              Registrar Vehículo
+              {submitLabel}
             </>
           )}
         </button>
