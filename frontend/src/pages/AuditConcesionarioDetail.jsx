@@ -13,16 +13,7 @@ const AuditConcesionarioDetail = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Helper de ocupación
-  const ocupacion = deposito && deposito.capacidad > 0 
-    ? Math.round((deposito.vehiculos?.length / deposito.capacidad) * 100) 
-    : 0;
 
-  const getOcupacionColor = (pct) => {
-    if (pct >= 90) return 'text-red-600 bg-red-50 border-red-200';
-    if (pct >= 75) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    return 'text-green-600 bg-green-50 border-green-200';
-  };
 
   const fetchDepositoInfo = async () => {
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -43,6 +34,17 @@ const AuditConcesionarioDetail = () => {
     queryFn: fetchDepositoInfo,
     enabled: !!id,
   });
+
+  // Helper de ocupación (debe ir DESPUÉS de definir deposito)
+  const ocupacion = deposito && deposito.capacidad > 0 
+    ? Math.round((deposito.vehiculos?.length / deposito.capacidad) * 100) 
+    : 0;
+
+  const getOcupacionColor = (pct) => {
+    if (pct >= 90) return 'text-red-600 bg-red-50 border-red-200';
+    if (pct >= 75) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+    return 'text-green-600 bg-green-50 border-green-200';
+  };
 
   if (loading) {
     return (
