@@ -421,10 +421,10 @@ const AdminDashboard = () => {
 
       {/* Notification Modal Overlay */}
       {selectedNotif && createPortal(
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div 
-            className="absolute inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
             onClick={() => { if (!resolving) { setSelectedNotif(null); setVehiculoDetail(null); } }}
           />
 
