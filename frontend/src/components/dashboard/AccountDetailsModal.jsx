@@ -31,7 +31,7 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
   const getRoleColor = (rol) => {
     const colors = {
-      'SUPER_USUARIO': 'text-purple-700 bg-purple-100 ring-purple-300',
+      'SUPER_USUARIO': 'text-red-700 bg-red-100 ring-red-300',
       'ADMINISTRADOR_SMYT': 'text-blue-700 bg-blue-100 ring-blue-300',
       'USUARIO_CONCESIONARIO': 'text-emerald-700 bg-emerald-100 ring-emerald-300'
     };
@@ -131,7 +131,7 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
                 {/* Role Card */}
                 <div className="bg-white/60 p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center hover:shadow-md transition-shadow">
                   <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${
-                    user.rol === 'SUPER_USUARIO' ? 'bg-purple-100 text-purple-700' :
+                    user.rol === 'SUPER_USUARIO' ? 'bg-red-100 text-red-700' :
                     user.rol === 'ADMINISTRADOR_SMYT' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
                   }`}>
                     <Shield className="w-6 h-6" />
