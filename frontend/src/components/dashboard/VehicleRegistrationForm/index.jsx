@@ -57,7 +57,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
 
         {/* Global Error */}
         {error && (
-          <div className="mx-8 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+          <div className="mx-8 mt-4 p-4 bg-gob-rosa/10 border border-gob-rosa rounded-lg flex items-center gap-3 text-gob-rosa">
             <AlertCircle size={20} />
             <span className="text-sm">{error}</span>
           </div>

@@ -151,7 +151,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
 
   const getInputClass = (fieldName) => `
     w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all
-    ${errors[fieldName] ? 'border-red-500 bg-red-50' : 'border-gray-200 bg-gray-50 hover:border-gray-300'}
+    ${errors[fieldName] ? 'border-gob-rosa bg-gob-rosa/10' : 'border-gray-200 bg-gray-50 hover:border-gray-300'}
   `;
 
   if (!isOpen) return null;
@@ -172,7 +172,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
             className={getInputClass('nombre')}
             placeholder="Ej. Juan"
           />
-          {errors.nombre && <p className="text-red-500 text-xs mt-1">{errors.nombre}</p>}
+          {errors.nombre && <p className="text-gob-rosa text-xs mt-1">{errors.nombre}</p>}
         </div>
 
         <div>
@@ -185,7 +185,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
               className={getInputClass('apellido')}
               placeholder="Ej. Pérez"
             />
-            {errors.apellido && <p className="text-red-500 text-xs mt-1">{errors.apellido}</p>}
+            {errors.apellido && <p className="text-gob-rosa text-xs mt-1">{errors.apellido}</p>}
         </div>
 
         <div>
@@ -198,7 +198,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
               className={getInputClass('email')}
               placeholder="correo@ejemplo.com"
             />
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            {errors.email && <p className="text-gob-rosa text-xs mt-1">{errors.email}</p>}
         </div>
 
         <div>
@@ -211,7 +211,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
               className={getInputClass('password')}
               placeholder="Mínimo 6 caracteres"
             />
-            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            {errors.password && <p className="text-gob-rosa text-xs mt-1">{errors.password}</p>}
         </div>
       </div>
     </div>
@@ -240,7 +240,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
               {isSuperAdmin && <option value="ADMINISTRADOR_SMYT">Administrador SMyT</option>}
               <option value="USUARIO_CONCESIONARIO">Usuario Concesionario</option>
             </select>
-            {errors.rol && <p className="text-red-500 text-xs mt-1">{errors.rol}</p>}
+            {errors.rol && <p className="text-gob-rosa text-xs mt-1">{errors.rol}</p>}
           </div>
 
           {formData.rol === 'USUARIO_CONCESIONARIO' && (
@@ -259,7 +259,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
                     </option>
                   ))}
                 </select>
-                {errors.depositoId && <p className="text-red-500 text-xs mt-1">{errors.depositoId}</p>}
+                {errors.depositoId && <p className="text-gob-rosa text-xs mt-1">{errors.depositoId}</p>}
              </div>
           )}
         </div>
@@ -269,8 +269,8 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
 
   const renderStep3 = () => (
     <div className="space-y-6 text-center py-2">
-      <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
-        <CheckCircle className="w-8 h-8 text-green-500" />
+      <div className="mx-auto w-16 h-16 bg-gob-verde/15 rounded-full flex items-center justify-center mb-4">
+        <CheckCircle className="w-8 h-8 text-gob-verde" />
       </div>
       <h3 className="text-2xl font-bold text-gray-900">Confirmar Creación</h3>
       <p className="text-gray-500 max-w-sm mx-auto">
@@ -284,7 +284,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
           <p><span className="font-semibold text-gray-700">Email:</span> {formData.email}</p>
           <p>
             <span className="font-semibold text-gray-700">Rol:</span>{' '} 
-            <span className="px-2 py-1 bg-violet-100 text-violet-700 rounded-md text-sm font-medium">
+            <span className="px-2 py-1 bg-gob-primary/10 text-gob-primary rounded-md text-sm font-medium">
               {formData.rol.replace('_', ' ')}
             </span>
           </p>
@@ -319,7 +319,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
 
         {/* Global Error */}
         {error && (
-          <div className="mx-8 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+          <div className="mx-8 mt-4 p-4 bg-gob-rosa/10 border border-gob-rosa rounded-lg flex items-center gap-3 text-gob-rosa">
             <AlertCircle size={20} />
             <span className="text-sm">{error}</span>
           </div>

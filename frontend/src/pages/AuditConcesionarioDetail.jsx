@@ -169,8 +169,8 @@ const AuditConcesionarioDetail = () => {
         {/* Columna Derecha: Inventario de Vehículos */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm h-full flex flex-col overflow-hidden">
-            <div className="px-6 py-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-gray-50/30">
-              <div className="flex items-center gap-2">
+            <div className="px-4 py-4 md:px-6 md:py-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-gray-50/30">
+              <div className="flex flex-wrap items-center gap-2">
                 <Car size={20} className="text-gray-700" />
                 <h3 className="text-lg font-bold text-gray-900">Inventario Registrado</h3>
                 <span className="text-sm text-gray-500 font-medium ml-2">
@@ -190,7 +190,8 @@ const AuditConcesionarioDetail = () => {
             </div>
             
             <div className="flex-1 overflow-x-auto min-h-75">
-              <table className="w-full text-left border-collapse">
+              {/* Desktop Table View */}
+              <table className="hidden md:table w-full text-left border-collapse">
                 <thead>
                   <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-200">
                     <th className="px-6 py-4 font-semibold">Folio SMyT</th>
@@ -263,6 +264,76 @@ const AuditConcesionarioDetail = () => {
                   )}
                 </tbody>
               </table>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden flex flex-col divide-y divide-gray-100 bg-white">
+                {!deposito.vehiculos || deposito.vehiculos.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-gray-500">
+                    <div className="flex flex-col items-center justify-center">
+                      <Car size={32} className="text-gray-300 mb-3" />
+                      <p className="font-medium text-gray-900">No hay vehículos registrados</p>
+                      <p className="text-sm text-gray-500 mt-1">Este concesionario no cuenta con inventario activo.</p>
+                    </div>
+                  </div>
+                ) : (
+                  deposito.vehiculos
+                    .filter(v => 
+                      (v.placa && v.placa.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                      (v.vin && v.vin.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                      (v.marcaTipo && v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                      (v.folioProceso && v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase()))
+                    )
+                    .map(v => (
+                    <div key={v.id} className="p-4 hover:bg-gray-50/50 transition-colors">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="pr-2">
+                           <span className="text-xs font-medium text-(--color-primary) mb-0.5 block">Folio: {v.folioProceso}</span>
+                           <div className="text-sm font-bold text-gray-900 leading-tight">
+                             {v.placa || 'S/P'}
+                           </div>
+                        </div>
+                        <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
+                              v.estatusLegal === 'ROBADO' ? 'bg-red-100 text-red-700 border border-red-200' :
+                              v.estatusLegal === 'DECOMISADO' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
+                              v.estatusLegal === 'SINIESTRADO' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
+                              'bg-gray-100 text-gray-700 border border-gray-200'
+                          }`}>
+                          {v.estatusLegal}
+                        </span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-2 text-xs mb-3">
+                        <div>
+                          <p className="font-semibold text-gray-500 mb-0.5">Vehículo</p>
+                          <p className="text-gray-900 truncate" title={`${v.marcaTipo}`}>
+                            {v.marcaTipo}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-500 mb-0.5">Fecha Ingreso</p>
+                          <p className="text-gray-900">
+                            {dayjs(v.fechaIngreso).format('DD MMM YYYY, HH:mm')}
+                          </p>
+                        </div>
+                      </div>
+                      
+                      <div className="pt-3 border-t border-gray-50 flex items-center justify-between">
+                         <div className="text-xs font-mono text-gray-400 truncate max-w-[50%]">
+                           VIN: {v.vin}
+                         </div>
+                         <button 
+                            onClick={() => navigate(`/admin/auditoria/vehiculo/${v.id}`)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-600 hover:text-(--color-primary) hover:bg-violet-50 border border-gray-200 rounded-lg text-xs font-semibold transition-colors focus:outline-none"
+                            title="Ver Expediente de Registro"
+                          >
+                            <Search size={14} />
+                            <span>Expediente</span>
+                          </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>

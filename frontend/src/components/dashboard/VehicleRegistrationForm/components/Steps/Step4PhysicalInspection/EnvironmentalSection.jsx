@@ -17,7 +17,7 @@ const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => 
         {environmentalItems.map((row) => {
           const isDisabled = formData[row.statusKey] === 'DRENADO';
           return (
-            <div key={row.label} className={`grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-4 border rounded-xl transition-colors ${errors[row.statusKey] || errors[row.cantKey] ? 'border-red-300' : 'border-gray-200'} ${isDisabled ? 'opacity-70 bg-gray-50' : 'bg-white'}`}>
+            <div key={row.label} className={`grid grid-cols-1 md:grid-cols-3 gap-4 items-start p-4 border rounded-xl transition-colors ${errors[row.statusKey] || errors[row.cantKey] ? 'border-gob-rosa' : 'border-gray-200'} ${isDisabled ? 'opacity-70 bg-gray-50' : 'bg-white'}`}>
               <span className="text-sm font-semibold text-gray-700 mt-2">{row.label}</span>
               <div className="w-full">
                 <div className="relative">
@@ -25,7 +25,7 @@ const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => 
                     name={row.statusKey} 
                     value={formData[row.statusKey]} 
                     onChange={onChange} 
-                    className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors[row.statusKey] ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors[row.statusKey] ? 'border-gob-rosa' : 'border-gray-300'}`}
                   >
                     <option value="">Estatus...</option>
                     <option value="DRENADO">Drenado</option>
@@ -35,7 +35,7 @@ const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => 
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                   </div>
                 </div>
-                {errors[row.statusKey] && <span className="text-xs text-red-500 font-medium mt-1 block">{errors[row.statusKey]}</span>}
+                {errors[row.statusKey] && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors[row.statusKey]}</span>}
               </div>
               
               <div className="w-full">
@@ -46,9 +46,9 @@ const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => 
                   onChange={onChange} 
                   disabled={isDisabled}
                   placeholder={isDisabled ? "N/A - Drenado" : "Cantidad (ej. 25%, 2L)"}
-                  className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors[row.cantKey] ? 'border-red-500' : 'border-gray-300'} ${isDisabled ? 'bg-gray-100 cursor-not-allowed text-gray-400' : ''}`}
+                  className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors[row.cantKey] ? 'border-gob-rosa' : 'border-gray-300'} ${isDisabled ? 'bg-gray-100 cursor-not-allowed text-gray-400' : ''}`}
                 />
-                {errors[row.cantKey] && <span className="text-xs text-red-500 font-medium mt-1 block">{errors[row.cantKey]}</span>}
+                {errors[row.cantKey] && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors[row.cantKey]}</span>}
               </div>
             </div>
           );

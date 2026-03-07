@@ -9,7 +9,7 @@ const InteriorSection = ({ formData, errors, onChange, getInputClass }) => {
   ];
 
   const getStatusColor = (status, fieldName) => {
-    if (errors[fieldName]) return 'border-red-500';
+    if (errors[fieldName]) return 'border-gob-rosa';
     if (!status) return 'border-gray-200 text-gray-500';
     return 'border-gray-200 text-gray-900';
   };
@@ -43,7 +43,7 @@ const InteriorSection = ({ formData, errors, onChange, getInputClass }) => {
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
               </div>
-              {errors[item.name] && <span className="text-xs text-red-500 font-medium">{errors[item.name]}</span>}
+              {errors[item.name] && <span className="text-xs text-gob-rosa font-medium">{errors[item.name]}</span>}
 
               {(formData[item.name] === 'MALO' || formData[item.name] === 'INCOMPLETOS' || formData[item.name] === 'DESPLEGADAS' || formData[item.name] === 'AUSENTES') && (
                 <div className="animate-in fade-in slide-in-from-top-1 duration-200 mt-1">
@@ -53,9 +53,9 @@ const InteriorSection = ({ formData, errors, onChange, getInputClass }) => {
                         value={formData[item.obsName]}
                         onChange={onChange}
                         placeholder={`Observaciones sobre ${item.label.toLowerCase()}...`}
-                        className={`w-full text-sm border focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 rounded-lg py-2 px-3 transition-all ${errors[item.obsName] ? 'border-red-500 bg-red-50 placeholder-red-300 text-red-700' : 'border-gray-200 bg-white placeholder-gray-400 text-gray-700'}`}
+                        className={`w-full text-sm border focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 rounded-lg py-2 px-3 transition-all ${errors[item.obsName] ? 'border-gob-rosa bg-gob-rosa/10 placeholder-gob-rosa/50 text-gob-rosa' : 'border-gray-200 bg-white placeholder-gray-400 text-gray-700'}`}
                     />
-                    {errors[item.obsName] && <span className="text-xs text-red-500 font-medium mt-1 block">{errors[item.obsName]}</span>}
+                    {errors[item.obsName] && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors[item.obsName]}</span>}
                 </div>
               )}
             </div>

@@ -11,7 +11,7 @@ const Step4PhysicalInspection = ({ formData, setFormData, errors, onChange, onKe
         <h3 className="text-xl font-semibold text-(--color-primary)">
           Paso 4: Inspección Física
         </h3>
-        <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full uppercase tracking-wider">
+        <span className="px-3 py-1 bg-gob-rosa/15 text-gob-rosa text-xs font-bold rounded-full uppercase tracking-wider">
           Cumplimiento Normativo Estricto
         </span>
       </div>

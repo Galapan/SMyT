@@ -13,9 +13,9 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
     : 0;
 
   const getOcupacionColor = (pct) => {
-    if (pct >= 90) return 'text-red-600 bg-red-50 border-red-200';
-    if (pct >= 75) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    return 'text-green-600 bg-green-50 border-green-200';
+    if (pct >= 90) return 'text-gob-rosa bg-gob-rosa/10 border-gob-rosa';
+    if (pct >= 75) return 'text-[var(--color-primary)] bg-gob-secondary/20 border-gob-secondary';
+    return 'text-gob-verde bg-gob-verde/5 border-gob-verde';
   };
 
   const hasUsers = deposito.usuarios && deposito.usuarios.length > 0;
@@ -136,7 +136,7 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
 
                 {/* Status Badge */}
                 <div className="shrink-0 ml-2">
-                   <div className={`w-2 h-2 rounded-full ${user.activo ? 'bg-green-500' : 'bg-red-500'}`} title={user.activo ? 'Cuenta Activa' : 'Cuenta Inactiva'} />
+                   <div className={`w-2 h-2 rounded-full ${user.activo ? 'bg-gob-verde' : 'bg-gob-rosa'}`} title={user.activo ? 'Cuenta Activa' : 'Cuenta Inactiva'} />
                 </div>
               </div>
             ))

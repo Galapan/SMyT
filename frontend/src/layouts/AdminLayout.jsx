@@ -84,7 +84,7 @@ const AdminLayout = () => {
 
       {/* Sidebar */}
       <aside className={`
-        fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out h-full
+        fixed lg:static inset-y-0 left-0 z-50 w-[80%] max-w-64 sm:max-w-none sm:w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out h-full
         ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="h-full flex flex-col">
@@ -129,7 +129,11 @@ const AdminLayout = () => {
 
           {/* User Profile / Logout */}
           <div className="p-4 border-t border-gray-100 shrink-0">
-            <div className="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                 onClick={() => {
+                   navigate('/admin/settings');
+                   setIsSidebarOpen(false);
+                 }}>
               <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 border border-gray-200">
                 {user ? (
                    <img 
@@ -149,8 +153,11 @@ const AdminLayout = () => {
                   {user ? getRolLabel(user.rol) : ''}
                 </p>
                 <button 
-                  onClick={handleLogout}
-                  className="flex items-center text-xs text-red-500 hover:text-red-700 mt-1 font-medium"
+                  onClick={(e) => {
+                    e.stopPropagation(); // Evita navegar a settings cuando se hace click en cerrar sesión
+                    handleLogout();
+                  }}
+                  className="flex items-center text-xs text-gob-rosa hover:text-gob-rosa mt-1 font-medium"
                 >
                   <LogOut size={12} className="mr-1" />
                   Cerrar Sesión

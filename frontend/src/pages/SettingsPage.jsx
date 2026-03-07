@@ -178,7 +178,7 @@ const SettingsPage = () => {
       {/* Message Alert */}
       {message && (
         <div className={`mb-6 p-4 rounded-lg flex items-center space-x-3 ${
-          message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+          message.type === 'success' ? 'bg-gob-verde/5 text-gob-verde' : 'bg-gob-rosa/10 text-gob-rosa'
         }`}>
           {message.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
           <span>{message.text}</span>

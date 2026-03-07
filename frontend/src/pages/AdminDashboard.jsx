@@ -225,7 +225,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 shrink-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6 shrink-0">
         <StatCard 
           title="Total de Vehículos" 
           value={stats.totalVehiculos.toString()} 
@@ -261,7 +261,7 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content Area (Grid for Dashboard config) */}
-      <div className="flex-1 flex flex-col xl:flex-row gap-6 min-h-100 lg:min-h-0 lg:overflow-hidden">
+      <div className="flex-1 flex flex-col xl:flex-row gap-4 xl:gap-6 min-h-100 lg:min-h-0 lg:overflow-hidden">
         {/* Depot Management Section */}
         <div className={`flex flex-col min-h-100 xl:min-h-0 ${userRol === 'SUPER_USUARIO' ? 'xl:w-2/3' : 'w-full'} lg:overflow-hidden`}>
           <DepotTable loading={loading} depots={depositos} />
@@ -270,7 +270,7 @@ const AdminDashboard = () => {
         {/* Notificaciones Panel (SUPER_USUARIO ve pendientes, otros ven resueltas) */}
         {userRol === 'SUPER_USUARIO' ? (
           <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in h-100 xl:h-full">
-            <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center space-x-2">
                 <Bell size={18} className="text-(--color-primary)" />
                 <h3 className="font-semibold text-gray-800">Solicitudes de Edición</h3>
@@ -316,7 +316,7 @@ const AdminDashboard = () => {
                   {notificaciones.map((notif) => (
                     <div 
                       key={notif.id} 
-                      className="p-4 rounded-lg border border-gray-100 bg-white hover:border-(--color-primary) hover:shadow-md transition-all cursor-pointer group"
+                      className="p-3 sm:p-4 rounded-lg border border-gray-100 bg-white hover:border-(--color-primary) hover:shadow-md transition-all cursor-pointer group"
                       onClick={() => handleOpenNotif(notif)}
                     >
                       <div className="flex justify-between items-start mb-2">
@@ -350,7 +350,7 @@ const AdminDashboard = () => {
           </div>
         ) : (
           <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in h-100 xl:h-full">
-            <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center space-x-2">
                 <CheckCircle size={18} className="text-green-600" />
                 <h3 className="font-semibold text-gray-800">Mis Solicitudes Aprobadas</h3>
@@ -385,7 +385,7 @@ const AdminDashboard = () => {
                   {notificaciones.map((notif) => (
                     <div 
                       key={notif.id} 
-                      className="p-4 rounded-lg border border-green-100 bg-green-50/30 hover:border-green-300 hover:shadow-md transition-all group flex flex-col justify-between"
+                      className="p-3 sm:p-4 rounded-lg border border-green-100 bg-green-50/30 hover:border-green-300 hover:shadow-md transition-all group flex flex-col justify-between"
                     >
                       <div>
                         <div className="flex justify-between items-start mb-2">
@@ -431,7 +431,7 @@ const AdminDashboard = () => {
           {/* Modal Content */}
           <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-slide-up-fade">
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-orange-100 text-orange-600 rounded-lg">
                   <AlertTriangle size={20} />
@@ -453,7 +453,7 @@ const AdminDashboard = () => {
             </div>
             
             {/* Modal Body */}
-            <div className="p-6 space-y-6">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
               {/* Vehicle Info - Skeleton or Loaded */}
               {loadingDetail ? (
                 <div className="animate-pulse space-y-4">
@@ -525,7 +525,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Modal Footer / Actions */}
-            <div className="px-6 py-4 bg-gray-50 flex items-center justify-end space-x-3 border-t border-gray-100">
+            <div className="px-4 py-3 sm:px-6 sm:py-4 bg-gray-50 flex items-center justify-end space-x-3 border-t border-gray-100">
               <button
                 onClick={() => handleResolveNotification(selectedNotif.id, 'RECHAZADA')}
                 disabled={resolving}

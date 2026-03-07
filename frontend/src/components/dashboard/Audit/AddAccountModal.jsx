@@ -181,7 +181,7 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
         {/* Header */}
         <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-violet-100 text-(--color-primary) rounded-xl">
+            <div className="p-2 bg-gob-primary/10 text-(--color-primary) rounded-xl">
               <UserPlus size={20} />
             </div>
             <div>
@@ -219,7 +219,7 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
 
         {/* Global Error */}
         {error && (
-          <div className="mx-6 mt-4 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3 text-red-700">
+          <div className="mx-6 mt-4 p-3.5 bg-gob-rosa/10 border border-gob-rosa rounded-xl flex items-start gap-3 text-gob-rosa">
             <AlertCircle size={18} className="shrink-0 mt-0.5" />
             <span className="text-sm">{error}</span>
           </div>

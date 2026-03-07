@@ -9,7 +9,7 @@ const ConditionalTextarea = ({
 }) => {
   const baseClass = "w-full px-4 py-2.5 bg-white border rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all text-sm resize-none";
   const textareaClass = error 
-    ? `${baseClass} border-red-500 focus:ring-red-500` 
+    ? `${baseClass} border-gob-rosa focus:ring-gob-rosa` 
     : `${baseClass} border-gray-300`;
 
   return (
@@ -22,7 +22,7 @@ const ConditionalTextarea = ({
         rows={rows}
         className={textareaClass}
       />
-      {error && <p className="text-xs text-red-500 mt-1">{error}</p>}
+      {error && <p className="text-xs text-gob-rosa mt-1">{error}</p>}
     </div>
   );
 };

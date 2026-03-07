@@ -12,9 +12,9 @@ const NewDepotModal = ({ isOpen, onClose }) => {
       />
 
       {/* Modal Content */}
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-fade-in">
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden animate-fade-in mx-2 sm:mx-0">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+        <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
           <h3 className="text-lg font-bold text-gray-900">Nuevo Depósito</h3>
           <button 
             onClick={onClose}
@@ -25,7 +25,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Form Body */}
-        <div className="p-6 space-y-4">
+        <div className="p-4 sm:p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Concesionario</label>
             <div className="relative">
@@ -62,8 +62,8 @@ const NewDepotModal = ({ isOpen, onClose }) => {
             </div>
           </div>
           
-          <div className="flex space-x-4">
-             <div className="w-1/2">
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+             <div className="w-full sm:w-1/2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
                 <input
                     type="tel"
@@ -71,7 +71,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
                     className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
                 />
              </div>
-             <div className="w-1/2">
+             <div className="w-full sm:w-1/2">
                 <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad (Vehículos)</label>
                 <input
                     type="number"
@@ -83,7 +83,7 @@ const NewDepotModal = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 flex items-center justify-end space-x-3">
+        <div className="px-4 py-3 sm:px-6 sm:py-4 bg-gray-50 flex items-center justify-end space-x-3">
           <button 
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"

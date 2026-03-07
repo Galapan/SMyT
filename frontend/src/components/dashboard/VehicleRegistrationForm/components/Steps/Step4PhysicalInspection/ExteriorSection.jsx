@@ -11,7 +11,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
   ];
 
   const getStatusColor = (status, fieldName) => {
-    if (errors[fieldName]) return 'border-red-500';
+    if (errors[fieldName]) return 'border-gob-rosa';
     if (!status) return 'border-gray-200 text-gray-500';
     return 'border-gray-200 text-gray-900';
   };
@@ -42,7 +42,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                   <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
               </div>
-              {errors[item.name] && <span className="text-xs text-red-500 font-medium">{errors[item.name]}</span>}
+              {errors[item.name] && <span className="text-xs text-gob-rosa font-medium">{errors[item.name]}</span>}
               
               {(formData[item.name] === 'DAÑADOS' || formData[item.name] === 'INCOMPLETOS' || formData[item.name] === 'MALO') && item.obsName && (
                  <ConditionalTextarea
@@ -72,7 +72,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Eje Delantero */}
           <div className="relative">
-            <div className={`p-5 border rounded-xl transition-colors ${errors.cantLlantasDelanteras || errors.estadoLlantasDelanteras ? 'border-red-300' : 'border-gray-200'}`}>
+            <div className={`p-5 border rounded-xl transition-colors ${errors.cantLlantasDelanteras || errors.estadoLlantasDelanteras ? 'border-gob-rosa' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between mb-4">
                  <p className="text-sm font-semibold text-gray-800">Eje Delantero</p>
                  <span className="text-xs text-gray-500">Frontal</span>
@@ -87,7 +87,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                     value={formData.cantLlantasDelanteras} 
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors.cantLlantasDelanteras ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors.cantLlantasDelanteras ? 'border-gob-rosa' : 'border-gray-300'}`}
                     min="0"
                     max="2"
                   />
@@ -110,7 +110,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </div>
                    </div>
-                   {errors.estadoLlantasDelanteras && <span className="text-xs text-red-500 font-medium mt-1 block">{errors.estadoLlantasDelanteras}</span>}
+                   {errors.estadoLlantasDelanteras && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors.estadoLlantasDelanteras}</span>}
                 </div>
               </div>
             </div>
@@ -118,7 +118,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
           
           {/* Eje Trasero */}
           <div className="relative">
-             <div className={`p-5 border rounded-xl transition-colors ${errors.cantLlantasTraseras || errors.estadoLlantasTraseras ? 'border-red-300' : 'border-gray-200'}`}>
+             <div className={`p-5 border rounded-xl transition-colors ${errors.cantLlantasTraseras || errors.estadoLlantasTraseras ? 'border-gob-rosa' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between mb-4">
                  <p className="text-sm font-semibold text-gray-800">Eje Trasero</p>
                  <span className="text-xs text-gray-500">Posterior</span>
@@ -133,7 +133,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                     value={formData.cantLlantasTraseras} 
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors.cantLlantasTraseras ? 'border-red-500' : 'border-gray-300'}`}
+                    className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors.cantLlantasTraseras ? 'border-gob-rosa' : 'border-gray-300'}`}
                     min="0"
                     max="2"
                   />
@@ -156,7 +156,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                         </div>
                    </div>
-                   {errors.estadoLlantasTraseras && <span className="text-xs text-red-500 font-medium mt-1 block">{errors.estadoLlantasTraseras}</span>}
+                   {errors.estadoLlantasTraseras && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors.estadoLlantasTraseras}</span>}
                 </div>
               </div>
             </div>

@@ -192,9 +192,9 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
       />
 
       {/* Modal Container */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-slide-up-fade flex flex-col">
+      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-slide-up-fade flex flex-col mx-2 sm:mx-0">
         {/* Header Style from Vehicle Form */}
-        <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
+        <div className="sticky top-0 bg-white z-10 px-4 sm:px-6 md:px-8 pt-4 pb-3 md:pt-6 md:pb-4 border-b border-gray-100">
           <ModalHeader 
             onClose={handleClose} 
             title="Registro de Depósito" 
@@ -204,14 +204,14 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
 
         {/* Global Error */}
         {error && (
-          <div className="mx-8 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
+          <div className="mx-4 sm:mx-6 md:mx-8 mt-4 p-3 md:p-4 bg-gob-rosa/10 border border-gob-rosa rounded-lg flex items-center gap-3 text-gob-rosa">
             <AlertCircle size={20} />
             <span className="text-sm">{error}</span>
           </div>
         )}
 
         {/* Form Content */}
-        <div className="p-8 overflow-y-auto max-h-[calc(90vh-250px)]">
+        <div className="p-4 sm:p-6 md:p-8 overflow-y-auto max-h-[calc(90vh-250px)]">
           <div
             key={currentStep}
             className={`${
@@ -236,7 +236,7 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
                   helperText="Nombre oficial de la concesión o establecimiento"
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <FormSelect
                     label="Municipio *"
                     name="municipio"
@@ -293,7 +293,7 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
                   placeholder="Nombre(s) y Apellidos"
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <FormInput
                     label="RFC *"
                     name="rfc"

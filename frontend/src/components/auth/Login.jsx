@@ -174,7 +174,7 @@ function Login() {
           </div>
 
           {error && (
-            <div className="text-red-500 text-sm bg-red-50 p-2 rounded border border-red-100 text-center">
+            <div className="text-gob-rosa text-sm bg-gob-rosa/10 p-2 rounded border border-gob-rosa text-center">
               {error}
             </div>
           )}

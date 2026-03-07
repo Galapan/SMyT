@@ -25,10 +25,10 @@ const AuditSearch = ({ onSearch }) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <div className="flex items-center mb-6">
-        <div className="p-2 bg-(--color-secondary)/30 rounded-lg mr-3">
-          <Search className="text-(--color-primary)" size={24} />
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5">
+      <div className="flex items-center mb-4 sm:mb-5">
+        <div className="p-2 sm:p-2.5 bg-(--color-secondary)/30 rounded-lg mr-3 shrink-0">
+          <Search className="text-(--color-primary) w-5 h-5 sm:w-6 sm:h-6" />
         </div>
         <div>
           <h2 className="text-lg font-bold text-gray-900">Auditoría Global</h2>

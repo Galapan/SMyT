@@ -31,9 +31,9 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
   const getRoleColor = (rol) => {
     const colors = {
-      'SUPER_USUARIO': 'text-red-700 bg-red-100 ring-red-200',
-      'ADMINISTRADOR_SMYT': 'text-blue-700 bg-blue-100 ring-blue-200',
-      'USUARIO_CONCESIONARIO': 'text-green-700 bg-green-100 ring-green-200'
+      'SUPER_USUARIO': 'text-gob-rosa bg-gob-rosa/15 ring-gob-rosa',
+      'ADMINISTRADOR_SMYT': 'text-gob-primary bg-gob-primary/15 ring-blue-200',
+      'USUARIO_CONCESIONARIO': 'text-gob-verde bg-gob-verde/15 ring-gob-verde'
     };
     return colors[rol] || 'text-gray-700 bg-gray-100 ring-gray-200';
   };
@@ -94,8 +94,8 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
               <div className="flex flex-col items-center mb-8 relative mt-2">
                 {/* Status Badge - Floating */}
                 <div className="absolute top-0 w-full flex justify-center -mt-6">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 shadow-[0_4px_10px_rgba(0,0,0,0.05)] text-xs font-semibold rounded-full border ${user.activo ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'}`}>
-                    {user.activo ? <CheckCircle size={14} className="text-green-500"/> : <XCircle size={14} className="text-red-500"/>}
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 shadow-[0_4px_10px_rgba(0,0,0,0.05)] text-xs font-semibold rounded-full border ${user.activo ? 'bg-gob-verde/5 text-gob-verde border-gob-verde' : 'bg-gob-rosa/10 text-gob-rosa border-gob-rosa'}`}>
+                    {user.activo ? <CheckCircle size={14} className="text-gob-verde"/> : <XCircle size={14} className="text-gob-rosa"/>}
                     {user.activo ? 'Cuenta Activa' : 'Cuenta Inactiva'}
                   </span>
                 </div>
@@ -131,8 +131,8 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
                 {/* Role Card */}
                 <div className="bg-white/60 p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center hover:shadow-md transition-shadow">
                   <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${
-                    user.rol === 'SUPER_USUARIO' ? 'bg-red-50 text-red-500' :
-                    user.rol === 'ADMINISTRADOR_SMYT' ? 'bg-blue-50 text-blue-500' : 'bg-green-50 text-green-500'
+                    user.rol === 'SUPER_USUARIO' ? 'bg-gob-rosa/10 text-gob-rosa' :
+                    user.rol === 'ADMINISTRADOR_SMYT' ? 'bg-[var(--color-primary)]/5 text-gob-primary' : 'bg-gob-verde/5 text-gob-verde'
                   }`}>
                     <Shield className="w-6 h-6" />
                   </div>
@@ -146,15 +146,15 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
                 {/* Deposit Card (Conditional) */}
                 {user.rol === 'USUARIO_CONCESIONARIO' && (
-                  <div className={`bg-white/60 p-4 rounded-2xl border flex items-center shadow-sm hover:shadow-md transition-shadow ${user.deposito ? 'border-gray-100' : 'border-orange-100 bg-orange-50/30'}`}>
-                    <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${user.deposito ? 'bg-gray-50 text-gray-500' : 'bg-orange-100 text-orange-500'}`}>
+                  <div className={`bg-white/60 p-4 rounded-2xl border flex items-center shadow-sm hover:shadow-md transition-shadow ${user.deposito ? 'border-gray-100' : 'border-gob-rosa bg-orange-50/30'}`}>
+                    <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${user.deposito ? 'bg-gray-50 text-gray-500' : 'bg-gob-rosa/15 text-gob-rosa'}`}>
                       <Warehouse className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className={`text-[11px] font-bold uppercase tracking-widest mb-1 ${user.deposito ? 'text-gray-400' : 'text-orange-400'}`}>
+                      <p className={`text-[11px] font-bold uppercase tracking-widest mb-1 ${user.deposito ? 'text-gray-400' : 'text-gob-rosa'}`}>
                         {user.deposito ? 'Depósito Asignado' : 'Asignación Pendiente'}
                       </p>
-                      <p className={`text-[15px] font-bold ${user.deposito ? 'text-gray-900' : 'text-orange-700'}`}>
+                      <p className={`text-[15px] font-bold ${user.deposito ? 'text-gray-900' : 'text-gob-rosa'}`}>
                         {user.deposito ? user.deposito.nombre : 'Sin asignación actual'}
                       </p>
                     </div>

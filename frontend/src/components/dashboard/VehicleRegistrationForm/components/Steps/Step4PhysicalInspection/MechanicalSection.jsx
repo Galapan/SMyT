@@ -4,7 +4,7 @@ import { Cog } from 'lucide-react';
 const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
   
   const getStatusStyle = (val, fieldName) => {
-      if (errors[fieldName]) return 'border-red-500 bg-white';
+      if (errors[fieldName]) return 'border-gob-rosa bg-white';
       return 'border-gray-200 bg-white';
   };
 
@@ -31,7 +31,7 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
                     <option value="MALO">Malo / Incompleto</option>
                     <option value="FALTANTE">Faltante</option>
                  </select>
-                 {errors.estadoMotor && <span className="text-xs text-red-500 font-medium mt-1 block">{errors.estadoMotor}</span>}
+                 {errors.estadoMotor && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors.estadoMotor}</span>}
             </div>
 
             <div className={`p-4 rounded-xl border transition-all ${getStatusStyle(formData.estadoBateria, 'estadoBateria')}`}>
@@ -47,7 +47,7 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
                     <option value="MALO">Dañada</option>
                     <option value="FALTANTE">Faltante</option>
                  </select>
-                 {errors.estadoBateria && <span className="text-xs text-red-500 font-medium mt-1 block">{errors.estadoBateria}</span>}
+                 {errors.estadoBateria && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors.estadoBateria}</span>}
             </div>
         </div>
 
@@ -60,7 +60,7 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
                   name="tipoTransmision" 
                   value={formData.tipoTransmision} 
                   onChange={onChange} 
-                  className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors.tipoTransmision ? 'border-red-500' : 'border-gray-200'}`}
+                  className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors.tipoTransmision ? 'border-gob-rosa' : 'border-gray-200'}`}
                 >
                   <option value="">Tipo...</option>
                   <option value="MANUAL">Manual</option>
@@ -70,7 +70,7 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
             </div>
-            {errors.tipoTransmision && <span className="text-xs text-red-500 font-medium mt-1 block">{errors.tipoTransmision}</span>}
+            {errors.tipoTransmision && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors.tipoTransmision}</span>}
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-600 mb-2">Sistema de Frenos</label>
@@ -79,7 +79,7 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
                   name="estadoFrenos" 
                   value={formData.estadoFrenos} 
                   onChange={onChange} 
-                  className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors.estadoFrenos ? 'border-red-500' : 'border-gray-200'}`}
+                  className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors.estadoFrenos ? 'border-gob-rosa' : 'border-gray-200'}`}
                 >
                   <option value="">Estado...</option>
                   <option value="FUNCIONAL">Funcional</option>
@@ -89,7 +89,7 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
              </div>
-             {errors.estadoFrenos && <span className="text-xs text-red-500 font-medium mt-1 block">{errors.estadoFrenos}</span>}
+             {errors.estadoFrenos && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors.estadoFrenos}</span>}
           </div>
         </div>
       </div>
