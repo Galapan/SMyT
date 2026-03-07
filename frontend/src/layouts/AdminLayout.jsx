@@ -157,9 +157,9 @@ const AdminLayout = () => {
                     e.stopPropagation(); // Evita navegar a settings cuando se hace click en cerrar sesión
                     handleLogout();
                   }}
-                  className="flex items-center text-xs text-gob-rosa hover:text-gob-rosa mt-1 font-medium"
+                  className="flex items-center text-xs text-red-600 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-md mt-2 font-semibold transition-colors w-full justify-center md:w-auto md:justify-start border border-red-100"
                 >
-                  <LogOut size={12} className="mr-1" />
+                  <LogOut size={14} className="mr-1.5" />
                   Cerrar Sesión
                 </button>
               </div>

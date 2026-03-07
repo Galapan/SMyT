@@ -84,7 +84,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
+    <div className="h-dvh w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
       {/* Card Formulario */}
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
         <div className="flex flex-col items-center mb-10">
@@ -174,7 +174,7 @@ function Login() {
           </div>
 
           {error && (
-            <div className="text-gob-rosa text-sm bg-gob-rosa/10 p-2 rounded border border-gob-rosa text-center">
+            <div className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-200 text-center font-medium">
               {error}
             </div>
           )}

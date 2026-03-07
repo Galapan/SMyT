@@ -31,9 +31,9 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
   const getRoleColor = (rol) => {
     const colors = {
-      'SUPER_USUARIO': 'text-gob-rosa bg-gob-rosa/15 ring-gob-rosa',
-      'ADMINISTRADOR_SMYT': 'text-gob-primary bg-gob-primary/15 ring-blue-200',
-      'USUARIO_CONCESIONARIO': 'text-gob-verde bg-gob-verde/15 ring-gob-verde'
+      'SUPER_USUARIO': 'text-purple-700 bg-purple-100 ring-purple-300',
+      'ADMINISTRADOR_SMYT': 'text-blue-700 bg-blue-100 ring-blue-300',
+      'USUARIO_CONCESIONARIO': 'text-emerald-700 bg-emerald-100 ring-emerald-300'
     };
     return colors[rol] || 'text-gray-700 bg-gray-100 ring-gray-200';
   };
@@ -131,8 +131,8 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
                 {/* Role Card */}
                 <div className="bg-white/60 p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center hover:shadow-md transition-shadow">
                   <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${
-                    user.rol === 'SUPER_USUARIO' ? 'bg-gob-rosa/10 text-gob-rosa' :
-                    user.rol === 'ADMINISTRADOR_SMYT' ? 'bg-[var(--color-primary)]/5 text-gob-primary' : 'bg-gob-verde/5 text-gob-verde'
+                    user.rol === 'SUPER_USUARIO' ? 'bg-purple-100 text-purple-700' :
+                    user.rol === 'ADMINISTRADOR_SMYT' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
                   }`}>
                     <Shield className="w-6 h-6" />
                   </div>

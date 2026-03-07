@@ -21,6 +21,7 @@ const DepositsPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const fetchData = useCallback(async () => {
+    setLoading(true);
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       
@@ -81,19 +82,19 @@ const DepositsPage = () => {
           <h1 className="text-2xl font-bold text-gray-900">Gestión de Depósitos</h1>
           <p className="text-gray-500">Registra y administra depósitos vehiculares.</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3 w-full md:w-auto">
           <button 
             onClick={fetchData}
-            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center font-medium"
+            className="flex-1 md:flex-none px-3 py-2 sm:px-4 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center font-medium text-sm sm:text-base"
           >
-            <RefreshCw size={18} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw size={18} className={`mr-1.5 sm:mr-2 ${loading ? 'animate-spin' : ''}`} />
             Actualizar
           </button>
           <button 
             onClick={() => setIsFormOpen(true)}
-            className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
+            className="flex-1 md:flex-none px-3 py-2 sm:px-4 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium text-sm sm:text-base"
           >
-            <Plus size={20} className="mr-2" />
+            <Plus size={20} className="mr-1.5 sm:mr-2" />
             Registrar
           </button>
         </div>
