@@ -472,7 +472,7 @@ const AccountsPage = () => {
                 initial={{ opacity: 0 }} 
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }} 
-                className="absolute inset-0 bg-gray-800/40 backdrop-blur-md"
+                className="fixed inset-0 bg-gray-800/40 backdrop-blur-md"
                 onClick={closeConfirmModal}
               />
               <m.div 
@@ -528,7 +528,7 @@ const AccountsPage = () => {
                 initial={{ opacity: 0 }} 
                 animate={{ opacity: 1 }} 
                 exit={{ opacity: 0 }} 
-                className="absolute inset-0 bg-gray-800/40 backdrop-blur-md"
+                className="fixed inset-0 bg-gray-800/40 backdrop-blur-md"
                 onClick={closeDeleteModal}
               />
               <m.div 
