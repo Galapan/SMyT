@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, Lock, Save, Camera, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import ImageCropper from '../components/common/ImageCropper';
 
 const SettingsPage = () => {
   const queryClient = useQueryClient();
@@ -11,6 +12,8 @@ const SettingsPage = () => {
   
   // Profile Editable State (Photo)
   const [fotoUrl, setFotoUrl] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
 
   // Password State
   const [passwords, setPasswords] = useState({
@@ -135,10 +138,24 @@ const SettingsPage = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFotoUrl(reader.result);
+        setSelectedImage(reader.result);
+        setShowCropper(true);
       };
       reader.readAsDataURL(file);
     }
+    // clear input so same file can be selected again
+    e.target.value = null; 
+  };
+
+  const handleCropComplete = (croppedImageFileUrl) => {
+    setFotoUrl(croppedImageFileUrl);
+    setShowCropper(false);
+    setSelectedImage(null);
+  };
+
+  const handleCropCancel = () => {
+    setShowCropper(false);
+    setSelectedImage(null);
   };
 
   return (
@@ -323,6 +340,15 @@ const SettingsPage = () => {
             </div>
           </form>
         </div>
+      )}
+
+      {/* Image Cropper Modal */}
+      {showCropper && selectedImage && (
+        <ImageCropper 
+          imageSrc={selectedImage} 
+          onCropComplete={handleCropComplete} 
+          onCancel={handleCropCancel} 
+        />
       )}
     </div>
   );
