@@ -282,8 +282,13 @@ const VehicleAdminDetail = () => {
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
           {/* Backdrop */}
           <div 
+            role="button"
+            tabIndex={0}
             className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity" 
             onClick={() => setShowEditModal(false)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') setShowEditModal(false);
+            }}
           />
           {/* Modal Container */}
           <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col border border-gray-200 animate-in fade-in zoom-in-95 duration-200">

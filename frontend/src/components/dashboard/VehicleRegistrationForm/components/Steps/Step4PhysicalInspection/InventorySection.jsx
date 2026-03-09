@@ -46,8 +46,9 @@ const InventorySection = ({ formData, setFormData, errors, onChange, getInputCla
           })}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones Adicionales / Otros Objetos</label>
+          <label htmlFor="observacionesInspector" className="block text-sm font-medium text-gray-700 mb-1">Observaciones Adicionales / Otros Objetos</label>
           <textarea
+            id="observacionesInspector"
             name="observacionesInspector"
             value={formData.observacionesInspector}
             onChange={onChange}

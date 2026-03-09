@@ -39,43 +39,46 @@ const AuditSearch = ({ onSearch }) => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Placa */}
         <div className="relative">
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+          <label htmlFor="placa" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
             Placa
           </label>
           <input
+            id="placa"
             type="text"
             name="placa"
             value={searchParams.placa}
             onChange={handleChange}
             placeholder="ABC-123"
-            className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border-gray-200 border rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all uppercase"
+            className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border-gray-200 border rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all motion-reduce:transition-none uppercase"
           />
         </div>
 
         {/* NIV (VIN) */}
         <div className="relative">
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+          <label htmlFor="vin" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
             NIV (VIN)
           </label>
           <input
+            id="vin"
             type="text"
             name="vin"
             value={searchParams.vin}
             onChange={handleChange}
             placeholder="17 dígitos..."
-            className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border-gray-200 border rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all uppercase"
+            className="w-full pl-4 pr-10 py-2.5 bg-gray-50 border-gray-200 border rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all motion-reduce:transition-none uppercase"
             maxLength={17}
           />
         </div>
 
         {/* Rango de Fechas */}
         <div className="relative">
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+          <label htmlFor="fechaInicio" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
             Fecha de Ingreso
           </label>
-          <div className="relative flex items-center bg-gray-50 border-gray-200 border rounded-lg focus-within:ring-2 focus-within:ring-(--color-primary) focus-within:border-transparent transition-all">
+          <div className="relative flex items-center bg-gray-50 border-gray-200 border rounded-lg focus-within:ring-2 focus-within:ring-(--color-primary) focus-within:border-transparent transition-all motion-reduce:transition-none">
              <Calendar size={18} className="absolute left-3 text-gray-400 pointer-events-none" />
              <input
+              id="fechaInicio"
               type="date"
               name="fechaInicio"
               value={searchParams.fechaInicio}
@@ -87,15 +90,16 @@ const AuditSearch = ({ onSearch }) => {
 
         {/* Tipo de Servicio */}
         <div className="relative">
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+          <label htmlFor="tipoServicio" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
             Tipo de Servicio
           </label>
           <div className="relative">
             <select 
+              id="tipoServicio"
               name="tipoServicio"
               value={searchParams.tipoServicio}
               onChange={handleChange}
-              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-gray-200 border rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all appearance-none text-gray-600"
+              className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-gray-200 border rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all motion-reduce:transition-none appearance-none text-gray-600"
             >
               <option value="">Todos</option>
               <option value="Arrastre">Arrastre</option>
@@ -110,7 +114,7 @@ const AuditSearch = ({ onSearch }) => {
       <div className="mt-6 flex justify-end">
         <button 
           onClick={handleSearch}
-          className="px-6 py-2.5 bg-(--color-primary) hover:opacity-90 text-white font-medium rounded-lg shadow-sm transition-all active:scale-95 flex items-center"
+          className="px-6 py-2.5 bg-(--color-primary) hover:opacity-90 text-white font-medium rounded-lg shadow-sm transition-all motion-reduce:transition-none active:scale-95 flex items-center"
         >
           <Search size={18} className="mr-2" />
           Buscar Vehículos

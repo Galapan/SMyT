@@ -77,8 +77,13 @@ const AdminLayout = () => {
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div 
+          role="button"
+          tabIndex={0}
           className="fixed inset-0 bg-gray-800/40 backdrop-blur-md z-40 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') setIsSidebarOpen(false);
+          }}
         />
       )}
 
@@ -129,10 +134,19 @@ const AdminLayout = () => {
 
           {/* User Profile / Logout */}
           <div className="p-4 border-t border-gray-100 shrink-0">
-            <div className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+            <div 
+                 role="button"
+                 tabIndex={0}
+                 className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                  onClick={() => {
                    navigate('/admin/settings');
                    setIsSidebarOpen(false);
+                 }}
+                 onKeyDown={(e) => {
+                   if (e.key === 'Enter' || e.key === ' ') {
+                     navigate('/admin/settings');
+                     setIsSidebarOpen(false);
+                   }
                  }}>
               <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 border border-gray-200">
                 {user ? (

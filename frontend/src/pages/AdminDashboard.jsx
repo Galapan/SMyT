@@ -315,9 +315,14 @@ const AdminDashboard = () => {
                 <div className="space-y-2">
                   {notificaciones.map((notif) => (
                     <div 
-                      key={notif.id} 
+                      key={notif.id}
+                      role="button"
+                      tabIndex={0} 
                       className="p-3 sm:p-4 rounded-lg border border-gray-100 bg-white hover:border-(--color-primary) hover:shadow-md transition-all cursor-pointer group"
                       onClick={() => handleOpenNotif(notif)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') handleOpenNotif(notif);
+                      }}
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div>
@@ -424,8 +429,15 @@ const AdminDashboard = () => {
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           {/* Backdrop */}
           <div 
+            role="button"
+            tabIndex={0}
             className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
             onClick={() => { if (!resolving) { setSelectedNotif(null); setVehiculoDetail(null); } }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                if (!resolving) { setSelectedNotif(null); setVehiculoDetail(null); }
+              }
+            }}
           />
 
           {/* Modal Content */}
@@ -482,7 +494,12 @@ const AdminDashboard = () => {
                 <>
                   {/* Vehicle Info */}
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 cursor-pointer hover:border-(--color-primary) hover:shadow-md transition-all group"
+                       role="button"
+                       tabIndex={0}
                        onClick={() => navigate(`/admin/auditoria/vehiculo/${selectedNotif.vehiculoId}`)}
+                       onKeyDown={(e) => {
+                         if (e.key === 'Enter' || e.key === ' ') navigate(`/admin/auditoria/vehiculo/${selectedNotif.vehiculoId}`);
+                       }}
                        title="Ver expediente completo del vehículo">
                     <div className="flex justify-between items-center mb-1">
                       <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Vehículo Afectado</span>

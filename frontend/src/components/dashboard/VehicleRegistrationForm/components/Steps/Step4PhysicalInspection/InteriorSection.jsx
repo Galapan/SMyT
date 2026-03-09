@@ -26,11 +26,12 @@ const InteriorSection = ({ formData, errors, onChange, getInputClass }) => {
           {interiorFields.map((item) => (
             <div key={item.name} className="flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <label className="text-sm font-semibold text-gray-700">{item.label}</label>
+                <label htmlFor={item.name} className="text-sm font-semibold text-gray-700">{item.label}</label>
               </div>
               
               <div className="relative">
                  <select 
+                  id={item.name}
                   name={item.name} 
                   value={formData[item.name]} 
                   onChange={onChange} 

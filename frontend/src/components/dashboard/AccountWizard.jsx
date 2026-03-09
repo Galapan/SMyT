@@ -163,8 +163,9 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
+          <label htmlFor="nombre" className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
           <input
+            id="nombre"
             type="text"
             name="nombre"
             value={formData.nombre}
@@ -176,8 +177,9 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         <div>
-           <label className="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
+           <label htmlFor="apellido" className="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
             <input
+              id="apellido"
               type="text"
               name="apellido"
               value={formData.apellido}
@@ -189,8 +191,9 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico *</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico *</label>
             <input
+              id="email"
               type="email"
               name="email"
               value={formData.email}
@@ -202,8 +205,9 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contraseña *</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Contraseña *</label>
             <input
+              id="password"
               type="password"
               name="password"
               value={formData.password}
@@ -228,8 +232,9 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Rol del Usuario *</label>
+            <label htmlFor="rol" className="block text-sm font-medium text-gray-700 mb-1">Rol del Usuario *</label>
             <select
+              id="rol"
               name="rol"
               value={formData.rol}
               onChange={handleChange}
@@ -245,8 +250,9 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
 
           {formData.rol === 'USUARIO_CONCESIONARIO' && (
              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Asignar a Depósito Vehicular *</label>
+                <label htmlFor="depositoId" className="block text-sm font-medium text-gray-700 mb-1">Asignar a Depósito Vehicular *</label>
                 <select
+                  id="depositoId"
                   name="depositoId"
                   value={formData.depositoId}
                   onChange={handleChange}
@@ -300,8 +306,13 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
     <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
       {/* Backdrop */}
       <div 
+        role="button"
+        tabIndex={0}
         className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') onClose();
+        }}
       />
 
       {/* Modal Container */}

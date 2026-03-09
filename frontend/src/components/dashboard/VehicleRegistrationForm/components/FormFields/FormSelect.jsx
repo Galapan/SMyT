@@ -15,10 +15,11 @@ const FormSelect = ({
 
   return (
     <div className={className}>
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label htmlFor={name} className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
       <select
+        id={name}
         name={name}
         value={value}
         onChange={onChange}

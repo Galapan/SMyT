@@ -19,8 +19,9 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
         {/* Motores y Bateria - Tarjetas grandes */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className={`p-4 rounded-xl border transition-all ${getStatusStyle(formData.estadoMotor, 'estadoMotor')}`}>
-                 <label className="block text-sm font-semibold text-gray-700 mb-2">Estado del Motor</label>
+                 <label htmlFor="estadoMotor" className="block text-sm font-semibold text-gray-700 mb-2">Estado del Motor</label>
                  <select
+                    id="estadoMotor"
                     name="estadoMotor"
                     value={formData.estadoMotor}
                     onChange={onChange}
@@ -35,8 +36,9 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
             </div>
 
             <div className={`p-4 rounded-xl border transition-all ${getStatusStyle(formData.estadoBateria, 'estadoBateria')}`}>
-                 <label className="block text-sm font-semibold text-gray-700 mb-2">Batería</label>
+                 <label htmlFor="estadoBateria" className="block text-sm font-semibold text-gray-700 mb-2">Batería</label>
                  <select
+                    id="estadoBateria"
                     name="estadoBateria"
                     value={formData.estadoBateria}
                     onChange={onChange}
@@ -54,9 +56,10 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
         {/* Detalles secundarios */}
         <div className="grid grid-cols-2 gap-6 pt-4 border-t border-gray-100">
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-2">Transmisión</label>
+            <label htmlFor="tipoTransmision" className="block text-sm font-semibold text-gray-600 mb-2">Transmisión</label>
             <div className="relative">
                 <select 
+                  id="tipoTransmision"
                   name="tipoTransmision" 
                   value={formData.tipoTransmision} 
                   onChange={onChange} 
@@ -73,9 +76,10 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
             {errors.tipoTransmision && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors.tipoTransmision}</span>}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-600 mb-2">Sistema de Frenos</label>
+            <label htmlFor="estadoFrenos" className="block text-sm font-semibold text-gray-600 mb-2">Sistema de Frenos</label>
              <div className="relative">
                 <select 
+                  id="estadoFrenos"
                   name="estadoFrenos" 
                   value={formData.estadoFrenos} 
                   onChange={onChange} 

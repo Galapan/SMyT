@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import FormInput from '../FormFields/FormInput';
 import FormSelect from '../FormFields/FormSelect';
 import { Upload } from 'lucide-react';
@@ -6,31 +7,25 @@ import { Upload } from 'lucide-react';
 const Step1AdministrativeData = ({ formData, errors, onChange }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
-  const [depositos, setDepositos] = useState([]);
-  
   const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
   const isAdmin = user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR_SMYT';
 
-  useEffect(() => {
-    if (isAdmin) {
-      const fetchDepositos = async () => {
-        try {
-          const API_URL = import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "");
-          const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-          const res = await fetch(`${API_URL}/api/depositos`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          const result = await res.json();
-          if (result.success) {
-            setDepositos(result.data.map(d => ({ value: d.id, label: `${d.nombre} - ${d.municipio}` })));
-          }
-        } catch (err) {
-          console.error('Error fetching depositos:', err);
-        }
-      };
-      fetchDepositos();
-    }
-  }, [isAdmin]);
+  const { data: depositos = [] } = useQuery({
+    queryKey: ['depositosSelect'],
+    queryFn: async () => {
+      const API_URL = import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "");
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/depositos`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const result = await res.json();
+      if (result.success) {
+        return result.data.map(d => ({ value: d.id, label: `${d.nombre} - ${d.municipio}` }));
+      }
+      return [];
+    },
+    enabled: isAdmin
+  });
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -148,7 +143,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Fotografías del Vehículo</label>
+        <label htmlFor="fotos-upload" className="block text-sm font-medium text-gray-700 mb-2">Fotografías del Vehículo</label>
         
         {/* Lista de fotos subidas */}
         {formData.fotos && formData.fotos.length > 0 && (
@@ -172,6 +167,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
 
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-(--color-primary) transition-colors relative">
           <input
+            id="fotos-upload"
             type="file"
             accept="image/*,application/pdf"
             onChange={handleFileUpload}
@@ -197,7 +193,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Documentos Adjuntos (Opcional)</label>
+        <p className="block text-sm font-medium text-gray-700 mb-1">Documentos Adjuntos (Opcional)</p>
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center bg-gray-50">
            <p className="text-sm text-gray-500">Funcionalidad de documentos en desarrollo...</p>
         </div>

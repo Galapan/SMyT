@@ -109,10 +109,11 @@ function Login() {
         {/* Formulario */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">
+            <label htmlFor="email-input" className="block text-xs font-semibold text-gray-600 mb-1">
               Correo Institucional
             </label>
             <input
+              id="email-input"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -123,10 +124,11 @@ function Login() {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">
+            <label htmlFor="password-input" className="block text-xs font-semibold text-gray-600 mb-1">
               Contraseña
             </label>
             <input
+              id="password-input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -137,9 +139,10 @@ function Login() {
           </div>
 
           <div className="flex items-center justify-between pt-1">
-            <label className="flex items-center cursor-pointer">
+            <label htmlFor="remember-me" className="flex items-center cursor-pointer">
               <div className="relative flex items-center">
                 <input
+                  id="remember-me"
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
@@ -165,12 +168,13 @@ function Login() {
                 Recordarme
               </span>
             </label>
-            <a
-              href="#"
-              className="text-xs font-medium text-[#572671] hover:underline"
+            <button
+              type="button"
+              className="text-xs font-medium text-[#572671] hover:underline bg-transparent border-none p-0 cursor-pointer"
+              onClick={() => alert("Función en desarrollo")}
             >
               ¿Olvidaste tu contraseña?
-            </a>
+            </button>
           </div>
 
           {error && (

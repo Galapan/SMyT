@@ -7,8 +7,13 @@ const NewDepotModal = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div 
+        role="button"
+        tabIndex={0}
         className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') onClose();
+        }}
       />
 
       {/* Modal Content */}
@@ -27,9 +32,10 @@ const NewDepotModal = ({ isOpen, onClose }) => {
         {/* Form Body */}
         <div className="p-4 sm:p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Concesionario</label>
+            <label htmlFor="nombre-concesionario" className="block text-sm font-medium text-gray-700 mb-1">Nombre del Concesionario</label>
             <div className="relative">
               <input
+                id="nombre-concesionario"
                 type="text"
                 placeholder="Ej. Grúas del Valle"
                 className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
@@ -39,9 +45,10 @@ const NewDepotModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación / Dirección</label>
+            <label htmlFor="ubicacion-direccion" className="block text-sm font-medium text-gray-700 mb-1">Ubicación / Dirección</label>
             <div className="relative">
               <input
+                id="ubicacion-direccion"
                 type="text"
                 placeholder="Calle, Número, Colonia..."
                 className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
@@ -51,9 +58,10 @@ const NewDepotModal = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Responsable</label>
+            <label htmlFor="responsable" className="block text-sm font-medium text-gray-700 mb-1">Responsable</label>
             <div className="relative">
               <input
+                id="responsable"
                 type="text"
                 placeholder="Nombre del encargado"
                 className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
@@ -64,16 +72,18 @@ const NewDepotModal = ({ isOpen, onClose }) => {
           
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
              <div className="w-full sm:w-1/2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                <label htmlFor="telefono" className="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
                 <input
+                    id="telefono"
                     type="tel"
                     placeholder="555-000-0000"
                     className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"
                 />
              </div>
              <div className="w-full sm:w-1/2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad (Vehículos)</label>
+                <label htmlFor="capacidad" className="block text-sm font-medium text-gray-700 mb-1">Capacidad (Vehículos)</label>
                 <input
+                    id="capacidad"
                     type="number"
                     placeholder="200"
                     className="w-full px-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all"

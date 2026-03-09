@@ -27,9 +27,10 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
         <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           {exteriorFields.map((item) => (
             <div key={item.name} className="space-y-3">
-              <label className="block text-sm font-semibold text-gray-700">{item.label}</label>
+              <label htmlFor={item.name} className="block text-sm font-semibold text-gray-700">{item.label}</label>
               <div className="relative">
                 <select
+                  id={item.name}
                   name={item.name}
                   value={formData[item.name]}
                   onChange={onChange}
@@ -80,8 +81,9 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
               
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Cantidad (Máx. 2)</label>
+                  <label htmlFor="cantLlantasDelanteras" className="text-xs font-semibold text-gray-600 mb-1 block">Cantidad (Máx. 2)</label>
                   <input 
+                    id="cantLlantasDelanteras"
                     type="number" 
                     name="cantLlantasDelanteras" 
                     value={formData.cantLlantasDelanteras} 
@@ -93,9 +95,10 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Condición</label>
+                  <label htmlFor="estadoLlantasDelanteras" className="text-xs font-semibold text-gray-600 mb-1 block">Condición</label>
                    <div className="relative">
                         <select 
+                            id="estadoLlantasDelanteras"
                             name="estadoLlantasDelanteras" 
                             value={formData.estadoLlantasDelanteras} 
                             onChange={onChange}
@@ -126,8 +129,9 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
               
               <div className="space-y-4">
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Cantidad (Máx. 2)</label>
+                  <label htmlFor="cantLlantasTraseras" className="text-xs font-semibold text-gray-600 mb-1 block">Cantidad (Máx. 2)</label>
                   <input 
+                    id="cantLlantasTraseras"
                     type="number" 
                     name="cantLlantasTraseras" 
                     value={formData.cantLlantasTraseras} 
@@ -139,9 +143,10 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 mb-1 block">Condición</label>
+                  <label htmlFor="estadoLlantasTraseras" className="text-xs font-semibold text-gray-600 mb-1 block">Condición</label>
                    <div className="relative">
                         <select 
+                            id="estadoLlantasTraseras"
                             name="estadoLlantasTraseras" 
                             value={formData.estadoLlantasTraseras} 
                             onChange={onChange}

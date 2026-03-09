@@ -233,8 +233,9 @@ const SettingsPage = () => {
               <div className="flex-1 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                    <label htmlFor="editData.nombre" className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
                     <input
+                      id="editData.nombre"
                       type="text"
                       value={editData.nombre}
                       onChange={(e) => setEditData({...editData, nombre: e.target.value})}
@@ -242,8 +243,9 @@ const SettingsPage = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+                    <label htmlFor="editData.apellido" className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
                     <input
+                      id="editData.apellido"
                       type="text"
                       value={editData.apellido}
                       onChange={(e) => setEditData({...editData, apellido: e.target.value})}
@@ -254,8 +256,9 @@ const SettingsPage = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <label htmlFor="profile.email" className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                     <input
+                      id="profile.email"
                       type="email"
                       value={profile.email}
                       disabled
@@ -263,8 +266,9 @@ const SettingsPage = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Rol</label>
+                    <label htmlFor="profile.rol" className="block text-sm font-medium text-gray-700 mb-2">Rol</label>
                     <input
+                      id="profile.rol"
                       type="text"
                       value={profile.rol}
                       disabled
@@ -294,8 +298,9 @@ const SettingsPage = () => {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-2xl animate-fade-in">
           <form onSubmit={handlePasswordSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
+              <label htmlFor="passwords.currentPassword" className="block text-sm font-medium text-gray-700 mb-2">Contraseña Actual</label>
               <input
+                id="passwords.currentPassword"
                 type="password"
                 value={passwords.currentPassword}
                 onChange={(e) => setPasswords({...passwords, currentPassword: e.target.value})}
@@ -305,8 +310,9 @@ const SettingsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
+              <label htmlFor="passwords.newPassword" className="block text-sm font-medium text-gray-700 mb-2">Nueva Contraseña</label>
               <input
+                id="passwords.newPassword"
                 type="password"
                 value={passwords.newPassword}
                 onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
@@ -317,8 +323,9 @@ const SettingsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
+              <label htmlFor="passwords.confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">Confirmar Nueva Contraseña</label>
               <input
+                id="passwords.confirmPassword"
                 type="password"
                 value={passwords.confirmPassword}
                 onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
