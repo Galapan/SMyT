@@ -9,7 +9,7 @@ const StatCard = ({ title, value, icon: Icon, trend, trendValue, color, loading 
           <Skeleton width="3rem" height="3rem" className="rounded-lg shrink-0" />
         ) : (
           <div className={`p-3 rounded-lg shrink-0 ${color}`}>
-            <Icon size={24} className="text-white" />
+            <Icon size={24} />
           </div>
         )}
         <div>

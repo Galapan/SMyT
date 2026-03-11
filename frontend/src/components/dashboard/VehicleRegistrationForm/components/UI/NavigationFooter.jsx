@@ -40,7 +40,7 @@ const NavigationFooter = ({
         <button
           onClick={onSubmit}
           disabled={loading}
-          className="px-6 py-2.5 bg-gob-verde hover:bg-gob-verde text-white rounded-lg font-medium flex items-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2.5 bg-(--color-verde) hover:opacity-90 text-white rounded-lg font-medium flex items-center gap-2 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>

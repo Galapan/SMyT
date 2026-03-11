@@ -41,9 +41,9 @@ const AuditConcesionarioDetail = () => {
     : 0;
 
   const getOcupacionColor = (pct) => {
-    if (pct >= 90) return 'text-red-600 bg-red-50 border-red-200';
-    if (pct >= 75) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-    return 'text-green-600 bg-green-50 border-green-200';
+    if (pct >= 90) return 'text-(--color-rojo) bg-(--color-rojo)/10 border-(--color-rojo)/20';
+    if (pct >= 75) return 'text-(--color-naranja) bg-(--color-naranja)/10 border-(--color-naranja)/20';
+    return 'text-(--color-verde) bg-(--color-verde)/10 border-(--color-verde)/20';
   };
 
   if (loading) {
@@ -233,10 +233,10 @@ const AuditConcesionarioDetail = () => {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                              v.estatusLegal === 'ROBADO' ? 'bg-red-100 text-red-700 border border-red-200' :
-                              v.estatusLegal === 'DECOMISADO' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
-                              v.estatusLegal === 'SINIESTRADO' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
-                              'bg-gray-100 text-gray-700 border border-gray-200'
+                              v.estatusLegal === 'ROBADO' ? 'bg-(--color-rojo)/15 text-(--color-rojo) border border-(--color-rojo)/20 font-bold' :
+                              v.estatusLegal === 'DECOMISADO' ? 'bg-(--color-naranja)/15 text-(--color-naranja) border border-(--color-naranja)/20 font-bold' :
+                              v.estatusLegal === 'SINIESTRADO' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 font-bold' :
+                              'bg-gray-100 text-gray-700 border border-gray-200 font-bold'
                           }`}>
                             {v.estatusLegal}
                           </span>
@@ -293,10 +293,10 @@ const AuditConcesionarioDetail = () => {
                            </div>
                         </div>
                         <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
-                              v.estatusLegal === 'ROBADO' ? 'bg-red-100 text-red-700 border border-red-200' :
-                              v.estatusLegal === 'DECOMISADO' ? 'bg-orange-100 text-orange-700 border border-orange-200' :
-                              v.estatusLegal === 'SINIESTRADO' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
-                              'bg-gray-100 text-gray-700 border border-gray-200'
+                              v.estatusLegal === 'ROBADO' ? 'bg-(--color-rojo)/15 text-(--color-rojo) border border-(--color-rojo)/20 font-bold' :
+                              v.estatusLegal === 'DECOMISADO' ? 'bg-(--color-naranja)/15 text-(--color-naranja) border border-(--color-naranja)/20 font-bold' :
+                              v.estatusLegal === 'SINIESTRADO' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 font-bold' :
+                              'bg-gray-100 text-gray-700 border border-gray-200 font-bold'
                           }`}>
                           {v.estatusLegal}
                         </span>

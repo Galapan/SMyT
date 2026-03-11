@@ -7,7 +7,7 @@ const AuditSearch = ({ onSearch }) => {
     vin: '',
     fechaInicio: '',
     fechaFin: '',
-    tipoServicio: ''
+    estatusLegal: ''
   });
 
   const handleChange = (e) => {
@@ -88,23 +88,23 @@ const AuditSearch = ({ onSearch }) => {
           </div>
         </div>
 
-        {/* Tipo de Servicio */}
+        {/* Estatus Legal */}
         <div className="relative">
-          <label htmlFor="tipoServicio" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
-            Tipo de Servicio
+          <label htmlFor="estatusLegal" className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1">
+            Estatus Legal
           </label>
           <div className="relative">
             <select 
-              id="tipoServicio"
-              name="tipoServicio"
-              value={searchParams.tipoServicio}
+              id="estatusLegal"
+              name="estatusLegal"
+              value={searchParams.estatusLegal}
               onChange={handleChange}
               className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border-gray-200 border rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none transition-all motion-reduce:transition-none appearance-none text-gray-600"
             >
               <option value="">Todos</option>
-              <option value="Arrastre">Arrastre</option>
-              <option value="Salvamento">Salvamento</option>
-              <option value="Resguardo">Resguardo</option>
+              <option value="ROBADO">Robado</option>
+              <option value="DECOMISADO">Decomisado</option>
+              <option value="SINIESTRADO">Siniestrado</option>
             </select>
             <Filter size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           </div>

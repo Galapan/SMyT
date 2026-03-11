@@ -1,5 +1,6 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react';
-import { Plus, Car, RefreshCw, Search, Eye, MoreVertical, ArrowUpDown } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
+import { Plus, Car, RefreshCw, Search, Eye, MoreVertical, ArrowUpDown, Filter as FilterIcon } from 'lucide-react';
 import VehicleRegistrationForm from '../components/dashboard/VehicleRegistrationForm';
 import VehicleDetailsModal from '../components/dashboard/VehicleDetailsModal';
 import TableSkeleton from '../components/common/TableSkeleton';
@@ -20,6 +21,7 @@ const initialState = {
   },
   loading: true,
   searchTerm: '',
+  estatusLegalFilter: '',
   isDetailsOpen: false,
   selectedVehicle: null,
 };
@@ -36,6 +38,8 @@ function reducer(state, action) {
       return { ...state, loading: action.payload };
     case 'SET_SEARCH_TERM':
       return { ...state, searchTerm: action.payload };
+    case 'SET_ESTATUS_LEGAL_FILTER':
+      return { ...state, estatusLegalFilter: action.payload };
     case 'SHOW_DETAILS':
       return { ...state, isDetailsOpen: true, selectedVehicle: action.payload };
     case 'HIDE_DETAILS':
@@ -46,8 +50,9 @@ function reducer(state, action) {
 }
 
 const VehiclesPage = () => {
+  const [searchParams] = useSearchParams();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isFormOpen, vehiculos, stats, loading, searchTerm, isDetailsOpen, selectedVehicle } = state;
+  const { isFormOpen, vehiculos, stats, loading, searchTerm, estatusLegalFilter, isDetailsOpen, selectedVehicle } = state;
 
   const fetchData = useCallback(async () => {
     dispatch({ type: 'SET_LOADING', payload: true });
@@ -83,20 +88,36 @@ const VehiclesPage = () => {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+    
+    // Check if there are query params from AuditSearch
+    const estatusLegal = searchParams.get('estatusLegal');
+    const searchTermFromUrl = searchParams.get('placa') || searchParams.get('vin') || '';
+    
+    if (estatusLegal) {
+      dispatch({ type: 'SET_ESTATUS_LEGAL_FILTER', payload: estatusLegal });
+    }
+    
+    if (searchTermFromUrl) {
+      dispatch({ type: 'SET_SEARCH_TERM', payload: searchTermFromUrl });
+    }
+  }, [fetchData, searchParams]);
 
   const handleFormSuccess = () => {
     fetchData();
   };
 
   const filteredVehiculos = useMemo(() => {
-    return vehiculos.filter(v => 
-      v.placa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.vin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [vehiculos, searchTerm]);
+    return vehiculos.filter(v => {
+      const matchesSearch = v.placa.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            v.vin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesEstatus = estatusLegalFilter ? v.estatusLegal === estatusLegalFilter : true;
+      
+      return matchesSearch && matchesEstatus;
+    });
+  }, [vehiculos, searchTerm, estatusLegalFilter]);
 
   const getStatusColor = (status) => {
     const colors = {
@@ -199,8 +220,22 @@ const VehiclesPage = () => {
                 placeholder="Buscar por placa, VIN, marca..."
                 value={searchTerm}
                 onChange={(e) => dispatch({ type: 'SET_SEARCH_TERM', payload: e.target.value })}
-                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none w-full md:w-80"
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none w-full md:w-64"
               />
+            </div>
+            {/* Estatus Filter Dropdown */}
+            <div className="relative w-full md:w-auto mt-3 md:mt-0">
+               <select
+                  value={estatusLegalFilter}
+                  onChange={(e) => dispatch({ type: 'SET_ESTATUS_LEGAL_FILTER', payload: e.target.value })}
+                  className="pl-10 pr-8 py-2 w-full md:w-48 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none appearance-none text-sm text-gray-700"
+               >
+                 <option value="">Todos los Estatus</option>
+                 <option value="ROBADO">Robado</option>
+                 <option value="DECOMISADO">Decomisado</option>
+                 <option value="SINIESTRADO">Siniestrado</option>
+               </select>
+               <FilterIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             </div>
           </div>
         </div>

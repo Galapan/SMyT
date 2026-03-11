@@ -124,7 +124,7 @@ const AdminDashboard = () => {
     if (searchParams.vin) queryParams.append('vin', searchParams.vin);
     if (searchParams.fechaInicio) queryParams.append('fechaInicio', searchParams.fechaInicio);
     if (searchParams.fechaFin) queryParams.append('fechaFin', searchParams.fechaFin);
-    if (searchParams.tipoServicio) queryParams.append('tipoServicio', searchParams.tipoServicio);
+    if (searchParams.estatusLegal) queryParams.append('estatusLegal', searchParams.estatusLegal);
     
     navigate(`/admin/vehicles?${queryParams.toString()}`);
   };
@@ -251,7 +251,7 @@ const AdminDashboard = () => {
           title="Total de Vehículos" 
           value={stats.totalVehiculos.toString()} 
           icon={Warehouse}
-          color="bg-[var(--color-primary)]"
+          color="bg-(--color-primary)/15 text-(--color-primary)"
           trend="up"
           trendValue={`${stats.totalDepositos} depósitos`}
           loading={loading}
@@ -260,7 +260,7 @@ const AdminDashboard = () => {
           title="Vehículos Ingresados Hoy" 
           value={stats.ingresosHoy.toString()} 
           icon={Car}
-          color="bg-[var(--color-verde)]"
+          color="bg-(--color-verde)/15 text-(--color-verde)"
           trend="up"
           trendValue="Nuevos hoy"
           loading={loading}
@@ -269,7 +269,7 @@ const AdminDashboard = () => {
           title="Vehículos Liberados" 
           value={stats.liberadosMes.toString()} 
           icon={Key}
-          color="bg-[var(--color-rosa)]"
+          color="bg-(--color-rosa)/15 text-(--color-rosa)"
           trend="down"
           trendValue="Este mes"
           loading={loading}
@@ -296,7 +296,7 @@ const AdminDashboard = () => {
                 <Bell size={18} className="text-(--color-primary)" />
                 <h3 className="font-semibold text-gray-800">Solicitudes de Edición</h3>
               </div>
-              <span className="bg-orange-100 text-orange-700 text-xs font-bold px-2 py-1 rounded-full">
+              <span className="bg-(--color-primary)/15 text-(--color-primary) border border-(--color-primary)/20 text-xs font-bold px-2 py-1 rounded-full">
                 {notificaciones.length}
               </span>
             </div>
@@ -329,7 +329,7 @@ const AdminDashboard = () => {
                 </div>
               ) : notificaciones.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
-                  <CheckCircle size={32} className="mb-2 text-green-400 opacity-50" />
+                  <CheckCircle size={32} className="mb-2 text-(--color-primary) opacity-50" />
                   <p className="text-sm">No hay solicitudes pendientes</p>
                 </div>
               ) : (
@@ -378,10 +378,10 @@ const AdminDashboard = () => {
           <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in h-100 xl:h-full">
             <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center space-x-2">
-                <CheckCircle size={18} className="text-green-600" />
+                <CheckCircle size={18} className="text-(--color-verde)" />
                 <h3 className="font-semibold text-gray-800">Mis Solicitudes Aprobadas</h3>
               </div>
-              <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-1 rounded-full">
+              <span className="bg-(--color-verde)/15 text-(--color-verde) border border-(--color-verde)/20 text-xs font-bold px-2 py-1 rounded-full">
                 {notificaciones.length}
               </span>
             </div>
@@ -403,7 +403,7 @@ const AdminDashboard = () => {
                 </div>
               ) : notificaciones.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
-                  <CheckCircle size={32} className="mb-2 text-green-400 opacity-50" />
+                  <CheckCircle size={32} className="mb-2 text-(--color-verde) opacity-50" />
                   <p className="text-sm">No tienes solicitudes pendientes de edición</p>
                 </div>
               ) : (
@@ -411,7 +411,7 @@ const AdminDashboard = () => {
                   {notificaciones.map((notif) => (
                     <div 
                       key={notif.id} 
-                      className="p-3 sm:p-4 rounded-lg border border-green-100 bg-green-50/30 hover:border-green-300 hover:shadow-md transition-all group flex flex-col justify-between"
+                      className="p-3 sm:p-4 rounded-lg border border-(--color-verde)/20 bg-(--color-verde)/5 hover:border-(--color-verde)/40 hover:shadow-md transition-all group flex flex-col justify-between"
                     >
                       <div>
                         <div className="flex justify-between items-start mb-2">
@@ -466,7 +466,7 @@ const AdminDashboard = () => {
             {/* Modal Header */}
             <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-orange-100 text-orange-600 rounded-lg">
+                <div className="p-2 bg-(--color-naranja)/15 text-(--color-naranja) rounded-lg border border-(--color-naranja)/20">
                   <AlertTriangle size={20} />
                 </div>
                 <div>
@@ -546,7 +546,7 @@ const AdminDashboard = () => {
                   {/* Justification */}
                   <div>
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Motivo de la solicitud</span>
-                    <div className="bg-orange-50/50 border border-orange-100 rounded-xl p-4">
+                    <div className="bg-(--color-naranja)/5 border border-(--color-naranja)/20 rounded-xl p-4">
                       <p className="text-sm text-gray-800 leading-relaxed">
                         "{selectedNotif.motivo}"
                       </p>

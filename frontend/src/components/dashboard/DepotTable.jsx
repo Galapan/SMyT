@@ -56,8 +56,8 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       depot.activo 
-                        ? 'bg-gob-verde/15 text-gob-verde' 
-                        : 'bg-gob-rosa/15 text-gob-rosa'
+                        ? 'bg-(--color-verde)/15 text-(--color-verde)' 
+                        : 'bg-(--color-rosa)/15 text-(--color-rosa)'
                     }`}>
                       {depot.activo ? 'Activo' : 'Inactivo'}
                     </span>
@@ -84,8 +84,8 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
                     </div>
                     <span className={`shrink-0 ml-2 px-2 py-0.5 inline-flex text-[10px] font-semibold rounded-full ${
                       depot.activo 
-                        ? 'bg-gob-verde/15 text-gob-verde' 
-                        : 'bg-gob-rosa/15 text-gob-rosa'
+                        ? 'bg-(--color-verde)/15 text-(--color-verde)' 
+                        : 'bg-(--color-rosa)/15 text-(--color-rosa)'
                     }`}>
                       {depot.activo ? 'Activo' : 'Inactivo'}
                     </span>

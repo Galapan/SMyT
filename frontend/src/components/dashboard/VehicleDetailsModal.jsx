@@ -11,7 +11,7 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehiculo }) => {
     <AnimatePresence>
       {isOpen && vehiculo && (
         <LazyMotion features={domAnimation}>
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 sm:py-8 lg:p-12 overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 sm:py-8 lg:p-12">
                 {/* Backdrop overlay */}
                 <m.div 
                   initial={{ opacity: 0 }}
@@ -28,7 +28,7 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehiculo }) => {
                     initial={{ opacity: 0, y: 50, scale: 0.9 }}
                     animate={{ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } }}
                     exit={{ opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2 } }}
-                    className="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl flex flex-col max-h-[90vh] lg:max-h-[85vh] z-10 overflow-hidden"
+                    className="relative bg-white w-full max-w-4xl rounded-3xl shadow-2xl flex flex-col max-h-[90dvh] lg:max-h-[85dvh] z-10 overflow-hidden"
                 >
                     {/* Header */}
                     <div className="flex-none px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-white z-10">
@@ -51,11 +51,9 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehiculo }) => {
                         </button>
                     </div>
 
-                    {/* Scrollable Content Wrapper to fix corner clipping */}
-                    <div className="flex-1 overflow-hidden">
-                        <div className="h-full overflow-y-auto p-6 sm:p-8 custom-scrollbar bg-gray-50/50">
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Scrollable Content Wrapper */}
+                    <div className="flex-1 overflow-y-auto overscroll-contain p-6 sm:p-8 custom-scrollbar bg-gray-50/50 min-h-0">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             
                             {/* Left Column */}
                             <div className="space-y-8">
@@ -203,7 +201,6 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehiculo }) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
                 </m.div>
 
                 {/* Expanded Photo Viewer */}
