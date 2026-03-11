@@ -1,6 +1,7 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react';
 import { Plus, Car, RefreshCw, Search, Eye, MoreVertical, ArrowUpDown } from 'lucide-react';
 import VehicleRegistrationForm from '../components/dashboard/VehicleRegistrationForm';
+import VehicleDetailsModal from '../components/dashboard/VehicleDetailsModal';
 import TableSkeleton from '../components/common/TableSkeleton';
 import StatsSkeleton from '../components/common/StatsSkeleton';
 
@@ -19,6 +20,8 @@ const initialState = {
   },
   loading: true,
   searchTerm: '',
+  isDetailsOpen: false,
+  selectedVehicle: null,
 };
 
 function reducer(state, action) {
@@ -33,6 +36,10 @@ function reducer(state, action) {
       return { ...state, loading: action.payload };
     case 'SET_SEARCH_TERM':
       return { ...state, searchTerm: action.payload };
+    case 'SHOW_DETAILS':
+      return { ...state, isDetailsOpen: true, selectedVehicle: action.payload };
+    case 'HIDE_DETAILS':
+      return { ...state, isDetailsOpen: false, selectedVehicle: null };
     default:
       return state;
   }
@@ -40,7 +47,7 @@ function reducer(state, action) {
 
 const VehiclesPage = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isFormOpen, vehiculos, stats, loading, searchTerm } = state;
+  const { isFormOpen, vehiculos, stats, loading, searchTerm, isDetailsOpen, selectedVehicle } = state;
 
   const fetchData = useCallback(async () => {
     dispatch({ type: 'SET_LOADING', payload: true });
@@ -93,8 +100,8 @@ const VehiclesPage = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      'ROBADO': 'bg-red-100 text-red-700',
-      'DECOMISADO': 'bg-orange-100 text-orange-700',
+      'ROBADO': 'bg-(--color-rojo)/15 text-(--color-rojo) border border-(--color-rojo)/20 font-bold',
+      'DECOMISADO': 'bg-(--color-naranja)/15 text-(--color-naranja) border border-(--color-naranja)/20 font-bold',
       'OBSOLETO': 'bg-gray-100 text-gray-700',
       'SINIESTRADO': 'bg-yellow-100 text-yellow-700'
     };
@@ -146,8 +153,8 @@ const VehiclesPage = () => {
           </div>
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Car className="w-6 h-6 text-green-600" />
+              <div className="p-3 bg-(--color-verde)/15 rounded-lg">
+                <Car className="w-6 h-6 text-(--color-verde)" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.ingresosHoy}</p>
@@ -157,8 +164,8 @@ const VehiclesPage = () => {
           </div>
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <Car className="w-6 h-6 text-orange-600" />
+              <div className="p-3 bg-(--color-naranja)/15 rounded-lg">
+                <Car className="w-6 h-6 text-(--color-naranja)" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalDepositos}</p>
@@ -168,8 +175,8 @@ const VehiclesPage = () => {
           </div>
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-red-100 rounded-lg">
-                <Car className="w-6 h-6 text-red-600" />
+              <div className="p-3 bg-(--color-rojo)/15 rounded-lg">
+                <Car className="w-6 h-6 text-(--color-rojo)" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.liberadosMes}</p>
@@ -256,7 +263,10 @@ const VehiclesPage = () => {
                     </td>
                     <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-gray-400 hover:text-(--color-primary) hover:bg-gray-100 rounded-lg transition-colors">
+                        <button 
+                          onClick={() => dispatch({ type: 'SHOW_DETAILS', payload: vehiculo })}
+                          className="p-2 text-gray-400 hover:text-(--color-primary) hover:bg-gray-100 rounded-lg transition-colors"
+                        >
                           <Eye size={16} />
                         </button>
                         <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
@@ -306,7 +316,10 @@ const VehiclesPage = () => {
                       VIN: {vehiculo.vin}
                     </div>
                     <div className="flex items-center gap-1.5">
-                      <button className="p-1.5 text-gray-400 hover:text-(--color-primary) hover:bg-violet-50 rounded-md transition-colors" title="Ver Detalles">
+                      <button 
+                        onClick={() => dispatch({ type: 'SHOW_DETAILS', payload: vehiculo })}
+                        className="p-1.5 text-gray-400 hover:text-(--color-primary) hover:bg-violet-50 rounded-md transition-colors" title="Ver Detalles"
+                      >
                         <Eye size={16} />
                       </button>
                       <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors" title="Más opciones">
@@ -335,6 +348,13 @@ const VehiclesPage = () => {
         isOpen={isFormOpen} 
         onClose={() => dispatch({ type: 'SET_FORM_OPEN', payload: false })}
         onSuccess={handleFormSuccess}
+      />
+
+      {/* Vehicle Details Modal */}
+      <VehicleDetailsModal 
+        isOpen={isDetailsOpen}
+        onClose={() => dispatch({ type: 'HIDE_DETAILS' })}
+        vehiculo={selectedVehicle}
       />
     </div>
   );

@@ -4,6 +4,7 @@ import { User, Shield, CheckCircle, AlertCircle } from 'lucide-react';
 import StepIndicator from './VehicleRegistrationForm/components/UI/StepIndicator';
 import ModalHeader from './VehicleRegistrationForm/components/UI/ModalHeader';
 import NavigationFooter from './VehicleRegistrationForm/components/UI/NavigationFooter';
+import Toast from "../common/Toast";
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -343,12 +344,12 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         {/* Global Error */}
-        {error && (
-          <div className="mx-8 mt-4 p-4 bg-gob-rosa/10 border border-gob-rosa rounded-lg flex items-center gap-3 text-gob-rosa">
-            <AlertCircle size={20} />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
+        <Toast 
+          show={!!error}
+          message={error}
+          type="error"
+          onClose={() => dispatch({ type: 'SET_ERROR', payload: null })}
+        />
 
         {/* Form Content */}
         <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6">

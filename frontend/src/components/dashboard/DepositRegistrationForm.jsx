@@ -12,6 +12,7 @@ import FormSelect from "./VehicleRegistrationForm/components/FormFields/FormSele
 import ModalHeader from "./VehicleRegistrationForm/components/UI/ModalHeader";
 import StepIndicator from "./VehicleRegistrationForm/components/UI/StepIndicator";
 import NavigationFooter from "./VehicleRegistrationForm/components/UI/NavigationFooter";
+import Toast from "../common/Toast";
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -215,12 +216,12 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         {/* Global Error */}
-        {error && (
-          <div className="mx-4 sm:mx-6 md:mx-8 mt-4 p-3 md:p-4 bg-gob-rosa/10 border border-gob-rosa rounded-lg flex items-center gap-3 text-gob-rosa">
-            <AlertCircle size={20} />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
+        <Toast 
+          show={!!error}
+          message={error}
+          type="error"
+          onClose={() => dispatch({ type: 'SET_ERROR', payload: "" })}
+        />
 
         {/* Form Content */}
         <div className="p-4 sm:p-6 md:p-8 overflow-y-auto max-h-[calc(90vh-250px)]">

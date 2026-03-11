@@ -113,9 +113,9 @@ const DepositsPage = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      ACTIVO: "bg-green-100 text-green-700",
-      INACTIVO: "bg-gray-100 text-gray-700",
-      SUSPENDIDO: "bg-red-100 text-red-700",
+      ACTIVO: "bg-(--color-verde)/15 text-(--color-verde) font-bold",
+      INACTIVO: "bg-gray-100 text-gray-700 font-bold",
+      SUSPENDIDO: "bg-(--color-rojo)/15 text-(--color-rojo) font-bold",
     };
     return colors[status] || "bg-gray-100 text-gray-700";
   };
@@ -173,8 +173,8 @@ const DepositsPage = () => {
           </div>
           <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
             <div className="flex items-center gap-3">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Warehouse className="w-6 h-6 text-green-600" />
+              <div className="p-3 bg-(--color-verde)/15 rounded-lg">
+                <Warehouse className="w-6 h-6 text-(--color-verde)" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">
@@ -315,9 +315,6 @@ const DepositsPage = () => {
                     </td>
                     <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-gray-400 hover:text-(--color-primary) hover:bg-gray-100 rounded-lg transition-colors">
-                          <Eye size={16} />
-                        </button>
                         <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                           <MoreVertical size={16} />
                         </button>
@@ -380,12 +377,6 @@ const DepositsPage = () => {
 
                   {/* Bottom row: Actions */}
                   <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-gray-50">
-                    <button
-                      className="p-1.5 text-gray-400 hover:text-(--color-primary) hover:bg-violet-50 rounded-md transition-colors"
-                      title="Ver Detalles"
-                    >
-                      <Eye size={16} />
-                    </button>
                     <button
                       className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
                       title="Más opciones"

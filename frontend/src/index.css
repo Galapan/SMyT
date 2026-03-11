@@ -2,10 +2,14 @@
 
 /* Variables CSS con la paleta oficial SMyT */
 :root {
-  --color-primary: #572671;
+  --color-primary: #42147D; /* Morado principal */
   --color-secondary: #fee6c4;
   --color-rosa: #aa0365;
-  --color-verde: #91aba5;
+  --color-rojo: #A70F26;
+  --color-verde: #6FB225;
+  --color-azul: #55AEC9;
+  --color-naranja: #EF8D00;
+  --color-morado: #42147D;
 }
 
 html,

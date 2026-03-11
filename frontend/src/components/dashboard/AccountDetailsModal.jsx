@@ -31,9 +31,9 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
   const getRoleColor = (rol) => {
     const colors = {
-      'SUPER_USUARIO': 'text-red-700 bg-red-100 ring-red-300',
-      'ADMINISTRADOR_SMYT': 'text-blue-700 bg-blue-100 ring-blue-300',
-      'USUARIO_CONCESIONARIO': 'text-emerald-700 bg-emerald-100 ring-emerald-300'
+      'SUPER_USUARIO': 'text-(--color-rojo) bg-(--color-rojo)/10 ring-(--color-rojo)/30',
+      'ADMINISTRADOR_SMYT': 'text-(--color-azul) bg-(--color-azul)/10 ring-(--color-azul)/30',
+      'USUARIO_CONCESIONARIO': 'text-(--color-verde) bg-(--color-verde)/10 ring-(--color-verde)/30 shadow-sm'
     };
     return colors[rol] || 'text-gray-700 bg-gray-100 ring-gray-200';
   };
@@ -95,8 +95,8 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
               <div className="flex flex-col items-center mb-8 relative mt-2">
                 {/* Status Badge - Floating */}
                 <div className="absolute top-0 w-full flex justify-center -mt-6">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 shadow-[0_4px_10px_rgba(0,0,0,0.05)] text-xs font-semibold rounded-full border ${user.activo ? 'bg-gob-verde/5 text-gob-verde border-gob-verde' : 'bg-gob-rosa/10 text-gob-rosa border-gob-rosa'}`}>
-                    {user.activo ? <CheckCircle size={14} className="text-gob-verde"/> : <XCircle size={14} className="text-gob-rosa"/>}
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 shadow-[0_4px_10px_rgba(0,0,0,0.05)] text-xs font-semibold rounded-full border ${user.activo ? 'bg-(--color-verde)/5 text-(--color-verde) border-(--color-verde)' : 'bg-(--color-rojo)/10 text-(--color-rojo) border-(--color-rojo)'}`}>
+                    {user.activo ? <CheckCircle size={14} className="text-(--color-verde)"/> : <XCircle size={14} className="text-(--color-rojo)"/>}
                     {user.activo ? 'Cuenta Activa' : 'Cuenta Inactiva'}
                   </span>
                 </div>
@@ -132,8 +132,8 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
                 {/* Role Card */}
                 <div className="bg-white/60 p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center hover:shadow-md transition-shadow">
                   <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${
-                    user.rol === 'SUPER_USUARIO' ? 'bg-red-100 text-red-700' :
-                    user.rol === 'ADMINISTRADOR_SMYT' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
+                    user.rol === 'SUPER_USUARIO' ? 'bg-(--color-rojo)/15 text-(--color-rojo)' :
+                    user.rol === 'ADMINISTRADOR_SMYT' ? 'bg-(--color-azul)/15 text-(--color-azul)' : 'bg-(--color-verde)/20 text-(--color-verde)'
                   }`}>
                     <Shield className="w-6 h-6" />
                   </div>

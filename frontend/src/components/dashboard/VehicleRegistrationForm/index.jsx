@@ -6,6 +6,7 @@ import { useVehicleForm } from './hooks/useVehicleForm';
 import ModalHeader from './components/UI/ModalHeader';
 import StepIndicator from './components/UI/StepIndicator';
 import NavigationFooter from './components/UI/NavigationFooter';
+import Toast from '../../common/Toast';
 
 // Step Components
 import Step1AdministrativeData from './components/Steps/Step1AdministrativeData';
@@ -19,6 +20,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
     direction,
     loading,
     error,
+    setError,
     errors,
     formData,
     setFormData,
@@ -65,12 +67,12 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
         </div>
 
         {/* Global Error */}
-        {error && (
-          <div className="mx-8 mt-4 p-4 bg-gob-rosa/10 border border-gob-rosa rounded-lg flex items-center gap-3 text-gob-rosa">
-            <AlertCircle size={20} />
-            <span className="text-sm">{error}</span>
-          </div>
-        )}
+        <Toast 
+          show={!!error}
+          message={error}
+          type="error"
+          onClose={() => setError("")}
+        />
 
         {/* Form Content */}
         <div className="p-8 overflow-y-auto max-h-[calc(90vh-280px)]">

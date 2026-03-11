@@ -95,14 +95,7 @@ async function getCroppedImg(
   );
 
   // As Base64 string
-  // return croppedCanvas.toDataURL('image/jpeg');
-
-  // As a blob
-  return new Promise((resolve, reject) => {
-    croppedCanvas.toBlob((file) => {
-      resolve(URL.createObjectURL(file));
-    }, 'image/jpeg');
-  });
+  return croppedCanvas.toDataURL('image/jpeg');
 }
 
 const ImageCropper = ({ imageSrc, onCropComplete, onCancel }) => {

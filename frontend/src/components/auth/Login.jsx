@@ -1,6 +1,7 @@
 import { useReducer, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logoTlax from "../../assets/LogoTlax.png";
+import Toast from "../common/Toast";
 
 // IMPORTANTE: En producción (Vercel), VITE_API_URL estará vacío para que las peticiones vayan al mismo dominio (/api/...) 
 // En desarrollo, usará localhost:3000 si no se especifica.
@@ -26,6 +27,8 @@ function reducer(state, action) {
       return { ...state, loading: false };
     case 'LOGIN_ERROR':
       return { ...state, error: action.payload, loading: false };
+    case 'CLEAR_ERROR':
+      return { ...state, error: "" };
     default:
       return state;
   }
@@ -103,6 +106,12 @@ function Login() {
 
   return (
     <div className="h-dvh w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
+      <Toast 
+        show={!!error}
+        message={error}
+        type="error"
+        onClose={() => dispatch({ type: 'CLEAR_ERROR' })}
+      />
       {/* Card Formulario */}
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
         <div className="flex flex-col items-center mb-10">
@@ -195,11 +204,7 @@ function Login() {
             </button>
           </div>
 
-          {error && (
-            <div className="text-red-600 text-sm bg-red-50 p-2 rounded border border-red-200 text-center font-medium">
-              {error}
-            </div>
-          )}
+          {/* Error manejado por Toast ahora */}
 
           <div className="pt-2">
             <button

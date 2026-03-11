@@ -2,6 +2,7 @@ import { useReducer, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, Lock, Save, Camera, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import ImageCropper from '../components/common/ImageCropper';
+import Toast from '../components/common/Toast';
 
 const initialState = {
   activeTab: 'profile',
@@ -212,15 +213,13 @@ const SettingsPage = () => {
         </button>
       </div>
 
-      {/* Message Alert */}
-      {message && (
-        <div className={`mb-6 p-4 rounded-lg flex items-center space-x-3 border ${
-          message.type === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
-        }`}>
-          {message.type === 'success' ? <CheckCircle size={20} /> : <AlertCircle size={20} />}
-          <span>{message.text}</span>
-        </div>
-      )}
+      {/* Message Alert => Reemplazado por Toast Global */}
+      <Toast 
+        show={!!message}
+        message={message?.text}
+        type={message?.type || 'success'}
+        onClose={() => dispatch({ type: 'SET_MESSAGE', payload: null })}
+      />
 
       {/* Profile Content */}
       {activeTab === 'profile' && (

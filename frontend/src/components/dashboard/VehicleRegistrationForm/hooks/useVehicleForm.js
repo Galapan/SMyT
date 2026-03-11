@@ -359,6 +359,7 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
     direction,
     loading,
     error,
+    setError,
     errors,
     formData,
     setFormData,
