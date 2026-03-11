@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Warehouse, Car, Key, Plus, RefreshCw, Bell, ChevronRight, CheckCircle, XCircle, X, AlertTriangle, Edit2 } from 'lucide-react';
@@ -12,18 +12,46 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
+const initialState = {
+  selectedNotif: null,
+  resolving: false,
+  loadingDetail: false,
+  vehiculoDetail: null,
+  isEditFormOpen: false,
+  vehicleToEdit: null,
+  editingNotifId: null,
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_SELECTED_NOTIF':
+      return { ...state, selectedNotif: action.payload };
+    case 'SET_RESOLVING':
+      return { ...state, resolving: action.payload };
+    case 'SET_LOADING_DETAIL':
+      return { ...state, loadingDetail: action.payload };
+    case 'SET_VEHICULO_DETAIL':
+      return { ...state, vehiculoDetail: action.payload };
+    case 'SET_EDIT_FORM_OPEN':
+      return { ...state, isEditFormOpen: action.payload };
+    case 'OPEN_NOTIF':
+      return { ...state, selectedNotif: action.payload, vehiculoDetail: null, loadingDetail: true };
+    case 'CLOSE_NOTIF':
+      return { ...state, selectedNotif: null, vehiculoDetail: null };
+    case 'OPEN_EDIT':
+      return { ...state, vehicleToEdit: action.payload.vehicleToEdit, editingNotifId: action.payload.editingNotifId, isEditFormOpen: true };
+    case 'CLOSE_EDIT':
+      return { ...state, isEditFormOpen: false, vehicleToEdit: null, editingNotifId: null };
+    default:
+      return state;
+  }
+}
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
   // Custom state for UI and Modals
-  const [selectedNotif, setSelectedNotif] = useState(null);
-  const [resolving, setResolving] = useState(false);
-  const [loadingDetail, setLoadingDetail] = useState(false);
-  const [vehiculoDetail, setVehiculoDetail] = useState(null);
-
-  // Estados para modo Edición
-  const [isEditFormOpen, setIsEditFormOpen] = useState(false);
-  const [vehicleToEdit, setVehicleToEdit] = useState(null);
-  const [editingNotifId, setEditingNotifId] = useState(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { selectedNotif, resolving, loadingDetail, vehiculoDetail, isEditFormOpen, vehicleToEdit, editingNotifId } = state;
 
   // Query Client for invalidating queries later
   const queryClient = useQueryClient();
@@ -102,9 +130,7 @@ const AdminDashboard = () => {
   };
 
   const handleOpenNotif = async (notif) => {
-    setSelectedNotif(notif);
-    setVehiculoDetail(null);
-    setLoadingDetail(true);
+    dispatch({ type: 'OPEN_NOTIF', payload: notif });
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/vehiculos/${notif.vehiculoId}`, {
@@ -112,17 +138,17 @@ const AdminDashboard = () => {
       });
       const data = await response.json();
       if (data.success) {
-        setVehiculoDetail(data.data);
+        dispatch({ type: 'SET_VEHICULO_DETAIL', payload: data.data });
       }
     } catch (error) {
       console.error('Error fetching vehicle detail:', error);
     } finally {
-      setLoadingDetail(false);
+      dispatch({ type: 'SET_LOADING_DETAIL', payload: false });
     }
   };
 
   const handleResolveNotification = async (notifId, estatus) => {
-    setResolving(true);
+    dispatch({ type: 'SET_RESOLVING', payload: true });
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       const response = await fetch(`${API_URL}/api/solicitudes/${notifId}/resolve`, {
@@ -138,8 +164,7 @@ const AdminDashboard = () => {
       if (result.success) {
         // Refetch queries instead of manually filtering to keep data in sync
         queryClient.invalidateQueries({ queryKey: ['dashboard', user?.id] });
-        setSelectedNotif(null);
-        setVehiculoDetail(null);
+        dispatch({ type: 'CLOSE_NOTIF' });
       } else {
         alert(result.message || 'Error al procesar la solicitud');
       }
@@ -147,7 +172,7 @@ const AdminDashboard = () => {
       console.error('Error resolviendo solicitud:', error);
       alert('Error de conexión al procesar la solicitud');
     } finally {
-      setResolving(false);
+      dispatch({ type: 'SET_RESOLVING', payload: false });
     }
   };
 
@@ -159,9 +184,7 @@ const AdminDashboard = () => {
       });
       const data = await response.json();
       if (data.success) {
-        setVehicleToEdit(data.data);
-        setEditingNotifId(notif.id);
-        setIsEditFormOpen(true);
+        dispatch({ type: 'OPEN_EDIT', payload: { vehicleToEdit: data.data, editingNotifId: notif.id } });
       }
     } catch (error) {
       console.error('Error fetching vehicle to edit:', error);
@@ -190,9 +213,7 @@ const AdminDashboard = () => {
     }
 
     // Al guardar la edición exitosamente, cerramos el modal
-    setIsEditFormOpen(false);
-    setVehicleToEdit(null);
-    setEditingNotifId(null);
+    dispatch({ type: 'CLOSE_EDIT' });
     
     // Invalidar para recargar datos
     queryClient.invalidateQueries({ queryKey: ['dashboard', user?.id] });
@@ -283,8 +304,8 @@ const AdminDashboard = () => {
             <div className="flex-1 overflow-y-auto p-2">
               {loading ? (
                 <div className="space-y-2 animate-pulse">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="p-4 rounded-lg border border-gray-100 bg-white">
+                  {[1, 2, 3].map((item) => (
+                    <div key={`skeleton-desktop-${item}`} className="p-4 rounded-lg border border-gray-100 bg-white">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <div className="h-3 w-16 bg-gray-200 rounded mb-1"></div>
@@ -368,8 +389,8 @@ const AdminDashboard = () => {
             <div className="flex-1 overflow-y-auto p-2">
               {loading ? (
                 <div className="space-y-2 animate-pulse">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="p-4 rounded-lg border border-gray-100 bg-white">
+                  {[1, 2, 3].map((item) => (
+                    <div key={`skeleton-mobile-${item}`} className="p-4 rounded-lg border border-gray-100 bg-white">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <div className="h-3 w-16 bg-gray-200 rounded mb-1"></div>
@@ -432,10 +453,10 @@ const AdminDashboard = () => {
             role="button"
             tabIndex={0}
             className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
-            onClick={() => { if (!resolving) { setSelectedNotif(null); setVehiculoDetail(null); } }}
+            onClick={() => { if (!resolving) dispatch({ type: 'CLOSE_NOTIF' }); }}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
-                if (!resolving) { setSelectedNotif(null); setVehiculoDetail(null); }
+                if (!resolving) dispatch({ type: 'CLOSE_NOTIF' });
               }
             }}
           />
@@ -456,7 +477,7 @@ const AdminDashboard = () => {
                 </div>
               </div>
               <button 
-                onClick={() => { if (!resolving) { setSelectedNotif(null); setVehiculoDetail(null); } }}
+                onClick={() => dispatch({ type: 'CLOSE_NOTIF' })}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors disabled:opacity-50"
                 disabled={resolving}
               >
@@ -544,9 +565,9 @@ const AdminDashboard = () => {
             {/* Modal Footer / Actions */}
             <div className="px-4 py-3 sm:px-6 sm:py-4 bg-gray-50 flex items-center justify-end space-x-3 border-t border-gray-100">
               <button
-                onClick={() => handleResolveNotification(selectedNotif.id, 'RECHAZADA')}
+                onClick={() => dispatch({ type: 'CLOSE_NOTIF' })}
                 disabled={resolving}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 flex items-center"
+                className="px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 flex items-center"
               >
                 {resolving ? 'Procesando...' : 'Rechazar'}
               </button>
@@ -564,15 +585,14 @@ const AdminDashboard = () => {
       )}
 
       {/* Formulario de Edición Reutilizado */}
-      <VehicleRegistrationForm 
-        isOpen={isEditFormOpen} 
-        onClose={() => {
-          setIsEditFormOpen(false);
-          setVehicleToEdit(null);
-        }}
-        onSuccess={handleEditSuccess}
-        initialData={vehicleToEdit}
-      />
+      {isEditFormOpen && vehicleToEdit && (
+        <VehicleRegistrationForm 
+          isOpen={isEditFormOpen} 
+          onClose={() => dispatch({ type: 'SET_EDIT_FORM_OPEN', payload: false })}
+          onSuccess={handleEditSuccess}
+          initialData={vehicleToEdit}
+        />
+      )}
     </div>
   );
 

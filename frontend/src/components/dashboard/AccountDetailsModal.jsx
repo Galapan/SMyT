@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { Shield, Warehouse, Calendar, Mail, X, CheckCircle, XCircle } from 'lucide-react';
 
 const AccountDetailsModal = ({ isOpen, onClose, user }) => {
@@ -60,11 +60,12 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
   };
 
   return createPortal(
+    <LazyMotion features={domAnimation}>
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
           {/* Backdrop */}
-          <motion.div
+          <m.div
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -74,7 +75,7 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
           />
 
           {/* Modal Container */}
-          <motion.div
+          <m.div
             variants={modalVariants}
             initial="hidden"
             animate="visible"
@@ -178,10 +179,11 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
             
             {/* Bottom Gradient Decor */}
             <div className="h-4 w-full bg-linear-to-t from-gray-50 to-transparent absolute bottom-0 pointer-events-none rounded-b-3xl"></div>
-          </motion.div>
+          </m.div>
         </div>
       )}
-    </AnimatePresence>,
+    </AnimatePresence>
+    </LazyMotion>,
     document.getElementById('modal-root') || document.body
   );
 };

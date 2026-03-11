@@ -1,7 +1,9 @@
 import { MapPin } from 'lucide-react';
 import TableSkeleton from '../common/TableSkeleton';
 
-const DepotTable = ({ loading = false, depots = [] }) => {
+const EMPTY_DEPOTS = [];
+
+const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">

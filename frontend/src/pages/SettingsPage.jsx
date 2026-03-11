@@ -1,26 +1,53 @@
-import { useState, useEffect } from 'react';
+import { useReducer, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, Lock, Save, Camera, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import ImageCropper from '../components/common/ImageCropper';
 
+const initialState = {
+  activeTab: 'profile',
+  isSubmittingProfile: false,
+  isSubmittingPassword: false,
+  message: null,
+  fotoUrl: null,
+  selectedImage: null,
+  showCropper: false,
+  passwords: { currentPassword: '', newPassword: '', confirmPassword: '' },
+  editData: { nombre: '', apellido: '' }
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_TAB':
+      return { ...state, activeTab: action.payload, message: null };
+    case 'SET_SUBMITTING_PROFILE':
+      return { ...state, isSubmittingProfile: action.payload };
+    case 'SET_SUBMITTING_PASSWORD':
+      return { ...state, isSubmittingPassword: action.payload };
+    case 'SET_MESSAGE':
+      return { ...state, message: action.payload };
+    case 'SET_PHOTO_DATA':
+      return { ...state, fotoUrl: action.payload };
+    case 'SHOW_CROPPER':
+      return { ...state, showCropper: true, selectedImage: action.payload };
+    case 'HIDE_CROPPER':
+      return { ...state, showCropper: false, selectedImage: null };
+    case 'SET_PASSWORDS':
+      return { ...state, passwords: { ...state.passwords, ...action.payload } };
+    case 'SET_EDIT_DATA':
+      return { ...state, editData: { ...state.editData, ...action.payload } };
+    case 'RESET_PASSWORDS':
+      return { ...state, passwords: { currentPassword: '', newPassword: '', confirmPassword: '' } };
+    case 'SYNC_PROFILE':
+      return { ...state, editData: { nombre: action.payload.nombre, apellido: action.payload.apellido }, fotoUrl: action.payload.fotoUrl };
+    default:
+      return state;
+  }
+}
+
 const SettingsPage = () => {
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState('profile');
-  const [isSubmittingProfile, setIsSubmittingProfile] = useState(false);
-  const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
-  const [message, setMessage] = useState(null); // { type: 'success' | 'error', text: '' }
-  
-  // Profile Editable State (Photo)
-  const [fotoUrl, setFotoUrl] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [showCropper, setShowCropper] = useState(false);
-
-  // Password State
-  const [passwords, setPasswords] = useState({
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: ''
-  });
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { activeTab, isSubmittingProfile, isSubmittingPassword, message, fotoUrl, selectedImage, showCropper, passwords, editData } = state;
 
   // Helper para obtener el token esté donde esté guardado
   const getToken = () => localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -43,20 +70,16 @@ const SettingsPage = () => {
     queryFn: fetchProfile,
   });
 
-  // Keep local generic editable states synchronized with profile if needed
-  const [editData, setEditData] = useState({ nombre: '', apellido: '' });
-
   useEffect(() => {
     if (profile.nombre) {
-      setEditData({ nombre: profile.nombre, apellido: profile.apellido });
-      setFotoUrl(profile.fotoUrl);
+      dispatch({ type: 'SYNC_PROFILE', payload: profile });
     }
   }, [profile]);
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmittingProfile(true);
-    setMessage(null);
+    dispatch({ type: 'SET_SUBMITTING_PROFILE', payload: true });
+    dispatch({ type: 'SET_MESSAGE', payload: null });
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "")}/api/users/profile`, {
@@ -75,7 +98,7 @@ const SettingsPage = () => {
       const result = await response.json();
 
       if (result.success) {
-        setMessage({ type: 'success', text: 'Perfil actualizado correctamente' });
+        dispatch({ type: 'SET_MESSAGE', payload: { type: 'success', text: 'Perfil actualizado correctamente' } });
         // Actualizar datos en sesión para que el layout se entere (si lee de storage)
         const updatedUser = { ...JSON.parse(sessionStorage.getItem('user')), ...result.data };
         sessionStorage.setItem('user', JSON.stringify(updatedUser));
@@ -86,24 +109,24 @@ const SettingsPage = () => {
         // Disparar evento para actualizar layout
         window.dispatchEvent(new Event('storage'));
       } else {
-        setMessage({ type: 'error', text: result.message || 'Error al actualizar perfil' });
+        dispatch({ type: 'SET_MESSAGE', payload: { type: 'error', text: result.message || 'Error al actualizar perfil' } });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Error de conexión' });
+      dispatch({ type: 'SET_MESSAGE', payload: { type: 'error', text: 'Error de conexión' } });
     } finally {
-      setIsSubmittingProfile(false);
+      dispatch({ type: 'SET_SUBMITTING_PROFILE', payload: false });
     }
   };
 
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     if (passwords.newPassword !== passwords.confirmPassword) {
-      setMessage({ type: 'error', text: 'las contraseñas nuevas no coinciden' });
+      dispatch({ type: 'SET_MESSAGE', payload: { type: 'error', text: 'las contraseñas nuevas no coinciden' } });
       return;
     }
     
-    setIsSubmittingPassword(true);
-    setMessage(null);
+    dispatch({ type: 'SET_SUBMITTING_PASSWORD', payload: true });
+    dispatch({ type: 'SET_MESSAGE', payload: null });
 
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "")}/api/users/change-password`, {
@@ -121,15 +144,15 @@ const SettingsPage = () => {
       const result = await response.json();
 
       if (result.success) {
-        setMessage({ type: 'success', text: 'Contraseña actualizada correctamente' });
-        setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        dispatch({ type: 'SET_MESSAGE', payload: { type: 'success', text: 'Contraseña actualizada correctamente' } });
+        dispatch({ type: 'RESET_PASSWORDS' });
       } else {
-        setMessage({ type: 'error', text: result.message || 'Error al cambiar contraseña' });
+        dispatch({ type: 'SET_MESSAGE', payload: { type: 'error', text: result.message || 'Error al cambiar contraseña' } });
       }
     } catch (error) {
-      setMessage({ type: 'error', text: 'Error de conexión' });
+      dispatch({ type: 'SET_MESSAGE', payload: { type: 'error', text: 'Error de conexión' } });
     } finally {
-      setIsSubmittingPassword(false);
+      dispatch({ type: 'SET_SUBMITTING_PASSWORD', payload: false });
     }
   };
 
@@ -138,8 +161,7 @@ const SettingsPage = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setSelectedImage(reader.result);
-        setShowCropper(true);
+        dispatch({ type: 'SHOW_CROPPER', payload: reader.result });
       };
       reader.readAsDataURL(file);
     }
@@ -148,14 +170,12 @@ const SettingsPage = () => {
   };
 
   const handleCropComplete = (croppedImageFileUrl) => {
-    setFotoUrl(croppedImageFileUrl);
-    setShowCropper(false);
-    setSelectedImage(null);
+    dispatch({ type: 'SET_PHOTO_DATA', payload: croppedImageFileUrl });
+    dispatch({ type: 'HIDE_CROPPER' });
   };
 
   const handleCropCancel = () => {
-    setShowCropper(false);
-    setSelectedImage(null);
+    dispatch({ type: 'HIDE_CROPPER' });
   };
 
   return (
@@ -165,7 +185,7 @@ const SettingsPage = () => {
       {/* Tabs */}
       <div className="flex space-x-4 mb-8 border-b border-gray-200">
         <button
-          onClick={() => { setActiveTab('profile'); setMessage(null); }}
+          onClick={() => dispatch({ type: 'SET_TAB', payload: 'profile' })}
           className={`pb-4 px-4 font-medium transition-colors relative ${
             activeTab === 'profile' 
               ? 'text-(--color-primary) border-b-2 border-(--color-primary)' 
@@ -178,7 +198,7 @@ const SettingsPage = () => {
           </div>
         </button>
         <button
-          onClick={() => { setActiveTab('security'); setMessage(null); }}
+          onClick={() => dispatch({ type: 'SET_TAB', payload: 'security' })}
           className={`pb-4 px-4 font-medium transition-colors relative ${
             activeTab === 'security' 
               ? 'text-(--color-primary) border-b-2 border-(--color-primary)' 
@@ -238,7 +258,7 @@ const SettingsPage = () => {
                       id="editData.nombre"
                       type="text"
                       value={editData.nombre}
-                      onChange={(e) => setEditData({...editData, nombre: e.target.value})}
+                      onChange={(e) => dispatch({ type: 'SET_EDIT_DATA', payload: { nombre: e.target.value } })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent transition-shadow outline-none"
                     />
                   </div>
@@ -248,7 +268,7 @@ const SettingsPage = () => {
                       id="editData.apellido"
                       type="text"
                       value={editData.apellido}
-                      onChange={(e) => setEditData({...editData, apellido: e.target.value})}
+                      onChange={(e) => dispatch({ type: 'SET_EDIT_DATA', payload: { apellido: e.target.value } })}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent transition-shadow outline-none"
                     />
                   </div>
@@ -303,7 +323,7 @@ const SettingsPage = () => {
                 id="passwords.currentPassword"
                 type="password"
                 value={passwords.currentPassword}
-                onChange={(e) => setPasswords({...passwords, currentPassword: e.target.value})}
+                onChange={(e) => dispatch({ type: 'SET_PASSWORDS', payload: { currentPassword: e.target.value } })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent transition-shadow outline-none"
                 required
               />
@@ -315,7 +335,7 @@ const SettingsPage = () => {
                 id="passwords.newPassword"
                 type="password"
                 value={passwords.newPassword}
-                onChange={(e) => setPasswords({...passwords, newPassword: e.target.value})}
+                onChange={(e) => dispatch({ type: 'SET_PASSWORDS', payload: { newPassword: e.target.value } })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent transition-shadow outline-none"
                 required
                 minLength={6}
@@ -328,7 +348,7 @@ const SettingsPage = () => {
                 id="passwords.confirmPassword"
                 type="password"
                 value={passwords.confirmPassword}
-                onChange={(e) => setPasswords({...passwords, confirmPassword: e.target.value})}
+                onChange={(e) => dispatch({ type: 'SET_PASSWORDS', payload: { confirmPassword: e.target.value } })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent transition-shadow outline-none"
                 required
                 minLength={6}

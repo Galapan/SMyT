@@ -149,7 +149,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
         {formData.fotos && formData.fotos.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             {formData.fotos.map((url, index) => (
-              <div key={index} className="relative group border rounded-lg overflow-hidden h-24 bg-gray-100">
+              <div key={url} className="relative group border rounded-lg overflow-hidden h-24 bg-gray-100">
                 <img src={url} alt={`Foto ${index + 1}`} className="w-full h-full object-cover" />
                 <button
                   type="button"

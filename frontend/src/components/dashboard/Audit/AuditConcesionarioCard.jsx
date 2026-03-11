@@ -24,6 +24,14 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
     <div 
       className="relative w-full h-64 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between cursor-pointer hover:border-(--color-primary)/30 transition-colors"
       onClick={() => !isFlipped && setIsFlipped(true)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          if (!isFlipped) setIsFlipped(true);
+        }
+      }}
+      role="button"
+      tabIndex={0}
     >
       
       {/* Front Face: Resumen del Depósito */}

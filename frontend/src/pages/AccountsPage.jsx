@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useReducer, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -13,26 +13,53 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
+const initialState = {
+  isFormOpen: false,
+  isDetailsOpen: false,
+  selectedUser: null,
+  searchTerm: '',
+  toast: { show: false, message: '', type: 'success' },
+  confirmModal: { isOpen: false, userId: null, currentStatus: null },
+  deleteModal: { isOpen: false, userId: null },
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_FORM_OPEN':
+      return { ...state, isFormOpen: action.payload };
+    case 'SET_DETAILS_OPEN':
+      return { ...state, isDetailsOpen: action.payload };
+    case 'SET_SELECTED_USER':
+      return { ...state, selectedUser: action.payload };
+    case 'SET_SEARCH_TERM':
+      return { ...state, searchTerm: action.payload };
+    case 'SHOW_TOAST':
+      return { ...state, toast: { show: true, message: action.payload.message, type: action.payload.type } };
+    case 'HIDE_TOAST':
+      return { ...state, toast: { ...state.toast, show: false } };
+    case 'OPEN_CONFIRM':
+      return { ...state, confirmModal: { isOpen: true, userId: action.payload.userId, currentStatus: action.payload.currentStatus } };
+    case 'CLOSE_CONFIRM':
+      return { ...state, confirmModal: { ...state.confirmModal, isOpen: false } };
+    case 'OPEN_DELETE':
+      return { ...state, deleteModal: { isOpen: true, userId: action.payload } };
+    case 'CLOSE_DELETE':
+      return { ...state, deleteModal: { ...state.deleteModal, isOpen: false } };
+    default:
+      return state;
+  }
+}
+
 const AccountsPage = () => {
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  // Custom Toast State
-  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
-  
-  // Custom Confirm Modal State
-  const [confirmModal, setConfirmModal] = useState({ isOpen: false, userId: null, currentStatus: null });
-  // Custom Delete Modal State
-  const [deleteModal, setDeleteModal] = useState({ isOpen: false, userId: null });
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { isFormOpen, isDetailsOpen, selectedUser, searchTerm, toast, confirmModal, deleteModal } = state;
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const showToast = (message, type = 'success') => {
-    setToast({ show: true, message, type });
-    setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 4000);
+    dispatch({ type: 'SHOW_TOAST', payload: { message, type } });
+    setTimeout(() => dispatch({ type: 'HIDE_TOAST' }), 4000);
   };
 
   // Redirect if not SUPER_USUARIO
@@ -70,11 +97,11 @@ const AccountsPage = () => {
   };
 
   const openConfirmModal = (userId, currentStatus) => {
-    setConfirmModal({ isOpen: true, userId, currentStatus });
+    dispatch({ type: 'OPEN_CONFIRM', payload: { userId, currentStatus } });
   };
 
   const closeConfirmModal = () => {
-    setConfirmModal({ isOpen: false, userId: null, currentStatus: null });
+    dispatch({ type: 'CLOSE_CONFIRM' });
   };
 
   const handleToggleStatus = async () => {
@@ -105,11 +132,11 @@ const AccountsPage = () => {
   };
 
   const openDeleteModal = (userId) => {
-    setDeleteModal({ isOpen: true, userId });
+    dispatch({ type: 'OPEN_DELETE', payload: userId });
   };
 
   const closeDeleteModal = () => {
-    setDeleteModal({ isOpen: false, userId: null });
+    dispatch({ type: 'CLOSE_DELETE' });
   };
 
   const handleDeleteUser = async () => {
@@ -193,7 +220,7 @@ const AccountsPage = () => {
             Actualizar
           </button>
           <button 
-            onClick={() => setIsFormOpen(true)}
+            onClick={() => dispatch({ type: 'SET_FORM_OPEN', payload: true })}
             className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
           >
             <Plus size={20} className="mr-2" />
@@ -265,7 +292,7 @@ const AccountsPage = () => {
                 type="text"
                 placeholder="Buscar por nombre, email, rol..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_SEARCH_TERM', payload: e.target.value })}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none w-full md:w-80"
               />
             </div>
@@ -334,7 +361,7 @@ const AccountsPage = () => {
                     <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button 
-                          onClick={() => { setSelectedUser(user); setIsDetailsOpen(true); }}
+                          onClick={() => { dispatch({ type: 'SET_SELECTED_USER', payload: user }); dispatch({ type: 'SET_DETAILS_OPEN', payload: true }); }}
                           className="p-2 text-gray-400 hover:text-(--color-primary) hover:bg-violet-50 rounded-lg transition-colors"
                           title="Ver Detalles"
                         >
@@ -408,7 +435,7 @@ const AccountsPage = () => {
                   {/* Bottom row: Actions */}
                   <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-gray-50">
                     <button 
-                      onClick={() => { setSelectedUser(user); setIsDetailsOpen(true); }}
+                      onClick={() => { dispatch({ type: 'SET_SELECTED_USER', payload: user }); dispatch({ type: 'SET_DETAILS_OPEN', payload: true }); }}
                       className="p-1.5 text-gray-400 hover:text-(--color-primary) hover:bg-violet-50 rounded-md transition-colors"
                       title="Ver Detalles"
                     >
@@ -451,14 +478,14 @@ const AccountsPage = () => {
       {/* Wizard Modal */}
       <AccountWizard 
         isOpen={isFormOpen} 
-        onClose={() => setIsFormOpen(false)}
+        onClose={() => dispatch({ type: 'SET_FORM_OPEN', payload: false })}
         onSuccess={handleFormSuccess}
       />
 
       {/* Details Modal */}
       <AccountDetailsModal
         isOpen={isDetailsOpen}
-        onClose={() => setIsDetailsOpen(false)}
+        onClose={() => dispatch({ type: 'SET_DETAILS_OPEN', payload: false })}
         user={selectedUser}
       />
 
@@ -597,7 +624,7 @@ const AccountsPage = () => {
             </div>
             <p className="text-sm font-medium pr-4">{toast.message}</p>
             <button 
-              onClick={() => setToast({ show: false, message: '', type: 'success' })}
+              onClick={() => dispatch({ type: 'HIDE_TOAST' })}
               className={`p-1 rounded-md transition-colors ${
                 toast.type === 'success' ? 'hover:bg-green-200' : 'hover:bg-red-200'
               }`}

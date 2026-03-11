@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logoTlax from "../../assets/LogoTlax.png";
 
@@ -8,13 +8,33 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
+const initialState = {
+  email: "",
+  password: "",
+  rememberMe: false,
+  loading: false,
+  error: ""
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
+    case 'LOGIN_START':
+      return { ...state, error: "", loading: true };
+    case 'LOGIN_SUCCESS':
+      return { ...state, loading: false };
+    case 'LOGIN_ERROR':
+      return { ...state, error: action.payload, loading: false };
+    default:
+      return state;
+  }
+}
+
 function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { email, password, rememberMe, loading, error } = state;
 
   // Redirigir automáticamente si hay una sesión activa
   useEffect(() => {
@@ -43,8 +63,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setLoading(true);
+    dispatch({ type: 'LOGIN_START' });
 
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -68,6 +87,7 @@ function Login() {
 
       // Redirigir según rol
       const usuario = data.data.usuario;
+      dispatch({ type: 'LOGIN_SUCCESS' });
       if (
         usuario.rol === "SUPER_USUARIO" ||
         usuario.rol === "ADMINISTRADOR_SMYT"
@@ -77,9 +97,7 @@ function Login() {
         navigate("/concesionario"); // Futuro: dashboard de concesionario
       }
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      dispatch({ type: 'LOGIN_ERROR', payload: err.message });
     }
   };
 
@@ -116,7 +134,7 @@ function Login() {
               id="email-input"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'email', value: e.target.value })}
               placeholder="usuario@tlaxcala.gob.mx"
               className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
               required
@@ -131,7 +149,7 @@ function Login() {
               id="password-input"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'password', value: e.target.value })}
               placeholder="••••••••"
               className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
               required
@@ -145,7 +163,7 @@ function Login() {
                   id="remember-me"
                   type="checkbox"
                   checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
+                  onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'rememberMe', value: e.target.checked })}
                   className="peer h-4 w-4 cursor-pointer appearance-none rounded-sm border border-gray-400 checked:border-[#572671] checked:bg-[#572671] transition-all"
                 />
                 <svg

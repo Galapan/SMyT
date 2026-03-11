@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useReducer } from "react";
 import { createPortal } from "react-dom";
 import {
   Building2,
@@ -17,15 +17,13 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
-const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [direction, setDirection] = useState("right");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [errors, setErrors] = useState({});
-
-  // Form state
-  const [formData, setFormData] = useState({
+const initialState = {
+  currentStep: 1,
+  direction: "right",
+  loading: false,
+  error: "",
+  errors: {},
+  formData: {
     nombreDeposito: "",
     municipio: "",
     direccion: "",
@@ -34,7 +32,33 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
     nombrePropietario: "",
     rfc: "",
     telefonoPropietario: "",
-  });
+  }
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_STEP':
+      return { ...state, currentStep: action.payload.step, direction: action.payload.direction };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload };
+    case 'SET_ERRORS':
+      return { ...state, errors: action.payload };
+    case 'UPDATE_FORM':
+      return { ...state, formData: { ...state.formData, ...action.payload } };
+    case 'CLEAR_FIELD_ERROR':
+      return { ...state, errors: { ...state.errors, [action.payload]: undefined } };
+    case 'RESET':
+      return { ...initialState };
+    default:
+      return state;
+  }
+}
+
+const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { currentStep, direction, loading, error, errors, formData } = state;
 
   const steps = [
     { id: 1, name: "Información del Depósito", icon: Building2 },
@@ -76,20 +100,18 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
         newErrors.telefonoPropietario = "El teléfono es requerido";
     }
 
-    setErrors(newErrors);
+    dispatch({ type: 'SET_ERRORS', payload: newErrors });
     return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setDirection("right");
-      setCurrentStep((prev) => Math.min(prev + 1, steps.length));
+      dispatch({ type: 'SET_STEP', payload: { step: Math.min(currentStep + 1, steps.length), direction: "right" } });
     }
   };
 
   const prevStep = () => {
-    setDirection("left");
-    setCurrentStep((prev) => Math.max(prev - 1, 1));
+    dispatch({ type: 'SET_STEP', payload: { step: Math.max(currentStep - 1, 1), direction: "left" } });
   };
 
   const handleChange = (e) => {
@@ -100,30 +122,15 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
       processedValue = value.toUpperCase().replace(/[^A-Z0-9]/g, "");
     }
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : processedValue,
-    }));
+    dispatch({ type: 'UPDATE_FORM', payload: { [name]: type === "checkbox" ? checked : processedValue } });
 
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      dispatch({ type: 'CLEAR_FIELD_ERROR', payload: name });
     }
   };
 
   const resetForm = () => {
-    setFormData({
-      nombreDeposito: "",
-      municipio: "",
-      direccion: "",
-      capacidad: "",
-      telefono: "",
-      nombrePropietario: "",
-      rfc: "",
-      telefonoPropietario: "",
-    });
-    setErrors({});
-    setError("");
-    setCurrentStep(1);
+    dispatch({ type: 'RESET' });
   };
 
   const handleSubmit = async (e) => {
@@ -131,8 +138,8 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
 
     if (!validateStep(2)) return;
 
-    setLoading(true);
-    setError("");
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'SET_ERROR', payload: "" });
 
     try {
       const token =
@@ -170,9 +177,9 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
       onClose();
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError(err.message);
+      dispatch({ type: 'SET_ERROR', payload: err.message });
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useReducer, useEffect, useCallback, useMemo } from 'react';
 import { Plus, Car, RefreshCw, Search, Eye, MoreVertical, ArrowUpDown } from 'lucide-react';
 import VehicleRegistrationForm from '../components/dashboard/VehicleRegistrationForm';
 import TableSkeleton from '../components/common/TableSkeleton';
@@ -8,20 +8,42 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
-const VehiclesPage = () => {
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [vehiculos, setVehiculos] = useState([]);
-  const [stats, setStats] = useState({
+const initialState = {
+  isFormOpen: false,
+  vehiculos: [],
+  stats: {
     totalVehiculos: 0,
     ingresosHoy: 0,
     liberadosMes: 0,
     totalDepositos: 0
-  });
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  },
+  loading: true,
+  searchTerm: '',
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_FORM_OPEN':
+      return { ...state, isFormOpen: action.payload };
+    case 'SET_VEHICULOS':
+      return { ...state, vehiculos: action.payload };
+    case 'SET_STATS':
+      return { ...state, stats: action.payload };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_SEARCH_TERM':
+      return { ...state, searchTerm: action.payload };
+    default:
+      return state;
+  }
+}
+
+const VehiclesPage = () => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { isFormOpen, vehiculos, stats, loading, searchTerm } = state;
 
   const fetchData = useCallback(async () => {
-    setLoading(true);
+    dispatch({ type: 'SET_LOADING', payload: true });
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       
@@ -34,19 +56,21 @@ const VehiclesPage = () => {
         })
       ]);
 
-      const vehiculosData = await vehiculosRes.json();
-      const statsData = await statsRes.json();
+      const [vehiculosData, statsData] = await Promise.all([
+        vehiculosRes.json(),
+        statsRes.json()
+      ]);
 
       if (vehiculosData.success) {
-        setVehiculos(vehiculosData.data);
+        dispatch({ type: 'SET_VEHICULOS', payload: vehiculosData.data });
       }
       if (statsData.success) {
-        setStats(statsData.data);
+        dispatch({ type: 'SET_STATS', payload: statsData.data });
       }
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   }, []);
 
@@ -94,7 +118,7 @@ const VehiclesPage = () => {
             Actualizar
           </button>
           <button 
-            onClick={() => setIsFormOpen(true)}
+            onClick={() => dispatch({ type: 'SET_FORM_OPEN', payload: true })}
             className="flex-2 md:flex-none px-3 py-2 sm:px-4 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium text-sm sm:text-base"
           >
             <Plus size={20} className="mr-1.5 sm:mr-2" />
@@ -167,7 +191,7 @@ const VehiclesPage = () => {
                 type="text"
                 placeholder="Buscar por placa, VIN, marca..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => dispatch({ type: 'SET_SEARCH_TERM', payload: e.target.value })}
                 className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent outline-none w-full md:w-80"
               />
             </div>
@@ -309,7 +333,7 @@ const VehiclesPage = () => {
       {/* Vehicle Registration Form Modal */}
       <VehicleRegistrationForm 
         isOpen={isFormOpen} 
-        onClose={() => setIsFormOpen(false)}
+        onClose={() => dispatch({ type: 'SET_FORM_OPEN', payload: false })}
         onSuccess={handleFormSuccess}
       />
     </div>

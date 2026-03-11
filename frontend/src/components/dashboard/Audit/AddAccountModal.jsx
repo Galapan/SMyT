@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useReducer, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { X, UserPlus, Loader2, Check, AlertCircle, Search, Link as LinkIcon, User } from "lucide-react";
 import FormInput from "../VehicleRegistrationForm/components/FormFields/FormInput";
@@ -7,26 +7,56 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
-const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombre }) => {
-  const [activeTab, setActiveTab] = useState("nuevo"); // 'nuevo' o 'existente'
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [errors, setErrors] = useState({});
-
-  // Tab: Nuevo
-  const [formData, setFormData] = useState({
+const initialState = {
+  activeTab: "nuevo",
+  loading: false,
+  error: "",
+  errors: {},
+  formData: {
     nombre: "",
     apellido: "",
     email: "",
     password: "",
     confirmPassword: "",
-  });
+  },
+  availableUsers: [],
+  selectedUserId: null,
+  searchTerm: "",
+  loadingUsers: false,
+};
 
-  // Tab: Existente
-  const [availableUsers, setAvailableUsers] = useState([]);
-  const [selectedUserId, setSelectedUserId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [loadingUsers, setLoadingUsers] = useState(false);
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_TAB':
+      return { ...state, activeTab: action.payload, error: "", errors: {} };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload };
+    case 'SET_ERRORS':
+      return { ...state, errors: action.payload };
+    case 'UPDATE_FORM':
+      return { ...state, formData: { ...state.formData, ...action.payload } };
+    case 'CLEAR_FIELD_ERROR':
+      return { ...state, errors: { ...state.errors, [action.payload]: undefined } };
+    case 'SET_AVAILABLE_USERS':
+      return { ...state, availableUsers: action.payload };
+    case 'SET_LOADING_USERS':
+      return { ...state, loadingUsers: action.payload };
+    case 'SET_SELECTED_USER':
+      return { ...state, selectedUserId: action.payload, error: "" };
+    case 'SET_SEARCH_TERM':
+      return { ...state, searchTerm: action.payload };
+    case 'RESET':
+      return { ...initialState };
+    default:
+      return state;
+  }
+}
+
+const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombre }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { activeTab, loading, error, errors, formData, availableUsers, selectedUserId, searchTerm, loadingUsers } = state;
 
   useEffect(() => {
     if (isOpen && activeTab === 'existente') {
@@ -35,8 +65,8 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
   }, [isOpen, activeTab]);
 
   const fetchAvailableUsers = async () => {
-    setLoadingUsers(true);
-    setError("");
+    dispatch({ type: 'SET_LOADING_USERS', payload: true });
+    dispatch({ type: 'SET_ERROR', payload: "" });
     try {
       const token = sessionStorage.getItem("token") || localStorage.getItem("token");
       const res = await fetch(`${API_URL}/api/users/concesionarios/disponibles`, {
@@ -44,14 +74,14 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
       });
       const data = await res.json();
       if (data.success) {
-        setAvailableUsers(data.data);
+        dispatch({ type: 'SET_AVAILABLE_USERS', payload: data.data });
       } else {
         throw new Error(data.message || "Error al obtener usuarios disponibles");
       }
     } catch (err) {
-      setError(err.message);
+      dispatch({ type: 'SET_ERROR', payload: err.message });
     } finally {
-      setLoadingUsers(false);
+      dispatch({ type: 'SET_LOADING_USERS', payload: false });
     }
   };
 
@@ -77,44 +107,33 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
       newErrors.confirmPassword = "Las contraseñas no coinciden";
     }
 
-    setErrors(newErrors);
+    dispatch({ type: 'SET_ERRORS', payload: newErrors });
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    dispatch({ type: 'UPDATE_FORM', payload: { [name]: value } });
 
     if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: undefined }));
+      dispatch({ type: 'CLEAR_FIELD_ERROR', payload: name });
     }
   };
 
   const resetForm = () => {
-    setFormData({
-      nombre: "",
-      apellido: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
-    setErrors({});
-    setError("");
-    setSelectedUserId(null);
-    setSearchTerm("");
-    setActiveTab("nuevo");
+    dispatch({ type: 'RESET' });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (activeTab === "nuevo" && !validateForm()) return;
     if (activeTab === "existente" && !selectedUserId) {
-      setError("Por favor selecciona un concesionario de la lista");
+      dispatch({ type: 'SET_ERROR', payload: "Por favor selecciona un concesionario de la lista" });
       return;
     }
 
-    setLoading(true);
-    setError("");
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'SET_ERROR', payload: "" });
 
     try {
       const token = sessionStorage.getItem("token") || localStorage.getItem("token");
@@ -149,9 +168,9 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
       if (onSuccess) onSuccess();
 
     } catch (err) {
-      setError(err.message);
+      dispatch({ type: 'SET_ERROR', payload: err.message });
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 
@@ -174,6 +193,15 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
       <div 
         className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
         onClick={handleClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClose();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Cerrar modal"
       />
 
       {/* Modal */}
@@ -203,14 +231,14 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
         <div className="px-6 pt-4 border-b border-gray-100 flex gap-4">
           <button
             type="button"
-            onClick={() => { setActiveTab('nuevo'); setError(''); }}
+            onClick={() => dispatch({ type: 'SET_TAB', payload: 'nuevo' })}
             className={`pb-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'nuevo' ? 'border-(--color-primary) text-(--color-primary)' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
           >
             Crear Nueva
           </button>
           <button
             type="button"
-            onClick={() => { setActiveTab('existente'); setError(''); }}
+            onClick={() => dispatch({ type: 'SET_TAB', payload: 'existente' })}
             className={`pb-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${activeTab === 'existente' ? 'border-(--color-primary) text-(--color-primary)' : 'border-transparent text-gray-500 hover:text-gray-700'}`}
           >
              <LinkIcon size={16} /> Vincular Existente
@@ -287,7 +315,7 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
                     type="text"
                     placeholder="Buscar concesionario..."
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={(e) => dispatch({ type: 'SET_SEARCH_TERM', payload: e.target.value })}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-(--color-primary) focus:border-(--color-primary) text-sm outline-none"
                   />
                 </div>
@@ -312,7 +340,7 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
                              name="selectedUser" 
                              value={u.id}
                              checked={selectedUserId === u.id}
-                             onChange={() => setSelectedUserId(u.id)}
+                             onChange={() => dispatch({ type: 'SET_SELECTED_USER', payload: u.id })}
                              className="w-4 h-4 text-(--color-primary) border-gray-300 focus:ring-(--color-primary) mr-3"
                            />
                            <div className="h-10 w-10 shrink-0 rounded-full bg-gray-200 overflow-hidden mr-3">

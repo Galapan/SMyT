@@ -1,10 +1,12 @@
+const EMPTY_OPTIONS = [];
+
 const FormSelect = ({ 
   label, 
   name, 
   value, 
   onChange, 
   error, 
-  options = [],
+  options = EMPTY_OPTIONS,
   placeholder = 'Seleccionar...',
   className = ''
 }) => {

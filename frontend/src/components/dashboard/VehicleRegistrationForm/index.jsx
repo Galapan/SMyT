@@ -45,6 +45,15 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
       <div 
         className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onClose();
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label="Cerrar"
       />
 
       {/* Modal Container */}

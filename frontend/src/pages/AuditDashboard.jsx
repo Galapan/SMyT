@@ -66,8 +66,8 @@ const AuditDashboard = () => {
       <div className="flex-1 pb-8">
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="w-full h-64 bg-white rounded-2xl border border-gray-100 p-6 flex flex-col justify-between animate-pulse">
+            {[1, 2, 3, 4, 5, 6].map((item) => (
+              <div key={`skeleton-${item}`} className="w-full h-64 bg-white rounded-2xl border border-gray-100 p-6 flex flex-col justify-between animate-pulse">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <div className="w-12 h-12 bg-gray-200 rounded-xl"></div>

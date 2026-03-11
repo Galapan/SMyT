@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useReducer } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { 
@@ -13,6 +13,33 @@ import dayjs from 'dayjs';
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
+
+const initialState = {
+  showEditModal: false,
+  editMotivo: '',
+  isSubmitting: false,
+  toast: { visible: false, message: '', type: 'success' },
+  selectedImage: null,
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case 'SET_EDIT_MODAL':
+      return { ...state, showEditModal: action.payload, editMotivo: action.payload ? state.editMotivo : '' };
+    case 'SET_EDIT_MOTIVO':
+      return { ...state, editMotivo: action.payload };
+    case 'SET_SUBMITTING':
+      return { ...state, isSubmitting: action.payload };
+    case 'SHOW_TOAST':
+      return { ...state, toast: { visible: true, message: action.payload.message, type: action.payload.type } };
+    case 'HIDE_TOAST':
+      return { ...state, toast: { ...state.toast, visible: false } };
+    case 'SET_SELECTED_IMAGE':
+      return { ...state, selectedImage: action.payload };
+    default:
+      return state;
+  }
+}
 
 const SectionHeader = ({ icon: Icon, title, status }) => (
   <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-gray-50/50">
@@ -45,12 +72,8 @@ const VehicleAdminDetail = () => {
   const user = userStr ? JSON.parse(userStr) : null;
   const userRol = user?.rol || '';
 
-  // Modal y Toast State para Solicitud de Edición
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editMotivo, setEditMotivo] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [toast, setToast] = useState({ visible: false, message: '', type: 'success' }); // type: success | error
-  const [selectedImage, setSelectedImage] = useState(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { showEditModal, editMotivo, isSubmitting, toast, selectedImage } = state;
 
   // Configuración de física de resortes para Framer Motion
   const springConfig = { 
@@ -61,9 +84,9 @@ const VehicleAdminDetail = () => {
   };
 
   const showNotification = (message, type = 'success') => {
-    setToast({ visible: true, message, type });
+    dispatch({ type: 'SHOW_TOAST', payload: { message, type } });
     setTimeout(() => {
-      setToast({ visible: false, message: '', type: 'success' });
+      dispatch({ type: 'HIDE_TOAST' });
     }, 4000);
   };
 
@@ -118,7 +141,8 @@ const VehicleAdminDetail = () => {
   };
 
   return (
-    <div className="h-full flex flex-col space-y-6 overflow-y-auto pb-4">
+    <LazyMotion features={domAnimation}>
+      <div className="h-full flex flex-col space-y-6 overflow-y-auto pb-4">
       {/* Header del Expediente */}
       <div className="shrink-0 bg-white rounded-xl border border-gray-200 p-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm z-10 relative">
         <div className="flex items-center gap-4">
@@ -150,7 +174,7 @@ const VehicleAdminDetail = () => {
         {/* Action Button - Oculto para Super Usuario */}
         {userRol !== 'SUPER_USUARIO' && (
           <button 
-            onClick={() => setShowEditModal(true)}
+            onClick={() => dispatch({ type: 'SET_EDIT_MODAL', payload: true })}
             className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 hover:shadow-sm border border-red-200 rounded-lg text-sm font-semibold transition-all"
           >
             <AlertTriangle size={16} />
@@ -174,16 +198,16 @@ const VehicleAdminDetail = () => {
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {vehiculo.fotos.map((foto, idx) => (
-                      <motion.div 
+                      <m.div 
                         layoutId={`foto-container-${foto}`}
                         transition={springConfig}
-                        key={idx} 
+                        key={foto} 
                         className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200 group relative cursor-pointer"
-                        onClick={() => setSelectedImage(foto)}
+                        onClick={() => dispatch({ type: 'SET_SELECTED_IMAGE', payload: foto })}
                         whileHover="hover"
                       >
                         {selectedImage !== foto && (
-                          <motion.img 
+                          <m.img 
                             layoutId={`foto-img-${foto}`}
                             transition={springConfig}
                             variants={{ hover: { scale: 1.05 } }}
@@ -194,17 +218,17 @@ const VehicleAdminDetail = () => {
                         )}
                         
                         {/* Hover Overlay */}
-                        <motion.div 
+                        <m.div 
                           variants={{ hover: { opacity: 1 } }}
                           initial={{ opacity: 0 }}
                           transition={{ duration: 0.2 }}
                           className="absolute inset-0 bg-black/20 flex items-center justify-center"
                         >
-                          <motion.div variants={{ hover: { scale: 1.1, opacity: 1 } }} initial={{ scale: 0.9, opacity: 0 }} transition={{ duration: 0.2 }}>
+                          <m.div variants={{ hover: { scale: 1.1, opacity: 1 } }} initial={{ scale: 0.9, opacity: 0 }} transition={{ duration: 0.2 }}>
                              <ImageIcon size={28} className="text-white drop-shadow-lg" />
-                          </motion.div>
-                        </motion.div>
-                      </motion.div>
+                          </m.div>
+                        </m.div>
+                      </m.div>
                   ))}
               </div>
             )}
@@ -298,10 +322,7 @@ const VehicleAdminDetail = () => {
                 <h3 className="text-lg font-bold text-gray-900">Solicitar Corrección de Registro</h3>
               </div>
               <button 
-                onClick={() => {
-                  setShowEditModal(false);
-                  setEditMotivo('');
-                }} 
+                onClick={() => dispatch({ type: 'SET_EDIT_MODAL', payload: false })}
                 className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-white rounded-lg transition-colors"
                 disabled={isSubmitting}
               >
@@ -320,15 +341,16 @@ const VehicleAdminDetail = () => {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label htmlFor="editMotivo" className="block text-sm font-semibold text-gray-700 mb-2">
                   Justificación de la Solicitud <span className="text-(--color-primary)">*</span>
                 </label>
                 <p className="text-xs text-gray-500 mb-2">
                   Señala con precisión qué campos del Expediente no concuerdan con la Evidencia Fotográfica o están mal capturados.
                 </p>
                 <textarea 
+                  id="editMotivo"
                   value={editMotivo}
-                  onChange={(e) => setEditMotivo(e.target.value)}
+                  onChange={(e) => dispatch({ type: 'SET_EDIT_MOTIVO', payload: e.target.value })}
                   disabled={isSubmitting}
                   className="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-(--color-primary)/20 focus:border-(--color-primary) outline-none transition-all resize-none shadow-inner disabled:bg-gray-50 disabled:text-gray-400"
                   rows={5}
@@ -340,10 +362,7 @@ const VehicleAdminDetail = () => {
             {/* Footer */}
             <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 rounded-b-2xl shrink-0">
               <button 
-                onClick={() => {
-                  setShowEditModal(false);
-                  setEditMotivo('');
-                }} 
+                onClick={() => dispatch({ type: 'SET_EDIT_MODAL', payload: false })}
                 disabled={isSubmitting}
                 className="px-4 py-2 text-sm font-semibold text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50"
               >
@@ -352,7 +371,7 @@ const VehicleAdminDetail = () => {
               <button 
                 disabled={!editMotivo.trim() || isSubmitting}
                 onClick={async () => {
-                  setIsSubmitting(true);
+                  dispatch({ type: 'SET_SUBMITTING', payload: true });
                   try {
                     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
                     const res = await fetch(`${API_URL}/api/solicitudes`, {
@@ -365,8 +384,7 @@ const VehicleAdminDetail = () => {
                     });
                     
                     if (res.ok) {
-                      setEditMotivo('');
-                      setShowEditModal(false); 
+                      dispatch({ type: 'SET_EDIT_MODAL', payload: false });
                       showNotification(`Solicitud enviada exitosamente para folio ${vehiculo.folioProceso}`);
                     } else {
                       const data = await res.json();
@@ -375,7 +393,7 @@ const VehicleAdminDetail = () => {
                   } catch (error) {
                     showNotification('Error de conexión con el servidor', 'error');
                   } finally {
-                    setIsSubmitting(false);
+                    dispatch({ type: 'SET_SUBMITTING', payload: false });
                   }
                 }}
                 className={`px-4 py-2 text-sm font-semibold text-white rounded-lg transition-colors shadow-sm flex items-center justify-center min-w-35 ${isSubmitting ? 'bg-(--color-primary)/70 cursor-wait' : 'bg-(--color-primary) hover:bg-violet-900 disabled:opacity-50'}`}
@@ -412,48 +430,49 @@ const VehicleAdminDetail = () => {
       {createPortal(
         <AnimatePresence>
           {selectedImage && (
-              <motion.div 
+              <m.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 className="fixed inset-0 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md cursor-zoom-out"
                 style={{ zIndex: 120 }}
-                onClick={() => setSelectedImage(null)}
+                onClick={() => dispatch({ type: 'SET_SELECTED_IMAGE', payload: null })}
               >
-                <motion.button 
+                <m.button 
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ delay: 0.1 }}
                   className="absolute top-4 right-4 sm:top-8 sm:right-8 p-3 text-white/70 hover:text-white bg-black/40 hover:bg-black/80 rounded-full transition-colors backdrop-blur-sm z-10"
-                  onClick={(e) => { e.stopPropagation(); setSelectedImage(null); }}
+                  onClick={(e) => { e.stopPropagation(); dispatch({ type: 'SET_SELECTED_IMAGE', payload: null }); }}
                 >
                   <X size={24} />
-                </motion.button>
+                </m.button>
                 
-                <motion.div
+                <m.div
                   layoutId={`foto-container-${selectedImage}`}
                   transition={springConfig}
                   className="max-w-full max-h-full flex items-center justify-center cursor-default bg-transparent"
                   onClick={(e) => e.stopPropagation()}
                   style={{ width: '100%', height: '100%' }}
                 >
-                  <motion.img 
+                  <m.img 
                     layoutId={`foto-img-${selectedImage}`}
                     transition={springConfig}
                     src={selectedImage} 
                     alt="Zoom preview" 
                     className="max-w-full max-h-full object-contain rounded-lg shadow-2xl bg-transparent relative z-10"
                   />
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
           )}
         </AnimatePresence>,
         document.getElementById('modal-root') || document.body
       )}
 
     </div>
+    </LazyMotion>
   );
 };
 

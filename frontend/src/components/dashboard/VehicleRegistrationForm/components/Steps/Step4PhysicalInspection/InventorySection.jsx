@@ -19,8 +19,8 @@ const InventorySection = ({ formData, setFormData, errors, onChange, getInputCla
         <h4 className="font-semibold text-gray-800">Inventario de Objetos y Herramientas</h4>
       </div>
       <div className="p-6 space-y-6">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Tags de Inventario (Seleccione lo presente)</label>
-        <div className="flex flex-wrap gap-2 mb-4">
+        <label htmlFor="inventory-tags" className="block text-sm font-medium text-gray-700 mb-1">Tags de Inventario (Seleccione lo presente)</label>
+        <div id="inventory-tags" className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Tags de Inventario">
           {inventoryTags.map(tag => {
             const isSelected = formData.objetosPersonales.includes(tag);
             return (

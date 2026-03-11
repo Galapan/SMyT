@@ -7,8 +7,8 @@ const TableSkeleton = ({ rows = 5, columns = 4 }) => {
       <table className="w-full">
         <thead className="bg-gray-50/50">
           <tr>
-            {[...Array(columns)].map((_, i) => (
-              <th key={i} className="px-6 py-3">
+            {[...Array(columns)].map((_, colIndex) => (
+              <th key={`th-${colIndex}`} className="px-6 py-3">
                 <Skeleton height="1rem" width="60%" />
               </th>
             ))}
@@ -16,9 +16,9 @@ const TableSkeleton = ({ rows = 5, columns = 4 }) => {
         </thead>
         <tbody className="divide-y divide-gray-100">
           {[...Array(rows)].map((_, rowIndex) => (
-            <tr key={rowIndex}>
+            <tr key={`tr-${rowIndex}`}>
               {[...Array(columns)].map((_, colIndex) => (
-                <td key={colIndex} className="px-6 py-4 whitespace-nowrap">
+                <td key={`td-${rowIndex}-${colIndex}`} className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     {colIndex === 0 && (
                       <Skeleton circle width="2.5rem" height="2.5rem" className="mr-4 shrink-0" />

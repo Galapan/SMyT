@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import Cropper from 'react-easy-crop';
 import { X, Check } from 'lucide-react';
 
@@ -166,9 +166,10 @@ const ImageCropper = ({ imageSrc, onCropComplete, onCancel }) => {
 
   return createPortal(
     <AnimatePresence>
+      <LazyMotion features={domAnimation}>
       <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
         {/* Backdrop */}
-        <motion.div
+        <m.div
           variants={backdropVariants}
           initial="hidden"
           animate="visible"
@@ -178,7 +179,7 @@ const ImageCropper = ({ imageSrc, onCropComplete, onCancel }) => {
         />
 
         {/* Modal Container */}
-        <motion.div
+        <m.div
           variants={modalVariants}
           initial="hidden"
           animate="visible"
@@ -268,8 +269,9 @@ const ImageCropper = ({ imageSrc, onCropComplete, onCancel }) => {
           
           {/* Bottom Gradient Decor */}
           <div className="h-4 w-full bg-linear-to-t from-gray-50 to-transparent absolute bottom-0 pointer-events-none rounded-b-3xl"></div>
-        </motion.div>
+        </m.div>
       </div>
+      </LazyMotion>
     </AnimatePresence>,
     document.getElementById('modal-root') || document.body
   );

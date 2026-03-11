@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useReducer } from 'react';
 import { createPortal } from 'react-dom';
 import { User, Shield, CheckCircle, AlertCircle } from 'lucide-react';
 import StepIndicator from './VehicleRegistrationForm/components/UI/StepIndicator';
@@ -9,41 +9,56 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
-const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
-  const [currentStep, setCurrentStep] = useState(1);
-  const [direction, setDirection] = useState('right');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [depositos, setDepositos] = useState([]);
-
-  const [formData, setFormData] = useState({
+const initialState = {
+  currentStep: 1,
+  direction: 'right',
+  loading: false,
+  error: null,
+  errors: {},
+  formData: {
     nombre: '',
     apellido: '',
     email: '',
     password: '',
     rol: '',
     depositoId: ''
-  });
+  }
+};
 
-  const [errors, setErrors] = useState({});
+function reducer(state, action) {
+  switch (action.type) {
+    case 'RESET':
+      return { ...initialState };
+    case 'SET_STEP':
+      return { ...state, currentStep: action.payload.step, direction: action.payload.direction };
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload };
+    case 'SET_ERROR':
+      return { ...state, error: action.payload };
+    case 'SET_ERRORS':
+      return { ...state, errors: action.payload };
+    case 'UPDATE_FORM':
+      return { ...state, formData: { ...state.formData, ...action.payload } };
+    case 'CLEAR_FIELD_ERROR':
+      return { ...state, errors: { ...state.errors, [action.payload]: null } };
+    default:
+      return state;
+  }
+}
+
+const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { currentStep, direction, loading, error, errors, formData } = state;
+  const [depositos, setDepositos] = useState([]);
 
   useEffect(() => {
-    if (isOpen) {
-      setCurrentStep(1);
-      setDirection('right');
-      setFormData({
-        nombre: '',
-        apellido: '',
-        email: '',
-        password: '',
-        rol: '',
-        depositoId: ''
-      });
-      setErrors({});
-      setError(null);
-      fetchDepositos();
-    }
-  }, [isOpen]);
+    fetchDepositos();
+  }, []);
+
+  const handleClose = () => {
+    dispatch({ type: 'RESET' });
+    onClose();
+  };
 
   const fetchDepositos = async () => {
     try {
@@ -88,40 +103,38 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         newErrors.depositoId = 'Debe seleccionar un depósito';
       }
     }
-    setErrors(newErrors);
+    dispatch({ type: 'SET_ERRORS', payload: newErrors });
     return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
     if (validateStep(currentStep)) {
-      setDirection('right');
-      setCurrentStep(prev => prev + 1);
+      dispatch({ type: 'SET_STEP', payload: { step: currentStep + 1, direction: 'right' } });
     }
   };
 
   const prevStep = () => {
-    setDirection('left');
-    setCurrentStep(prev => prev - 1);
+    dispatch({ type: 'SET_STEP', payload: { step: currentStep - 1, direction: 'left' } });
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    dispatch({ type: 'UPDATE_FORM', payload: { [name]: value } });
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
+      dispatch({ type: 'CLEAR_FIELD_ERROR', payload: name });
     }
     
     // Si cambia el rol y no es concesionario, limpiar el depositoId
     if (name === 'rol' && value !== 'USUARIO_CONCESIONARIO') {
-        setFormData(prev => ({ ...prev, depositoId: '' }));
+        dispatch({ type: 'UPDATE_FORM', payload: { depositoId: '' } });
     }
   };
 
   const handleSubmit = async () => {
     if (!validateStep(3)) return; // Although step 3 has no inputs, just to be safe
     
-    setLoading(true);
-    setError(null);
+    dispatch({ type: 'SET_LOADING', payload: true });
+    dispatch({ type: 'SET_ERROR', payload: null });
 
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -137,15 +150,16 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
       const data = await response.json();
 
       if (data.success) {
+        dispatch({ type: 'RESET' });
         onSuccess(data.data);
         onClose();
       } else {
-        setError(data.message || 'Error al crear el usuario');
+        dispatch({ type: 'SET_ERROR', payload: data.message || 'Error al crear el usuario' });
       }
     } catch (err) {
-      setError('Error de conexión con el servidor');
+      dispatch({ type: 'SET_ERROR', payload: 'Error de conexión con el servidor' });
     } finally {
-      setLoading(false);
+      dispatch({ type: 'SET_LOADING', payload: false });
     }
   };
 
@@ -309,9 +323,9 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         role="button"
         tabIndex={0}
         className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
-        onClick={onClose}
+        onClick={handleClose}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') onClose();
+          if (e.key === 'Enter' || e.key === ' ') handleClose();
         }}
       />
 
@@ -320,7 +334,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
         
         {/* Header */}
         <div className="shrink-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
-          <ModalHeader onClose={onClose} title="Creación de Cuentas" />
+          <ModalHeader onClose={handleClose} title="Creación de Cuentas" />
 
           {/* Stepper */}
           <div className="mt-6">
