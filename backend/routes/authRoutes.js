@@ -13,4 +13,13 @@ router.post('/verify-email', authController.verifyEmail);
 // GET /api/auth/me - Obtener usuario actual (requiere JWT)
 router.get('/me', verifyToken, authController.getCurrentUser);
 
+// POST /api/auth/forgot-password - Solicitar recuperación de contraseña
+router.post('/forgot-password', authController.forgotPassword);
+
+// POST /api/auth/reset-password - Restablecer contraseña con código
+router.post('/reset-password', authController.resetPassword);
+
+// POST /api/auth/verify-reset-code - Verificar código de recuperación
+router.post('/verify-reset-code', authController.verifyResetCode);
+
 module.exports = router;

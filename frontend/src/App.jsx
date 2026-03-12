@@ -3,6 +3,8 @@ import { Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Login from './components/auth/Login';
 import Verification from './components/auth/Verification';
+import ForgotPassword from './components/auth/ForgotPassword';
+import ResetPassword from './components/auth/ResetPassword';
 import AdminLayout from './layouts/AdminLayout';
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
@@ -39,6 +41,8 @@ function App() {
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/verify" element={<Verification />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>

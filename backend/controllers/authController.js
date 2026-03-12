@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
+const { sendPasswordResetEmail } = require('../utils/emailService');
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'smyt-secret-key-change-in-production';
@@ -210,8 +211,209 @@ const verifyEmail = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/auth/forgot-password
+ * Solicitar recuperación de contraseña (envía correo con código)
+ */
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'El email es requerido'
+      });
+    }
+
+    const emailNormalizado = email.toLowerCase().trim();
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { email: emailNormalizado }
+    });
+
+    // Siempre devolvemos el mismo mensaje de éxito por seguridad
+    // (no revelar si un correo está registrado o no)
+    if (!usuario) {
+      return res.json({
+        success: true,
+        message: 'Si el correo existe en nuestro sistema, recibirás un código de recuperación.'
+      });
+    }
+
+    // Generar código de 6 dígitos
+    const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // El código expira en 1 hora
+    const expiracion = new Date();
+    expiracion.setHours(expiracion.getHours() + 1);
+
+    await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: {
+        codigoVerificacion: codigo,
+        expiracionCodigo: expiracion
+      }
+    });
+
+    // Enviar correo
+    const emailSent = await sendPasswordResetEmail(emailNormalizado, codigo);
+
+    if (!emailSent) {
+      // Revertir el código en caso de error de envío para evitar estado inconsistente
+      await prisma.usuario.update({
+        where: { id: usuario.id },
+        data: {
+          codigoVerificacion: null,
+          expiracionCodigo: null
+        }
+      });
+      return res.status(500).json({
+        success: false,
+        message: 'Error al enviar el correo de recuperación. Por favor intenta más tarde.'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Si el correo existe en nuestro sistema, recibirás un código de recuperación.'
+    });
+
+  } catch (error) {
+    console.error('Error al solicitar recuperación de contraseña:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * POST /api/auth/reset-password
+ * Restablecer contraseña con código de 6 dígitos
+ */
+const resetPassword = async (req, res) => {
+  try {
+    const { email, code, newPassword } = req.body;
+
+    if (!email || !code || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, código y nueva contraseña son requeridos'
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: 'La contraseña debe tener al menos 8 caracteres'
+      });
+    }
+
+    const emailNormalizado = email.toLowerCase().trim();
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { email: emailNormalizado }
+    });
+
+    if (!usuario) {
+      return res.status(400).json({
+        success: false,
+        message: 'Datos de recuperación inválidos o expirados'
+      });
+    }
+
+    // Verificar si el código concuerda y no ha expirado
+    if (usuario.codigoVerificacion !== code || !usuario.expiracionCodigo || new Date() > usuario.expiracionCodigo) {
+      return res.status(400).json({
+        success: false,
+        message: 'El código de recuperación es incorrecto o ha expirado'
+      });
+    }
+
+    // Hashear la nueva contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+    // Actualizar usuario
+    await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: {
+        password: hashedPassword,
+        codigoVerificacion: null,
+        expiracionCodigo: null
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Contraseña actualizada exitosamente'
+    });
+
+  } catch (error) {
+    console.error('Error al restablecer contraseña:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
+/**
+ * POST /api/auth/verify-reset-code
+ * Verificar si el código de recuperación es válido sin cambiar contraseña
+ */
+const verifyResetCode = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email y código son requeridos'
+      });
+    }
+
+    const emailNormalizado = email.toLowerCase().trim();
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { email: emailNormalizado }
+    });
+
+    if (!usuario) {
+      return res.status(400).json({
+        success: false,
+        message: 'Datos de recuperación inválidos o expirados'
+      });
+    }
+
+    // Verificar si el código concuerda y no ha expirado
+    if (usuario.codigoVerificacion !== code || !usuario.expiracionCodigo || new Date() > usuario.expiracionCodigo) {
+      return res.status(400).json({
+        success: false,
+        message: 'El código de recuperación es incorrecto o ha expirado'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Código verificado correctamente'
+    });
+
+  } catch (error) {
+    console.error('Error al verificar código de recuperación:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
 module.exports = {
   login,
   getCurrentUser,
-  verifyEmail
+  verifyEmail,
+  forgotPassword,
+  resetPassword,
+  verifyResetCode
 };

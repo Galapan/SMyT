@@ -224,7 +224,7 @@ function Login() {
             <button
               type="button"
               className="text-xs font-medium text-[#572671] hover:underline bg-transparent border-none p-0 cursor-pointer"
-              onClick={() => alert("Función en desarrollo")}
+              onClick={() => navigate("/forgot-password")}
             >
               ¿Olvidaste tu contraseña?
             </button>
