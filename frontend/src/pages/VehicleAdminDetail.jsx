@@ -9,6 +9,7 @@ import {
   Calendar, FileCode2, MapPin, Edit3, X, User
 } from 'lucide-react';
 import dayjs from 'dayjs';
+import Toast from '../components/common/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -412,20 +413,12 @@ const VehicleAdminDetail = () => {
       )}
 
       {/* Floating Toast Notification */}
-      {toast.visible && (
-        <div className={`fixed bottom-6 right-6 z-60 px-4 py-3 rounded-xl shadow-lg border flex items-center gap-3 animate-in slide-in-from-bottom-5 fade-in duration-300 ${
-          toast.type === 'success' 
-            ? 'bg-green-50 border-green-200 text-green-800' 
-            : 'bg-red-50 border-red-200 text-red-800'
-        }`}>
-          {toast.type === 'success' ? (
-            <CheckCircle2 size={20} className="text-green-500 shrink-0" />
-          ) : (
-            <AlertTriangle size={20} className="text-red-500 shrink-0" />
-          )}
-          <p className="text-sm font-medium">{toast.message}</p>
-        </div>
-      )}
+      <Toast 
+        show={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => dispatch({ type: 'HIDE_TOAST' })}
+      />
 
       {createPortal(
         <AnimatePresence>

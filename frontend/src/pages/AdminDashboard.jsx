@@ -7,6 +7,7 @@ import StatCard from '../components/dashboard/StatCard';
 import AuditSearch from '../components/dashboard/AuditSearch';
 import DepotTable from '../components/dashboard/DepotTable';
 import VehicleRegistrationForm from '../components/dashboard/VehicleRegistrationForm';
+import Toast from '../components/common/Toast';
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -20,6 +21,7 @@ const initialState = {
   isEditFormOpen: false,
   vehicleToEdit: null,
   editingNotifId: null,
+  toast: { show: false, message: '', type: 'success' },
 };
 
 function reducer(state, action) {
@@ -42,6 +44,10 @@ function reducer(state, action) {
       return { ...state, vehicleToEdit: action.payload.vehicleToEdit, editingNotifId: action.payload.editingNotifId, isEditFormOpen: true };
     case 'CLOSE_EDIT':
       return { ...state, isEditFormOpen: false, vehicleToEdit: null, editingNotifId: null };
+    case 'SHOW_TOAST':
+      return { ...state, toast: { show: true, message: action.payload.message, type: action.payload.type } };
+    case 'HIDE_TOAST':
+      return { ...state, toast: { ...state.toast, show: false } };
     default:
       return state;
   }
@@ -51,7 +57,7 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   // Custom state for UI and Modals
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { selectedNotif, resolving, loadingDetail, vehiculoDetail, isEditFormOpen, vehicleToEdit, editingNotifId } = state;
+  const { selectedNotif, resolving, loadingDetail, vehiculoDetail, isEditFormOpen, vehicleToEdit, editingNotifId, toast } = state;
 
   // Query Client for invalidating queries later
   const queryClient = useQueryClient();
@@ -59,6 +65,10 @@ const AdminDashboard = () => {
   const userStr = sessionStorage.getItem('user') || localStorage.getItem('user');
   const user = userStr ? JSON.parse(userStr) : null;
   const userRol = user?.rol || '';
+
+  const showNotification = (message, type = 'success') => {
+    dispatch({ type: 'SHOW_TOAST', payload: { message, type } });
+  };
 
   const fetchDashboardData = async () => {
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
@@ -109,6 +119,7 @@ const AdminDashboard = () => {
   const { data: dashboardData, isLoading: loading, refetch } = useQuery({
     queryKey: ['dashboard', user?.id],
     queryFn: fetchDashboardData,
+    refetchInterval: 10000, // Auto-refresh cada 10 segundos
   });
 
   const stats = dashboardData?.stats || {
@@ -165,12 +176,13 @@ const AdminDashboard = () => {
         // Refetch queries instead of manually filtering to keep data in sync
         queryClient.invalidateQueries({ queryKey: ['dashboard', user?.id] });
         dispatch({ type: 'CLOSE_NOTIF' });
+        showNotification(result.message || 'Solicitud procesada correctamente');
       } else {
-        alert(result.message || 'Error al procesar la solicitud');
+        showNotification(result.message || 'Error al procesar la solicitud', 'error');
       }
     } catch (error) {
       console.error('Error resolviendo solicitud:', error);
-      alert('Error de conexión al procesar la solicitud');
+      showNotification('Error de conexión al procesar la solicitud', 'error');
     } finally {
       dispatch({ type: 'SET_RESOLVING', payload: false });
     }
@@ -388,9 +400,9 @@ const AdminDashboard = () => {
             
             <div className="flex-1 overflow-y-auto p-2">
               {loading ? (
-                <div className="space-y-2 animate-pulse">
+                <div className="space-y-4 animate-pulse px-2 pb-2">
                   {[1, 2, 3].map((item) => (
-                    <div key={`skeleton-mobile-${item}`} className="p-4 rounded-lg border border-gray-100 bg-white">
+                    <div key={`skeleton-mobile-${item}`} className="p-4 rounded-xl border border-gray-200 bg-white">
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <div className="h-3 w-16 bg-gray-200 rounded mb-1"></div>
@@ -407,31 +419,33 @@ const AdminDashboard = () => {
                   <p className="text-sm">No tienes solicitudes pendientes de edición</p>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="space-y-4 px-2 pb-2">
                   {notificaciones.map((notif) => (
                     <div 
                       key={notif.id} 
-                      className="p-3 sm:p-4 rounded-lg border border-(--color-verde)/20 bg-(--color-verde)/5 hover:border-(--color-verde)/40 hover:shadow-md transition-all group flex flex-col justify-between"
+                      className="p-4 rounded-xl border border-gray-200 bg-[#f9faf9] shadow-sm flex flex-col justify-between"
                     >
                       <div>
-                        <div className="flex justify-between items-start mb-2">
+                        <div className="flex justify-between items-start mb-3">
                           <div>
-                            <span className="text-xs font-semibold text-gray-500 block">Vehículo Aprobado</span>
-                            <p className="text-sm font-bold text-gray-900">{notif.vehiculo?.placa || 'Sin Placa'} - {notif.vehiculo?.folioProceso}</p>
+                            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block mb-0.5">Vehículo Aprobado</span>
+                            <p className="text-sm font-bold text-[#1a1f36]">
+                              {notif.vehiculo?.placa || 'Sin Placa'} - {notif.vehiculo?.folioProceso}
+                            </p>
                           </div>
-                          <span className="text-[10px] text-gray-400">
+                          <span className="text-[10px] font-medium text-gray-400">
                             {new Date(notif.fechaResolucion || notif.fechaSolicitud).toLocaleDateString()}
                           </span>
                         </div>
-                        <div className="mb-3">
-                          <span className="text-xs font-semibold text-gray-500 block">Tu Solicitud</span>
-                          <p className="text-sm text-gray-700">{notif.motivo}</p>
+                        <div className="mb-4">
+                          <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block mb-0.5">Tu Solicitud</span>
+                          <p className="text-sm text-gray-600 leading-relaxed">{notif.motivo}</p>
                         </div>
                       </div>
 
                       <button
                         onClick={() => handleEditVehicle(notif)}
-                        className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 bg-white text-(--color-primary) border border-(--color-primary) hover:bg-(--color-primary) hover:text-white rounded-lg text-sm font-semibold transition-colors"
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-(--color-primary) border border-(--color-primary) hover:bg-(--color-primary)/5 rounded-lg text-sm font-semibold transition-colors"
                       >
                         <Edit2 size={16} />
                         Editar Registro
@@ -565,7 +579,7 @@ const AdminDashboard = () => {
             {/* Modal Footer / Actions */}
             <div className="px-4 py-3 sm:px-6 sm:py-4 bg-gray-50 flex items-center justify-end space-x-3 border-t border-gray-100">
               <button
-                onClick={() => dispatch({ type: 'CLOSE_NOTIF' })}
+                onClick={() => handleResolveNotification(selectedNotif.id, 'RECHAZADA')}
                 disabled={resolving}
                 className="px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 rounded-lg text-sm font-semibold transition-colors disabled:opacity-50 flex items-center"
               >
@@ -593,6 +607,13 @@ const AdminDashboard = () => {
           initialData={vehicleToEdit}
         />
       )}
+
+      <Toast 
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => dispatch({ type: 'HIDE_TOAST' })}
+      />
     </div>
   );
 

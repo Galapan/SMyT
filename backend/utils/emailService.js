@@ -1,7 +1,15 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-// Initialize Resend with API Key (Needs to be set in .env)
-const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key');
+// Initialize Nodemailer transporter
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: process.env.SMTP_PORT || 465,
+  secure: process.env.SMTP_PORT == 465, // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS,
+  },
+});
 
 /**
  * Sends a verification email to the user with a 6-digit code.
@@ -10,9 +18,9 @@ const resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_key');
  */
 const sendVerificationEmail = async (email, codigo) => {
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'SMyT <onboarding@resend.dev>', // Change this to your verified domain later if possible
-      to: [email],
+    const info = await transporter.sendMail({
+      from: `"SMyT" <${process.env.SMTP_USER || 'noreply@smyt.com'}>`, // sender address
+      to: email,
       subject: 'Código de Verificación - SMyT',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
@@ -26,12 +34,7 @@ const sendVerificationEmail = async (email, codigo) => {
       `,
     });
 
-    if (error) {
-      console.error('Resend API Error:', error);
-      return false;
-    }
-
-    console.log('Verification email sent successfully:', data);
+    console.log('Verification email sent successfully:', info.messageId);
     return true;
   } catch (err) {
     console.error('Error sending verification email:', err);
@@ -46,9 +49,9 @@ const sendVerificationEmail = async (email, codigo) => {
  */
 const sendPasswordResetEmail = async (email, codigo) => {
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'SMyT <onboarding@resend.dev>', // Change this to your verified domain later if possible
-      to: [email],
+    const info = await transporter.sendMail({
+      from: `"SMyT" <${process.env.SMTP_USER || 'noreply@smyt.com'}>`, // sender address
+      to: email,
       subject: 'Recuperación de Contraseña - SMyT',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
@@ -62,12 +65,7 @@ const sendPasswordResetEmail = async (email, codigo) => {
       `,
     });
 
-    if (error) {
-      console.error('Resend API Error:', error);
-      return false;
-    }
-
-    console.log('Password reset email sent successfully:', data);
+    console.log('Password reset email sent successfully:', info.messageId);
     return true;
   } catch (err) {
     console.error('Error sending password reset email:', err);
