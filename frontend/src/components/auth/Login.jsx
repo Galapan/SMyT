@@ -1,5 +1,5 @@
-import { useReducer, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useReducer, useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import logoTlax from "../../assets/LogoTlax.png";
 import Toast from "../common/Toast";
 
@@ -36,8 +36,16 @@ function reducer(state, action) {
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [state, dispatch] = useReducer(reducer, initialState);
   const { email, password, rememberMe, loading, error } = state;
+  const [toast, setToast] = useState({ show: false, message: "", type: "error" });
+
+  useEffect(() => {
+    if (error) {
+      setToast({ show: true, message: error, type: "error" });
+    }
+  }, [error]);
 
   // Redirigir automáticamente si hay una sesión activa
   useEffect(() => {
@@ -55,12 +63,20 @@ function Login() {
         ) {
           navigate("/admin");
         } else {
-          navigate("/concesionario");
+          // navigate("/concesionario");
+          navigate("/admin"); // temporal mapping since there is no concesionario dashboard yet
         }
       } catch (err) {
         // Si hay error en el parseo, el usuario se queda en el login
         console.error("Error parseando usuario guardado:", err);
       }
+    }
+    
+    // Check if coming back from successful verification
+    if (location.state?.message) {
+      setToast({ show: true, message: location.state.message, type: "success" });
+      // Clean up the state so it doesn't show again on refresh
+      window.history.replaceState({}, document.title);
     }
   }, [navigate]);
 
@@ -80,6 +96,13 @@ function Login() {
       const data = await response.json();
 
       if (!response.ok) {
+        // Check if unverified
+        if (data.unverified) {
+            dispatch({ type: 'LOGIN_SUCCESS' }); // Stop loading
+            navigate("/verify", { state: { email: data.email || email } });
+            return;
+        }
+
         throw new Error(data.message || "Error al iniciar sesión");
       }
 
@@ -107,10 +130,13 @@ function Login() {
   return (
     <div className="h-dvh w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
       <Toast 
-        show={!!error}
-        message={error}
-        type="error"
-        onClose={() => dispatch({ type: 'CLEAR_ERROR' })}
+        show={toast.show}
+        message={toast.message}
+        type={toast.type}
+        onClose={() => {
+            setToast({ ...toast, show: false });
+            dispatch({ type: 'CLEAR_ERROR' });
+        }}
       />
       {/* Card Formulario */}
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">

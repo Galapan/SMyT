@@ -1,5 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+const { sendVerificationEmail } = require("../utils/emailService");
 
 const prisma = new PrismaClient();
 
@@ -206,6 +208,11 @@ const createUser = async (req, res) => {
     // Crear URL de avatar por defecto
     const defaultFotoUrl = `https://ui-avatars.com/api/?background=random&color=fff&size=512&name=${encodeURIComponent(nombre + ' ' + apellido)}`;
 
+    // Generar código de verificación (6 dígitos)
+    const verificationCode = crypto.randomInt(100000, 999999).toString();
+    const expirationTime = new Date();
+    expirationTime.setHours(expirationTime.getHours() + 24); // Expira en 24h
+
     // Crear el usuario
     const newUser = await prisma.usuario.create({
       data: {
@@ -215,6 +222,9 @@ const createUser = async (req, res) => {
         password: hashedPassword,
         rol,
         fotoUrl: defaultFotoUrl,
+        verificado: false,
+        codigoVerificacion: verificationCode,
+        expiracionCodigo: expirationTime,
         depositoId: rol === "USUARIO_CONCESIONARIO" ? depositoId : null,
         creadoPorId: creadorId,
       },
@@ -225,6 +235,7 @@ const createUser = async (req, res) => {
         email: true,
         rol: true,
         fotoUrl: true,
+        verificado: true,
         deposito: {
           select: {
             nombre: true,
@@ -233,9 +244,12 @@ const createUser = async (req, res) => {
       },
     });
 
+    // Enviar correo de verificación (no bloqueamos la respuesta si falla el correo, pero lo intentamos)
+    await sendVerificationEmail(email.toLowerCase(), verificationCode);
+
     res.status(201).json({
       success: true,
-      message: "Usuario creado exitosamente",
+      message: "Usuario creado exitosamente. Se ha enviado un código de verificación por correo.",
       data: newUser,
     });
   } catch (error) {

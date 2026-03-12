@@ -9,6 +9,7 @@ const depositosRoutes = require('./routes/depositos');
 const userRoutes = require('./routes/userRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const solicitudRoutes = require('./routes/solicitudRoutes');
+const { startAccountCleanupJob } = require('./cron/accountCleanup');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -56,6 +57,9 @@ app.use((err, req, res, next) => {
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+    
+    // Iniciar el cron job de limpieza
+    startAccountCleanupJob();
   });
 }
 

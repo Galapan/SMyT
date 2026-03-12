@@ -48,6 +48,9 @@ model Usuario {
   rol             Rol
   fotoUrl         String?   @default("https://ui-avatars.com/api/?background=random&color=fff&name=User")
   activo          Boolean   @default(true)
+  verificado      Boolean   @default(true) // Set to true by default for existing users, false for new ones
+  codigoVerificacion String?
+  expiracionCodigo   DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

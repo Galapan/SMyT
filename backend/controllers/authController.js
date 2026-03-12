@@ -45,6 +45,16 @@ const login = async (req, res) => {
       });
     }
 
+    // Verificar si el usuario ha verificado su cuenta
+    if (!usuario.verificado) {
+      return res.status(403).json({
+        success: false,
+        message: 'Cuenta no verificada. Por favor, verifica tu correo electrónico.',
+        unverified: true, // Frontend can use this flag to redirect to verification screen
+        email: usuario.email // Pass email back for the verification screen
+      });
+    }
+
     // Verificar password
     const isPasswordValid = await bcrypt.compare(password, usuario.password);
 
@@ -124,7 +134,84 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/auth/verify-email
+ * Verificar cuenta de usuario con código
+ */
+const verifyEmail = async (req, res) => {
+  try {
+    const { email, code } = req.body;
+
+    if (!email || !code) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email y código son requeridos'
+      });
+    }
+
+    // Normalizar email
+    const emailNormalizado = email.toLowerCase().trim();
+
+    // Buscar usuario
+    const usuario = await prisma.usuario.findUnique({
+      where: { email: emailNormalizado }
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        message: 'Usuario no encontrado'
+      });
+    }
+
+    if (usuario.verificado) {
+      return res.status(400).json({
+        success: false,
+        message: 'La cuenta ya está verificada'
+      });
+    }
+
+    // Verificar si el código coincide y si no ha expirado
+    if (usuario.codigoVerificacion !== code) {
+      return res.status(400).json({
+        success: false,
+        message: 'Código de verificación incorrecto'
+      });
+    }
+
+    if (new Date() > usuario.expiracionCodigo) {
+      return res.status(400).json({
+        success: false,
+        message: 'El código de verificación ha expirado. Por favor solicita uno nuevo.'
+      });
+    }
+
+    // Actualizar usuario a verificado y limpiar el código
+    await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: {
+        verificado: true,
+        codigoVerificacion: null,
+        expiracionCodigo: null
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Cuenta verificada exitosamente'
+    });
+
+  } catch (error) {
+    console.error('Error al verificar email:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor al verificar la cuenta'
+    });
+  }
+};
+
 module.exports = {
   login,
-  getCurrentUser
+  getCurrentUser,
+  verifyEmail
 };

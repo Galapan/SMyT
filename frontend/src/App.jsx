@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Login from './components/auth/Login';
+import Verification from './components/auth/Verification';
 import AdminLayout from './layouts/AdminLayout';
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
@@ -37,6 +38,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/verify" element={<Verification />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>
