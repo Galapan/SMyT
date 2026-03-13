@@ -1,5 +1,6 @@
 import { useState, useEffect, useReducer } from 'react';
 import { createPortal } from 'react-dom';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { User, Shield, CheckCircle, AlertCircle } from 'lucide-react';
 import StepIndicator from './VehicleRegistrationForm/components/UI/StepIndicator';
 import ModalHeader from './VehicleRegistrationForm/components/UI/ModalHeader';
@@ -167,7 +168,6 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
     ${errors[fieldName] ? 'border-(--color-rosa) bg-(--color-rosa)/5 focus:ring-(--color-rosa)' : 'border-gray-300'}
   `;
 
-  if (!isOpen) return null;
 
   // Render Step 1
   const renderStep1 = () => (
@@ -297,21 +297,39 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
     </div>
   );
 
-  return createPortal(
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
-      {/* Backdrop */}
-      <div 
-        role="button"
-        tabIndex={0}
-        className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
-        onClick={handleClose}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') handleClose();
-        }}
-      />
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } }
+  };
 
-      {/* Modal Container */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden animate-slide-up-fade flex flex-col max-h-[90vh]">
+  const modalVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } },
+    exit: { opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2 } }
+  };
+
+  return createPortal(
+    <LazyMotion features={domAnimation}>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
+          {/* Backdrop */}
+          <m.div
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="fixed inset-0 bg-gray-800/40 backdrop-blur-md"
+            onClick={handleClose}
+          />
+
+          {/* Modal Container */}
+          <m.div
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh] z-10">
         
         {/* Header */}
         <div className="shrink-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
@@ -355,8 +373,11 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
           submitLabel="Crear Cuenta"
         />
         </div>
-      </div>
-    </div>,
+          </m.div>
+        </div>
+      )}
+    </AnimatePresence>
+    </LazyMotion>,
     document.getElementById('modal-root') || document.body
   );
 };

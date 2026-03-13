@@ -1,4 +1,5 @@
 import { createPortal } from 'react-dom';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { FileText, Car, Shield, ClipboardCheck, AlertCircle } from 'lucide-react';
 import { useVehicleForm } from './hooks/useVehicleForm';
 
@@ -39,27 +40,39 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
     { id: 4, name: 'Inspección Física', icon: ClipboardCheck }
   ];
 
-  if (!isOpen) return null;
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } }
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } },
+    exit: { opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2 } }
+  };
 
   return createPortal(
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
-        onClick={onClose}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onClose();
-          }
-        }}
-        role="button"
-        tabIndex={0}
-        aria-label="Cerrar"
-      />
+    <LazyMotion features={domAnimation}>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
+          {/* Backdrop */}
+          <m.div 
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="fixed inset-0 bg-gray-800/40 backdrop-blur-md"
+            onClick={onClose}
+          />
 
-      {/* Modal Container */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden animate-slide-up-fade flex flex-col">
+          {/* Modal Container */}
+          <m.div
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col z-10">
         {/* Header */}
         <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
           <ModalHeader onClose={onClose} />
@@ -127,8 +140,11 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
           onSubmit={handleSubmit}
           loading={loading}
         />
-      </div>
-    </div>,
+          </m.div>
+        </div>
+      )}
+    </AnimatePresence>
+    </LazyMotion>,
     document.getElementById('modal-root')
   );
 };

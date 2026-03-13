@@ -59,11 +59,11 @@ function Login() {
         const usuario = JSON.parse(storedUser);
         if (
           usuario.rol === "SUPER_USUARIO" ||
-          usuario.rol === "ADMINISTRADOR"
+          usuario.rol === "ADMINISTRADOR" ||
+          usuario.rol === "ADMINISTRADOR_CONCESIONARIO"
         ) {
           navigate("/admin");
         } else {
-          // navigate("/concesionario");
           navigate("/admin"); // temporal mapping since there is no concesionario dashboard yet
         }
       } catch (err) {
@@ -116,11 +116,12 @@ function Login() {
       dispatch({ type: 'LOGIN_SUCCESS' });
       if (
         usuario.rol === "SUPER_USUARIO" ||
-        usuario.rol === "ADMINISTRADOR"
+        usuario.rol === "ADMINISTRADOR" ||
+        usuario.rol === "ADMINISTRADOR_CONCESIONARIO"
       ) {
         navigate("/admin");
       } else {
-        navigate("/concesionario"); // Futuro: dashboard de concesionario
+        navigate("/admin"); // Futuro: dashboard de concesionario
       }
     } catch (err) {
       dispatch({ type: 'LOGIN_ERROR', payload: err.message });

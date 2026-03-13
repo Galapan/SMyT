@@ -56,7 +56,7 @@ const AdminLayout = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Depósitos', href: '/admin/deposits', icon: Warehouse },
+    { name: 'Depósitos', href: '/admin/deposits', icon: Warehouse, roles: ['SUPER_USUARIO', 'ADMINISTRADOR'] },
     { name: 'Vehículos', href: '/admin/vehicles', icon: Car },
     { name: 'Auditoría', href: '/admin/auditoria', icon: Search },
     { name: 'Cuentas', href: '/admin/accounts', icon: Users, roles: ['SUPER_USUARIO'] },

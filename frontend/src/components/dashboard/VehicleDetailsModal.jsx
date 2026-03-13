@@ -149,7 +149,7 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehiculo }) => {
                                             <div className="p-2 bg-blue-50 text-blue-600 rounded-lg shrink-0 mt-0.5"><MapPin size={18}/></div>
                                             <div>
                                                 <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">Ubicación Actual</p>
-                                                <p className="font-bold text-gray-900 pt-0.5">Depósito ID: {vehiculo.depositoId}</p>
+                                                <p className="font-bold text-gray-900 pt-0.5">{vehiculo.deposito?.nombre || `Deposito ID: ${vehiculo.depositoId}`}</p>
                                             </div>
                                         </div>
                                         

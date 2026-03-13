@@ -204,8 +204,13 @@ const createVehicle = async (req, res) => {
 // Obtener todos los vehículos
 const getAllVehicles = async (req, res) => {
   try {
+    const whereClause = { activo: true };
+    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO' && req.user.depositoId) {
+      whereClause.depositoId = req.user.depositoId;
+    }
+
     const vehiculos = await prisma.vehiculo.findMany({
-      where: { activo: true },
+      where: whereClause,
       include: {
         deposito: true,
         registradoPor: {
@@ -242,19 +247,23 @@ const getVehicleStats = async (req, res) => {
     
     const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
+    const whereBase = { activo: true };
+    const whereHoy = { fechaIngreso: { gte: today }, activo: true };
+    const whereLiberados = { fechaSalida: { gte: startOfMonth }, activo: false };
+
+    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO' && req.user.depositoId) {
+      whereBase.depositoId = req.user.depositoId;
+      whereHoy.depositoId = req.user.depositoId;
+      whereLiberados.depositoId = req.user.depositoId;
+    }
+
     const [totalVehiculos, ingresosHoy, liberadosMes, depositos] = await Promise.all([
-      prisma.vehiculo.count({ where: { activo: true } }),
+      prisma.vehiculo.count({ where: whereBase }),
       prisma.vehiculo.count({
-        where: {
-          fechaIngreso: { gte: today },
-          activo: true
-        }
+        where: whereHoy
       }),
       prisma.vehiculo.count({
-        where: {
-          fechaSalida: { gte: startOfMonth },
-          activo: false
-        }
+        where: whereLiberados
       }),
       prisma.deposito.count({ where: { activo: true } })
     ]);

@@ -1,5 +1,6 @@
 import { useReducer } from "react";
 import { createPortal } from "react-dom";
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import {
   Building2,
   User,
@@ -189,23 +190,39 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
     onClose();
   };
 
-  if (!isOpen) return null;
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } }
+  };
+
+  const modalVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } },
+    exit: { opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2 } }
+  };
 
   return createPortal(
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto overflow-x-hidden">
-      {/* Backdrop */}
-      <div
-        role="button"
-        tabIndex={0}
-        className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
-        onClick={handleClose}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') handleClose();
-        }}
-      />
+    <LazyMotion features={domAnimation}>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto overflow-x-hidden">
+          {/* Backdrop */}
+          <m.div
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="fixed inset-0 bg-gray-800/40 backdrop-blur-md"
+            onClick={handleClose}
+          />
 
-      {/* Modal Container */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden animate-slide-up-fade flex flex-col mx-2 sm:mx-0">
+          {/* Modal Container */}
+          <m.div
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col mx-2 sm:mx-0 z-10">
         {/* Header Style from Vehicle Form */}
         <div className="sticky top-0 bg-white z-10 px-4 sm:px-6 md:px-8 pt-4 pb-3 md:pt-6 md:pb-4 border-b border-gray-100">
           <ModalHeader 
@@ -341,8 +358,11 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
           loading={loading}
           submitLabel="Registrar Depósito"
         />
-      </div>
-    </div>,
+          </m.div>
+        </div>
+      )}
+    </AnimatePresence>
+    </LazyMotion>,
     document.getElementById("modal-root"),
   );
 };

@@ -1,5 +1,6 @@
 import { useReducer, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { X, UserPlus, Loader2, Check, AlertCircle, Search, Link as LinkIcon, User } from "lucide-react";
 import FormInput from "../VehicleRegistrationForm/components/FormFields/FormInput";
 
@@ -179,33 +180,45 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
     onClose();
   };
 
-  if (!isOpen) return null;
-
   const filteredUsers = availableUsers.filter(u => 
     u.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
     u.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  return createPortal(
-    <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-gray-800/40 backdrop-blur-md transition-opacity"
-        onClick={handleClose}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            handleClose();
-          }
-        }}
-        role="button"
-        tabIndex={0}
-        aria-label="Cerrar modal"
-      />
+  const backdropVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } }
+  };
 
-      {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-slide-up-fade flex flex-col">
+  const modalVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.9 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', damping: 25, stiffness: 300 } },
+    exit: { opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2 } }
+  };
+
+  return createPortal(
+    <LazyMotion features={domAnimation}>
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+          {/* Backdrop */}
+          <m.div
+            variants={backdropVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            className="fixed inset-0 bg-gray-800/40 backdrop-blur-md"
+            onClick={handleClose}
+          />
+
+          {/* Modal */}
+          <m.div
+            variants={modalVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col z-10">
         {/* Header */}
         <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
           <div className="flex items-center gap-3">
@@ -394,8 +407,11 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
             )}
           </button>
         </div>
-      </div>
-    </div>,
+          </m.div>
+        </div>
+      )}
+    </AnimatePresence>
+    </LazyMotion>,
     document.getElementById("modal-root")
   );
 };

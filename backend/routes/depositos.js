@@ -79,8 +79,13 @@ router.get('/stats', authenticateToken, async (req, res) => {
 // GET /api/depositos/audit - Obtener depositos para auditoria (concesionarios) con sus usuarios
 router.get('/audit', authenticateToken, async (req, res) => {
   try {
+    const whereClause = { activo: true };
+    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO' && req.user.depositoId) {
+      whereClause.id = req.user.depositoId;
+    }
+
     const depositos = await prisma.deposito.findMany({
-      where: { activo: true },
+      where: whereClause,
       include: {
         usuarios: {
           select: {
@@ -229,7 +234,8 @@ router.get('/:id', authenticateToken, async (req, res) => {
             email: true,
             nombre: true,
             apellido: true,
-            rol: true
+            rol: true,
+            fotoUrl: true
           }
         }
       }
