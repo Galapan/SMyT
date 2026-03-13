@@ -181,7 +181,7 @@ router.post('/', authenticateToken, async (req, res) => {
           password: hashedPassword,
           nombre: userFirstName,
           apellido: userLastName,
-          rol: 'USUARIO_CONCESIONARIO',
+          rol: 'ADMINISTRADOR_CONCESIONARIO',
           depositoId: deposito.id,
           creadoPorId: req.user.id
         }

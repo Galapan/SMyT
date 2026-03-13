@@ -146,7 +146,7 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
              "Content-Type": "application/json",
              Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ ...formData, depositoId, rol: "USUARIO_CONCESIONARIO" }),
+          body: JSON.stringify({ ...formData, depositoId, rol: "ADMINISTRADOR_CONCESIONARIO" }),
         });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message || "Error al crear la cuenta");

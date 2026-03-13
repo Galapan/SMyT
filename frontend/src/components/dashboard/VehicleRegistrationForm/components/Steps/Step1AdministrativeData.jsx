@@ -8,7 +8,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
-  const isAdmin = user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR_SMYT';
+  const isAdmin = user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR';
 
   const { data: depositos = [] } = useQuery({
     queryKey: ['depositosSelect'],

@@ -59,7 +59,7 @@ function Login() {
         const usuario = JSON.parse(storedUser);
         if (
           usuario.rol === "SUPER_USUARIO" ||
-          usuario.rol === "ADMINISTRADOR_SMYT"
+          usuario.rol === "ADMINISTRADOR"
         ) {
           navigate("/admin");
         } else {
@@ -116,7 +116,7 @@ function Login() {
       dispatch({ type: 'LOGIN_SUCCESS' });
       if (
         usuario.rol === "SUPER_USUARIO" ||
-        usuario.rol === "ADMINISTRADOR_SMYT"
+        usuario.rol === "ADMINISTRADOR"
       ) {
         navigate("/admin");
       } else {

@@ -125,7 +125,7 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
       if (!formData.autoridad.trim()) newErrors.autoridad = 'La autoridad es requerida';
       
       const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
-      if ((user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR_SMYT') && !formData.depositoId) {
+      if ((user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR') && !formData.depositoId) {
         newErrors.depositoId = 'Debe seleccionar un concesionario';
       }
     }

@@ -101,9 +101,6 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
     }
     if (step === 2) {
       if (!formData.rol) newErrors.rol = 'Debe seleccionar un rol';
-      if (formData.rol === 'USUARIO_CONCESIONARIO' && !formData.depositoId) {
-        newErrors.depositoId = 'Debe seleccionar un depósito';
-      }
     }
     dispatch({ type: 'SET_ERRORS', payload: newErrors });
     return Object.keys(newErrors).length === 0;
@@ -127,7 +124,7 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
     }
     
     // Si cambia el rol y no es concesionario, limpiar el depositoId
-    if (name === 'rol' && value !== 'USUARIO_CONCESIONARIO') {
+    if (name === 'rol' && value !== 'ADMINISTRADOR_CONCESIONARIO') {
         dispatch({ type: 'UPDATE_FORM', payload: { depositoId: '' } });
     }
   };
@@ -239,16 +236,16 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
               className={getInputClass('rol')}
             >
               <option value="">Seleccione un rol...</option>
-              {isSuperAdmin && <option value="SUPER_USUARIO">Super Usuario</option>}
-              {isSuperAdmin && <option value="ADMINISTRADOR_SMYT">Administrador SMyT</option>}
-              <option value="USUARIO_CONCESIONARIO">Usuario Concesionario</option>
+              {isSuperAdmin && <option value="SUPER_USUARIO">Super usuario</option>}
+              {isSuperAdmin && <option value="ADMINISTRADOR">Administrador</option>}
+              <option value="ADMINISTRADOR_CONCESIONARIO">Administrador concesionario</option>
             </select>
             {errors.rol && <p className="text-(--color-rosa) text-xs mt-1">{errors.rol}</p>}
           </div>
 
-          {formData.rol === 'USUARIO_CONCESIONARIO' && (
+          {formData.rol === 'ADMINISTRADOR_CONCESIONARIO' && (
              <div>
-                <label htmlFor="depositoId" className="block text-sm font-medium text-gray-700 mb-1">Asignar a Depósito Vehicular *</label>
+                <label htmlFor="depositoId" className="block text-sm font-medium text-gray-700 mb-1">Asignar a Depósito Vehicular <span className="text-gray-400 font-normal">(Opcional)</span></label>
                 <select
                   id="depositoId"
                   name="depositoId"
@@ -292,8 +289,8 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
               {formData.rol.replace('_', ' ')}
             </span>
           </p>
-          {formData.rol === 'USUARIO_CONCESIONARIO' && (
-            <p><span className="font-semibold text-gray-700">Depósito:</span> {depositos.find(d => d.id === formData.depositoId)?.nombre}</p>
+          {formData.rol === 'ADMINISTRADOR_CONCESIONARIO' && (
+            <p><span className="font-semibold text-gray-700">Depósito:</span> {formData.depositoId ? depositos.find(d => d.id === formData.depositoId)?.nombre : <span className="text-gray-400 italic">Sin asignar</span>}</p>
           )}
         </div>
       </div>

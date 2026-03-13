@@ -14,8 +14,8 @@ datasource db {
 // Enum para los 3 tipos de rol
 enum Rol {
   SUPER_USUARIO
-  ADMINISTRADOR_SMYT
-  USUARIO_CONCESIONARIO
+  ADMINISTRADOR
+  ADMINISTRADOR_CONCESIONARIO
 }
 
 // Enum para estatus legal del vehículo

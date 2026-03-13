@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { Shield, Warehouse, Calendar, Mail, X, CheckCircle, XCircle } from 'lucide-react';
+import { formatRole } from '../../utils/formatRole';
 
 const AccountDetailsModal = ({ isOpen, onClose, user }) => {
   useEffect(() => {
@@ -20,20 +21,11 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
   if (!user) return null;
 
-  const getRoleLabel = (rol) => {
-    const roles = {
-      'SUPER_USUARIO': 'Super Usuario',
-      'ADMINISTRADOR_SMYT': 'Administrador SMyT',
-      'USUARIO_CONCESIONARIO': 'Concesionario'
-    };
-    return roles[rol] || rol;
-  };
-
   const getRoleColor = (rol) => {
     const colors = {
       'SUPER_USUARIO': 'text-(--color-rojo) bg-(--color-rojo)/10 ring-(--color-rojo)/30',
-      'ADMINISTRADOR_SMYT': 'text-(--color-azul) bg-(--color-azul)/10 ring-(--color-azul)/30',
-      'USUARIO_CONCESIONARIO': 'text-(--color-verde) bg-(--color-verde)/10 ring-(--color-verde)/30 shadow-sm'
+      'ADMINISTRADOR': 'text-(--color-azul) bg-(--color-azul)/10 ring-(--color-azul)/30',
+      'ADMINISTRADOR_CONCESIONARIO': 'text-(--color-verde) bg-(--color-verde)/10 ring-(--color-verde)/30 shadow-sm'
     };
     return colors[rol] || 'text-gray-700 bg-gray-100 ring-gray-200';
   };
@@ -133,20 +125,20 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
                 <div className="bg-white/60 p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center hover:shadow-md transition-shadow">
                   <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${
                     user.rol === 'SUPER_USUARIO' ? 'bg-(--color-rojo)/15 text-(--color-rojo)' :
-                    user.rol === 'ADMINISTRADOR_SMYT' ? 'bg-(--color-azul)/15 text-(--color-azul)' : 'bg-(--color-verde)/20 text-(--color-verde)'
+                    user.rol === 'ADMINISTRADOR' ? 'bg-(--color-azul)/15 text-(--color-azul)' : 'bg-(--color-verde)/20 text-(--color-verde)'
                   }`}>
                     <Shield className="w-6 h-6" />
                   </div>
                   <div>
                     <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">Nivel de Acceso</p>
                     <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-lg ring-1 ring-inset ${getRoleColor(user.rol)}`}>
-                      {getRoleLabel(user.rol)}
+                      {formatRole(user.rol)}
                     </span>
                   </div>
                 </div>
 
                 {/* Deposit Card (Conditional) */}
-                {user.rol === 'USUARIO_CONCESIONARIO' && (
+                {user.rol === 'ADMINISTRADOR_CONCESIONARIO' && (
                   <div className={`bg-white/60 p-4 rounded-2xl border flex items-center shadow-sm hover:shadow-md transition-shadow ${user.deposito ? 'border-gray-100' : 'border-gob-rosa bg-orange-50/30'}`}>
                     <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${user.deposito ? 'bg-gray-50 text-gray-500' : 'bg-gob-rosa/15 text-gob-rosa'}`}>
                       <Warehouse className="w-6 h-6" />

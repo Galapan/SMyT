@@ -13,6 +13,7 @@ import {
   Users
 } from 'lucide-react';
 import logoSmyt from '../assets/logo_smyt.png';
+import { formatRole } from '../utils/formatRole';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -61,16 +62,6 @@ const AdminLayout = () => {
     { name: 'Cuentas', href: '/admin/accounts', icon: Users, roles: ['SUPER_USUARIO'] },
     { name: 'Configuración', href: '/admin/settings', icon: Settings },
   ];
-
-  // Obtener nombre del rol para mostrar
-  const getRolLabel = (rol) => {
-    const roles = {
-      'SUPER_USUARIO': 'Super Usuario',
-      'ADMINISTRADOR_SMYT': 'Administrador',
-      'USUARIO_CONCESIONARIO': 'Concesionario'
-    };
-    return roles[rol] || rol;
-  };
 
   return (
     <div className="h-screen bg-gray-50 flex overflow-hidden">
@@ -164,7 +155,7 @@ const AdminLayout = () => {
                   {user ? `${user.nombre} ${user.apellido}` : 'Cargando...'}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {user ? getRolLabel(user.rol) : ''}
+                  {user ? formatRole(user.rol) : ''}
                 </p>
                 <button 
                   onClick={(e) => {

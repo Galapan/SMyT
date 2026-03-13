@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Users, RefreshCw, Search, Eye, MoreVertical, Shield, Power, Check, AlertCircle, X, AlertTriangle, Trash2 } from 'lucide-react';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
+import { formatRole } from '../utils/formatRole';
 import AccountWizard from '../components/dashboard/AccountWizard';
 import AccountDetailsModal from '../components/dashboard/AccountDetailsModal';
 import TableSkeleton from '../components/common/TableSkeleton';
@@ -175,20 +176,13 @@ const AccountsPage = () => {
     );
   }, [users, searchTerm]);
 
-  const getRoleLabel = (rol) => {
-    const roles = {
-      'SUPER_USUARIO': 'Super Usuario',
-      'ADMINISTRADOR_SMYT': 'Administrador SMyT',
-      'USUARIO_CONCESIONARIO': 'Concesionario'
-    };
-    return roles[rol] || rol;
-  };
+  const getRoleLabel = (rol) => formatRole(rol);
 
   const getRoleColor = (rol) => {
     const colors = {
       'SUPER_USUARIO': 'bg-(--color-rojo)/10 text-(--color-rojo) shadow-[0_2px_10px_rgba(167,15,38,0.1)] font-bold border border-(--color-rojo)/20',
-      'ADMINISTRADOR_SMYT': 'bg-(--color-azul)/10 text-(--color-azul) shadow-[0_2px_10px_rgba(85,174,201,0.1)] font-bold border border-(--color-azul)/20',
-      'USUARIO_CONCESIONARIO': 'bg-(--color-verde)/15 text-(--color-verde) shadow-[0_2px_10px_rgba(111,178,37,0.1)] font-bold border border-(--color-verde)/20'
+      'ADMINISTRADOR': 'bg-(--color-azul)/10 text-(--color-azul) shadow-[0_2px_10px_rgba(85,174,201,0.1)] font-bold border border-(--color-azul)/20',
+      'ADMINISTRADOR_CONCESIONARIO': 'bg-(--color-verde)/15 text-(--color-verde) shadow-[0_2px_10px_rgba(111,178,37,0.1)] font-bold border border-(--color-verde)/20'
     };
     return colors[rol] || 'bg-gray-100 text-gray-700';
   };
@@ -198,8 +192,8 @@ const AccountsPage = () => {
     return {
       total: users.length,
       superAdmins: users.filter(u => u.rol === 'SUPER_USUARIO').length,
-      admins: users.filter(u => u.rol === 'ADMINISTRADOR_SMYT').length,
-      concesionarios: users.filter(u => u.rol === 'USUARIO_CONCESIONARIO').length,
+      admins: users.filter(u => u.rol === 'ADMINISTRADOR').length,
+      concesionarios: users.filter(u => u.rol === 'ADMINISTRADOR_CONCESIONARIO').length,
     };
   }, [users]);
 
@@ -252,7 +246,7 @@ const AccountsPage = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.superAdmins}</p>
-                <p className="text-sm text-gray-500">Super Usuarios</p>
+                <p className="text-sm text-gray-500">Super usuarios</p>
               </div>
             </div>
           </div>
@@ -274,7 +268,7 @@ const AccountsPage = () => {
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.concesionarios}</p>
-                <p className="text-sm text-gray-500">Concesionarios</p>
+                <p className="text-sm text-gray-500">Adm. Concesionarios</p>
               </div>
             </div>
           </div>

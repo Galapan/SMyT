@@ -164,7 +164,7 @@ const createUser = async (req, res) => {
     }
 
     // Validación de permisos
-    if (creadorRol === "USUARIO_CONCESIONARIO") {
+    if (creadorRol === "ADMINISTRADOR_CONCESIONARIO") {
       return res.status(403).json({
         success: false,
         message: "No tienes permisos para crear usuarios",
@@ -172,8 +172,8 @@ const createUser = async (req, res) => {
     }
 
     if (
-      creadorRol === "ADMINISTRADOR_SMYT" &&
-      rol !== "USUARIO_CONCESIONARIO"
+      creadorRol === "ADMINISTRADOR" &&
+      rol !== "ADMINISTRADOR_CONCESIONARIO"
     ) {
       return res.status(403).json({
         success: false,
@@ -182,13 +182,7 @@ const createUser = async (req, res) => {
       });
     }
 
-    // Si es concesionario, DEBE tener un deposito
-    if (rol === "USUARIO_CONCESIONARIO" && !depositoId) {
-      return res.status(400).json({
-        success: false,
-        message: "Un usuario concesionario debe estar asignado a un depósito",
-      });
-    }
+    // Si es concesionario, el deposito es OPCIONAL (se puede asignar después)
 
     // Verificar si el correo ya existe
     const existingUser = await prisma.usuario.findUnique({
@@ -225,7 +219,7 @@ const createUser = async (req, res) => {
         verificado: false,
         codigoVerificacion: verificationCode,
         expiracionCodigo: expirationTime,
-        depositoId: rol === "USUARIO_CONCESIONARIO" ? depositoId : null,
+        depositoId: rol === "ADMINISTRADOR_CONCESIONARIO" ? depositoId : null,
         creadoPorId: creadorId,
       },
       select: {
@@ -267,7 +261,7 @@ const getUsers = async (req, res) => {
     const creadorRol = req.user.rol;
 
     // Validación de permisos
-    if (creadorRol === "USUARIO_CONCESIONARIO") {
+    if (creadorRol === "ADMINISTRADOR_CONCESIONARIO") {
       return res.status(403).json({
         success: false,
         message: "No tienes permisos para ver usuarios",
@@ -322,7 +316,7 @@ const getAvailableConcesionarios = async (req, res) => {
   try {
     const usuarios = await prisma.usuario.findMany({
       where: {
-        rol: "USUARIO_CONCESIONARIO",
+        rol: "ADMINISTRADOR_CONCESIONARIO",
         depositoId: null,
         activo: true
       },
@@ -358,7 +352,7 @@ const assignDeposito = async (req, res) => {
     const { depositoId } = req.body;
 
     // Validación de permisos
-    if (req.user.rol === "USUARIO_CONCESIONARIO") {
+    if (req.user.rol === "ADMINISTRADOR_CONCESIONARIO") {
       return res.status(403).json({
         success: false,
         message: "No tienes permisos para realizar esta acción",
@@ -408,7 +402,7 @@ const toggleStatus = async (req, res) => {
     const { id } = req.params;
     
     // Solo Super Usuario puede desactivar a otros admins/concesionarios
-    if (req.user.rol !== "SUPER_USUARIO" && req.user.rol !== "ADMINISTRADOR_SMYT") {
+    if (req.user.rol !== "SUPER_USUARIO" && req.user.rol !== "ADMINISTRADOR") {
       return res.status(403).json({
         success: false,
         message: "No tienes permisos para realizar esta acción",
