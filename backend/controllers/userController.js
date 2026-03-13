@@ -507,6 +507,7 @@ const deleteUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al eliminar cuenta:", error);
+    
     res.status(500).json({
       success: false,
       message: "Error al eliminar la cuenta de usuario",

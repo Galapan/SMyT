@@ -60,7 +60,7 @@ model Usuario {
 
   // Relación: Administrador que creó este usuario
   creadoPorId     String?
-  creadoPor       Usuario?  @relation("UsuarioCreador", fields: [creadoPorId], references: [id])
+  creadoPor       Usuario?  @relation("UsuarioCreador", fields: [creadoPorId], references: [id], onDelete: SetNull)
   usuariosCreados Usuario[] @relation("UsuarioCreador")
 
   // Vehículos registrados por este usuario
@@ -179,8 +179,8 @@ model Vehiculo {
   deposito          Deposito  @relation(fields: [depositoId], references: [id])
 
   // Usuario que registró el vehículo
-  registradoPorId   String
-  registradoPor     Usuario   @relation(fields: [registradoPorId], references: [id])
+  registradoPorId   String?
+  registradoPor     Usuario?   @relation(fields: [registradoPorId], references: [id], onDelete: SetNull)
 
   // Solicitudes de Edición recibidas
   solicitudesEdicion SolicitudEdicion[]
@@ -204,12 +204,12 @@ model SolicitudEdicion {
   vehiculo        Vehiculo @relation(fields: [vehiculoId], references: [id])
 
   // Admin SMyT que solicita el cambio
-  solicitanteId   String
-  solicitante     Usuario  @relation("UsuarioSolicitante", fields: [solicitanteId], references: [id])
+  solicitanteId   String?
+  solicitante     Usuario?  @relation("UsuarioSolicitante", fields: [solicitanteId], references: [id], onDelete: SetNull)
 
   // Usuario (Concesionario o Admin) que resolvió la solicitud
   resolutorId     String?
-  resolutor       Usuario? @relation("UsuarioResolutor", fields: [resolutorId], references: [id])
+  resolutor       Usuario? @relation("UsuarioResolutor", fields: [resolutorId], references: [id], onDelete: SetNull)
 
   @@map("solicitudes_edicion")
 }
