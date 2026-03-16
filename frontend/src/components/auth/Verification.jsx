@@ -11,6 +11,7 @@ function Verification() {
   const navigate = useNavigate();
   const location = useLocation();
   const inputRefs = useRef([]);
+  const codeInputIds = useRef(["d1", "d2", "d3", "d4", "d5", "d6"]);
   
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const [email, setEmail] = useState("");
@@ -137,17 +138,17 @@ function Verification() {
             className="flex justify-between gap-2 px-2"
             onPaste={handlePaste}
           >
-            {code.map((digit, index) => (
+            {codeInputIds.current.map((slotId, idx) => (
               <input
-                key={index}
-                ref={(el) => (inputRefs.current[index] = el)}
+                key={slotId}
+                ref={(el) => (inputRefs.current[idx] = el)}
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
                 maxLength={1}
-                value={digit}
-                onChange={(e) => handleChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
+                value={code[idx]}
+                onChange={(e) => handleChange(idx, e.target.value)}
+                onKeyDown={(e) => handleKeyDown(idx, e)}
                 className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-[#572671]"
                 required
               />

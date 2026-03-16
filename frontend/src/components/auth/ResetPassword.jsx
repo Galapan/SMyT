@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useReducer, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logoTlax from "../../assets/LogoTlax.png";
 import Toast from "../common/Toast";
@@ -7,29 +7,60 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL 
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
+const initialState = {
+  step: 1, // 1: Verify Code, 2: New Password
+  email: "",
+  code: ["", "", "", "", "", ""],
+  newPassword: "",
+  confirmPassword: "",
+  loading: false,
+  toast: { show: false, message: "", type: "error" },
+};
+
+function reducer(state, action) {
+  switch (action.type) {
+    case "SET_STEP":
+      return { ...state, step: action.payload };
+    case "SET_EMAIL":
+      return { ...state, email: action.payload };
+    case "SET_CODE":
+      return { ...state, code: action.payload };
+    case "SET_NEW_PASSWORD":
+      return { ...state, newPassword: action.payload };
+    case "SET_CONFIRM_PASSWORD":
+      return { ...state, confirmPassword: action.payload };
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
+    case "SHOW_TOAST":
+      return { ...state, toast: { show: true, message: action.payload.message, type: action.payload.type } };
+    case "HIDE_TOAST":
+      return { ...state, toast: { ...state.toast, show: false } };
+    case "RESET_TOAST":
+      return { ...state, toast: { show: false, message: "", type: "error" } };
+    default:
+      return state;
+  }
+}
+
 function ResetPassword() {
   const navigate = useNavigate();
   const location = useLocation();
   const inputRefs = useRef([]);
-  
-  const [step, setStep] = useState(1); // 1: Verify Code, 2: New Password
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState({ show: false, message: "", type: "error" });
+  const codeInputIds = useRef(["d1", "d2", "d3", "d4", "d5", "d6"]);
+
+  const [state, dispatch] = useReducer(reducer, initialState);
+  const { step, email, code, newPassword, confirmPassword, loading, toast } = state;
 
   useEffect(() => {
     if (location.state?.email) {
-      setEmail(location.state.email);
+      dispatch({ type: "SET_EMAIL", payload: location.state.email });
     } else {
       // Si no hay email, no podemos resetear, volver a forgot-password o login
       navigate("/forgot-password");
     }
     
     if (location.state?.message) {
-      setToast({ show: true, message: location.state.message, type: "success" });
+      dispatch({ type: "SHOW_TOAST", payload: { message: location.state.message, type: "success" } });
       // Limpiar state para evitar que salga en cada recarga
       window.history.replaceState({ email: location.state?.email }, document.title);
     }
@@ -41,7 +72,7 @@ function ResetPassword() {
 
     const newCode = [...code];
     newCode[index] = value.slice(-1); 
-    setCode(newCode);
+    dispatch({ type: "SET_CODE", payload: newCode });
 
     if (value && index < 5) {
       inputRefs.current[index + 1].focus();
@@ -63,7 +94,7 @@ function ResetPassword() {
       for (let i = 0; i < pastedData.length; i++) {
         newCode[i] = pastedData[i];
       }
-      setCode(newCode);
+      dispatch({ type: "SET_CODE", payload: newCode });
       const nextIndex = Math.min(pastedData.length, 5);
       inputRefs.current[nextIndex].focus();
     }
@@ -74,8 +105,8 @@ function ResetPassword() {
     const fullCode = code.join("");
     if (fullCode.length < 6) return;
 
-    setLoading(true);
-    setToast({ show: false, message: "", type: "error" });
+    dispatch({ type: "SET_LOADING", payload: true });
+    dispatch({ type: "RESET_TOAST" });
 
     try {
       const response = await fetch(`${API_URL}/api/auth/verify-reset-code`, {
@@ -91,11 +122,11 @@ function ResetPassword() {
       }
 
       // Pasar al siguiente paso
-      setStep(2);
+      dispatch({ type: "SET_STEP", payload: 2 });
     } catch (err) {
-      setToast({ show: true, message: err.message, type: "error" });
+      dispatch({ type: "SHOW_TOAST", payload: { message: err.message, type: "error" } });
     } finally {
-      setLoading(false);
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
@@ -104,17 +135,17 @@ function ResetPassword() {
     if (!newPassword || !confirmPassword) return;
 
     if (newPassword !== confirmPassword) {
-      setToast({ show: true, message: "Las contraseñas no coinciden", type: "error" });
+      dispatch({ type: "SHOW_TOAST", payload: { message: "Las contraseñas no coinciden", type: "error" } });
       return;
     }
 
     if (newPassword.length < 8) {
-      setToast({ show: true, message: "La contraseña debe tener al menos 8 caracteres", type: "error" });
+      dispatch({ type: "SHOW_TOAST", payload: { message: "La contraseña debe tener al menos 8 caracteres", type: "error" } });
       return;
     }
 
-    setLoading(true);
-    setToast({ show: false, message: "", type: "error" });
+    dispatch({ type: "SET_LOADING", payload: true });
+    dispatch({ type: "RESET_TOAST" });
 
     try {
       const response = await fetch(`${API_URL}/api/auth/reset-password`, {
@@ -133,7 +164,7 @@ function ResetPassword() {
         throw new Error(data.message || "Error al restablecer contraseña");
       }
 
-      setToast({ show: true, message: "Contraseña actualizada exitosamente", type: "success" });
+      dispatch({ type: "SHOW_TOAST", payload: { message: "Contraseña actualizada exitosamente", type: "success" } });
       
       setTimeout(() => {
         navigate("/login", { 
@@ -142,9 +173,9 @@ function ResetPassword() {
       }, 2000);
 
     } catch (err) {
-      setToast({ show: true, message: err.message, type: "error" });
+      dispatch({ type: "SHOW_TOAST", payload: { message: err.message, type: "error" } });
     } finally {
-      setLoading(false);
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
@@ -154,7 +185,7 @@ function ResetPassword() {
         show={toast.show}
         message={toast.message}
         type={toast.type}
-        onClose={() => setToast({ ...toast, show: false })}
+        onClose={() => dispatch({ type: "HIDE_TOAST" })}
       />
       
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
@@ -183,17 +214,17 @@ function ResetPassword() {
               className="flex justify-between gap-2 px-2"
               onPaste={handlePaste}
             >
-              {code.map((digit, index) => (
+              {codeInputIds.current.map((slotId, idx) => (
                 <input
-                  key={index}
-                  ref={(el) => (inputRefs.current[index] = el)}
+                  key={slotId}
+                  ref={(el) => (inputRefs.current[idx] = el)}
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
                   maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleCodeChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  value={code[idx]}
+                  onChange={(e) => handleCodeChange(idx, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(idx, e)}
                   className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-[#572671]"
                   required
                   disabled={loading}
@@ -231,13 +262,12 @@ function ResetPassword() {
                 id="password-input"
                 type="password"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => dispatch({ type: "SET_NEW_PASSWORD", payload: e.target.value })}
                 placeholder="Min. 8 caracteres"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
                 required
                 disabled={loading}
                 minLength={8}
-                autoFocus
               />
             </div>
 
@@ -249,7 +279,7 @@ function ResetPassword() {
                 id="confirm-password-input"
                 type="password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={(e) => dispatch({ type: "SET_CONFIRM_PASSWORD", payload: e.target.value })}
                 placeholder="Repite tu contraseña"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
                 required

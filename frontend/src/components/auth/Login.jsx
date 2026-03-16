@@ -41,12 +41,6 @@ function Login() {
   const { email, password, rememberMe, loading, error } = state;
   const [toast, setToast] = useState({ show: false, message: "", type: "error" });
 
-  useEffect(() => {
-    if (error) {
-      setToast({ show: true, message: error, type: "error" });
-    }
-  }, [error]);
-
   // Redirigir automáticamente si hay una sesión activa
   useEffect(() => {
     const storedUser =
@@ -125,6 +119,7 @@ function Login() {
       }
     } catch (err) {
       dispatch({ type: 'LOGIN_ERROR', payload: err.message });
+      setToast({ show: true, message: err.message, type: "error" });
     }
   };
 
