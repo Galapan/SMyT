@@ -95,7 +95,6 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
                 {/* Avatar */}
                 <div className="mt-8 mb-4 relative group">
-                  <div className="absolute inset-0 bg-linear-to-tr from-(--color-primary) to-violet-300 rounded-full blur opacity-40 group-hover:opacity-60 transition-opacity"></div>
                   <div className="h-32 w-32 shrink-0 rounded-full bg-white overflow-hidden shadow-lg relative z-10 border-4 border-white">
                     <img 
                       src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) 
