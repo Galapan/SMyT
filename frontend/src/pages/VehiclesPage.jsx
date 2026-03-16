@@ -5,6 +5,7 @@ import VehicleRegistrationForm from '../components/dashboard/VehicleRegistration
 import VehicleDetailsModal from '../components/dashboard/VehicleDetailsModal';
 import TableSkeleton from '../components/common/TableSkeleton';
 import StatsSkeleton from '../components/common/StatsSkeleton';
+import Pagination from '../components/common/Pagination';
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -24,6 +25,8 @@ const initialState = {
   estatusLegalFilter: '',
   isDetailsOpen: false,
   selectedVehicle: null,
+  currentPage: 1,
+  itemsPerPage: 7,
 };
 
 function reducer(state, action) {
@@ -37,9 +40,11 @@ function reducer(state, action) {
     case 'SET_LOADING':
       return { ...state, loading: action.payload };
     case 'SET_SEARCH_TERM':
-      return { ...state, searchTerm: action.payload };
+      return { ...state, searchTerm: action.payload, currentPage: 1 };
     case 'SET_ESTATUS_LEGAL_FILTER':
-      return { ...state, estatusLegalFilter: action.payload };
+      return { ...state, estatusLegalFilter: action.payload, currentPage: 1 };
+    case 'SET_PAGE':
+      return { ...state, currentPage: action.payload };
     case 'SHOW_DETAILS':
       return { ...state, isDetailsOpen: true, selectedVehicle: action.payload };
     case 'HIDE_DETAILS':
@@ -118,6 +123,11 @@ const VehiclesPage = () => {
       return matchesSearch && matchesEstatus;
     });
   }, [vehiculos, searchTerm, estatusLegalFilter]);
+
+  const paginatedVehiculos = useMemo(() => {
+    const start = (state.currentPage - 1) * state.itemsPerPage;
+    return filteredVehiculos.slice(start, start + state.itemsPerPage);
+  }, [filteredVehiculos, state.currentPage, state.itemsPerPage]);
 
   const getStatusColor = (status) => {
     const colors = {
@@ -271,7 +281,7 @@ const VehiclesPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredVehiculos.map((vehiculo) => (
+                {paginatedVehiculos.map((vehiculo) => (
                   <tr key={vehiculo.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                       <span className="text-sm font-medium text-(--color-primary)">{vehiculo.folioProceso}</span>
@@ -316,7 +326,7 @@ const VehiclesPage = () => {
             
             {/* Card view for smaller screens */}
             <div className="md:hidden flex flex-col divide-y divide-gray-100">
-              {filteredVehiculos.map((vehiculo) => (
+              {paginatedVehiculos.map((vehiculo) => (
                 <div key={vehiculo.id} className="p-4 hover:bg-gray-50 transition-colors">
                   {/* Top row: Folio, Placa, Status */}
                   <div className="flex justify-between items-start mb-3">
@@ -370,11 +380,12 @@ const VehiclesPage = () => {
 
         {/* Table Footer */}
         {filteredVehiculos.length > 0 && (
-          <div className="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 flex items-center justify-between">
-            <p className="text-sm text-gray-500">
-              Mostrando {filteredVehiculos.length} de {vehiculos.length} vehículos
-            </p>
-          </div>
+          <Pagination 
+            totalItems={filteredVehiculos.length}
+            itemsPerPage={state.itemsPerPage}
+            currentPage={state.currentPage}
+            onPageChange={(page) => dispatch({ type: 'SET_PAGE', payload: page })}
+          />
         )}
       </div>
 

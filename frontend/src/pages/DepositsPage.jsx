@@ -11,6 +11,7 @@ import {
 import DepositRegistrationForm from "../components/dashboard/DepositRegistrationForm";
 import TableSkeleton from "../components/common/TableSkeleton";
 import StatsSkeleton from "../components/common/StatsSkeleton";
+import Pagination from "../components/common/Pagination";
 
 const API_URL =
   import.meta.env.VITE_API_URL !== undefined
@@ -30,6 +31,8 @@ const initialState = {
   },
   loading: true,
   searchTerm: "",
+  currentPage: 1,
+  itemsPerPage: 7,
 };
 
 function reducer(state, action) {
@@ -51,7 +54,9 @@ function reducer(state, action) {
     case "SET_FORM_OPEN":
       return { ...state, isFormOpen: action.payload };
     case "SET_SEARCH_TERM":
-      return { ...state, searchTerm: action.payload };
+      return { ...state, searchTerm: action.payload, currentPage: 1 };
+    case "SET_PAGE":
+      return { ...state, currentPage: action.payload };
     default:
       return state;
   }
@@ -109,6 +114,11 @@ const DepositsPage = () => {
       d.municipio.toLowerCase().includes(searchTerm.toLowerCase()) ||
       d.direccion.toLowerCase().includes(searchTerm.toLowerCase()) ||
       d.numero.includes(searchTerm),
+  );
+
+  const paginatedDepositos = filteredDepositos.slice(
+    (state.currentPage - 1) * state.itemsPerPage,
+    state.currentPage * state.itemsPerPage
   );
 
   const getStatusColor = (status) => {
@@ -281,7 +291,7 @@ const DepositsPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredDepositos.map((deposito) => (
+                {paginatedDepositos.map((deposito) => (
                   <tr
                     key={deposito.id}
                     className="hover:bg-gray-50 transition-colors"
@@ -327,7 +337,7 @@ const DepositsPage = () => {
 
             {/* Card view for smaller screens */}
             <div className="md:hidden flex flex-col divide-y divide-gray-100">
-              {filteredDepositos.map((deposito) => (
+              {paginatedDepositos.map((deposito) => (
                 <div
                   key={deposito.id}
                   className="p-4 hover:bg-gray-50 transition-colors"
@@ -392,12 +402,12 @@ const DepositsPage = () => {
 
         {/* Table Footer */}
         {filteredDepositos.length > 0 && (
-          <div className="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 flex items-center justify-between">
-            <p className="text-sm text-gray-500">
-              Mostrando {filteredDepositos.length} de {depositos.length}{" "}
-              depósitos
-            </p>
-          </div>
+          <Pagination 
+            totalItems={filteredDepositos.length}
+            itemsPerPage={state.itemsPerPage}
+            currentPage={state.currentPage}
+            onPageChange={(page) => dispatch({ type: 'SET_PAGE', payload: page })}
+          />
         )}
       </div>
 

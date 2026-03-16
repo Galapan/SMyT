@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { RefreshCw, Search, Warehouse, Users, Car, MapPin, Eye, Phone, ShieldCheck, Mail } from 'lucide-react';
 import AuditConcesionarioCard from '../components/dashboard/Audit/AuditConcesionarioCard';
+import Pagination from '../components/common/Pagination';
 import dayjs from 'dayjs';
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
@@ -11,8 +12,15 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
 
 const AuditDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem('user') || localStorage.getItem('user');
@@ -44,6 +52,11 @@ const AuditDashboard = () => {
     dep.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
     dep.municipio.toLowerCase().includes(searchTerm.toLowerCase()) ||
     dep.nombrePropietario.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const paginatedDepositos = filteredDepositos.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
 
   // --- CONCESIONARIO VIEW: Single dealership ---
@@ -302,7 +315,7 @@ const AuditDashboard = () => {
               type="text"
               placeholder="Buscar concesionario..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={handleSearch}
               className="pl-10 pr-4 py-2 w-64 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-(--color-primary)/20 focus:border-(--color-primary) transition-all"
             />
           </div>
@@ -352,11 +365,23 @@ const AuditDashboard = () => {
             <p className="text-gray-500 max-w-sm">No se encontraron depósitos que coincidan con tu búsqueda actual.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredDepositos.map(deposito => (
-              <AuditConcesionarioCard key={deposito.id} deposito={deposito} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {paginatedDepositos.map(deposito => (
+                <AuditConcesionarioCard key={deposito.id} deposito={deposito} />
+              ))}
+            </div>
+            {filteredDepositos.length > 0 && (
+              <div className="mt-6 border border-gray-100 rounded-lg overflow-hidden">
+                <Pagination 
+                  totalItems={filteredDepositos.length}
+                  itemsPerPage={itemsPerPage}
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

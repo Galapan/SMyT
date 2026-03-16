@@ -9,6 +9,7 @@ import AccountWizard from '../components/dashboard/AccountWizard';
 import AccountDetailsModal from '../components/dashboard/AccountDetailsModal';
 import TableSkeleton from '../components/common/TableSkeleton';
 import StatsSkeleton from '../components/common/StatsSkeleton';
+import Pagination from '../components/common/Pagination';
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -22,6 +23,8 @@ const initialState = {
   toast: { show: false, message: '', type: 'success' },
   confirmModal: { isOpen: false, userId: null, currentStatus: null },
   deleteModal: { isOpen: false, userId: null },
+  currentPage: 1,
+  itemsPerPage: 7,
 };
 
 function reducer(state, action) {
@@ -33,7 +36,9 @@ function reducer(state, action) {
     case 'SET_SELECTED_USER':
       return { ...state, selectedUser: action.payload };
     case 'SET_SEARCH_TERM':
-      return { ...state, searchTerm: action.payload };
+      return { ...state, searchTerm: action.payload, currentPage: 1 };
+    case 'SET_PAGE':
+      return { ...state, currentPage: action.payload };
     case 'SHOW_TOAST':
       return { ...state, toast: { show: true, message: action.payload.message, type: action.payload.type } };
     case 'HIDE_TOAST':
@@ -176,6 +181,11 @@ const AccountsPage = () => {
     );
   }, [users, searchTerm]);
 
+  const paginatedUsers = useMemo(() => {
+    const start = (state.currentPage - 1) * state.itemsPerPage;
+    return filteredUsers.slice(start, start + state.itemsPerPage);
+  }, [filteredUsers, state.currentPage, state.itemsPerPage]);
+
   const getRoleLabel = (rol) => formatRole(rol);
 
   const getRoleColor = (rol) => {
@@ -317,7 +327,7 @@ const AccountsPage = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredUsers.map((user) => (
+                {paginatedUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                       <div className="flex items-center">
@@ -387,7 +397,7 @@ const AccountsPage = () => {
             
             {/* Card view for smaller screens */}
             <div className="md:hidden flex flex-col divide-y divide-gray-100">
-              {filteredUsers.map((user) => (
+              {paginatedUsers.map((user) => (
                 <div key={user.id} className="p-4 hover:bg-gray-50 transition-colors">
                   {/* Top row: Avatar, Name, Status */}
                   <div className="flex justify-between items-start mb-3">
@@ -461,11 +471,12 @@ const AccountsPage = () => {
 
         {/* Table Footer */}
         {filteredUsers.length > 0 && (
-          <div className="px-4 py-3 sm:px-6 sm:py-4 border-t border-gray-100 flex items-center justify-between">
-            <p className="text-sm text-gray-500">
-              Mostrando {filteredUsers.length} de {users.length} usuarios
-            </p>
-          </div>
+          <Pagination 
+            totalItems={filteredUsers.length}
+            itemsPerPage={state.itemsPerPage}
+            currentPage={state.currentPage}
+            onPageChange={(page) => dispatch({ type: 'SET_PAGE', payload: page })}
+          />
         )}
       </div>
 

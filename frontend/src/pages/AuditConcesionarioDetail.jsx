@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Warehouse, Users, Car, Phone, Mail, User, ShieldCheck, MapPin, Search } from 'lucide-react';
 import dayjs from 'dayjs';
+import Pagination from '../components/common/Pagination';
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -12,6 +13,13 @@ const AuditConcesionarioDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1);
+  };
 
 
 
@@ -62,6 +70,20 @@ const AuditConcesionarioDetail = () => {
       </div>
     );
   }
+
+  const filteredVehiculos = deposito?.vehiculos
+    ? deposito.vehiculos.filter(v => 
+        (v.placa && v.placa.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (v.vin && v.vin.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (v.marcaTipo && v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (v.folioProceso && v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase()))
+      )
+    : [];
+
+  const paginatedVehiculos = filteredVehiculos.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   if (!deposito) return null;
 
@@ -183,7 +205,7 @@ const AuditConcesionarioDetail = () => {
                   type="text"
                   placeholder="Buscar por placa, VIN o marca..."
                   value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onChange={handleSearch}
                   className="w-full pl-9 pr-4 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-(--color-primary)/20 focus:border-(--color-primary) transition-all"
                 />
               </div>
@@ -213,14 +235,7 @@ const AuditConcesionarioDetail = () => {
                       </td>
                     </tr>
                   ) : (
-                    deposito.vehiculos
-                      .filter(v => 
-                        (v.placa && v.placa.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                        (v.vin && v.vin.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                        (v.marcaTipo && v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                        (v.folioProceso && v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase()))
-                      )
-                      .map(v => (
+                    paginatedVehiculos.map(v => (
                       <tr key={v.id} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-6 py-4">
                           <span className="inline-flex font-mono text-sm font-medium text-gray-900 bg-gray-100 px-2 py-1 border border-gray-200 rounded">
@@ -276,14 +291,7 @@ const AuditConcesionarioDetail = () => {
                     </div>
                   </div>
                 ) : (
-                  deposito.vehiculos
-                    .filter(v => 
-                      (v.placa && v.placa.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                      (v.vin && v.vin.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                      (v.marcaTipo && v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase())) ||
-                      (v.folioProceso && v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase()))
-                    )
-                    .map(v => (
+                  paginatedVehiculos.map(v => (
                     <div key={v.id} className="p-4 hover:bg-gray-50/50 transition-colors">
                       <div className="flex justify-between items-start mb-3">
                         <div className="pr-2">
@@ -332,9 +340,17 @@ const AuditConcesionarioDetail = () => {
                       </div>
                     </div>
                   ))
-                )}
+                 )}
               </div>
             </div>
+            {filteredVehiculos.length > 0 && (
+              <Pagination 
+                totalItems={filteredVehiculos.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </div>
         </div>
 

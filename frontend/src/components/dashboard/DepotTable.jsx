@@ -1,9 +1,19 @@
+import { useState } from 'react';
 import { MapPin } from 'lucide-react';
 import TableSkeleton from '../common/TableSkeleton';
+import Pagination from '../common/Pagination';
 
 const EMPTY_DEPOTS = [];
 
 const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 7;
+
+  const paginatedDepots = depots.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden h-full flex flex-col">
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">
@@ -34,7 +44,7 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {depots.map((depot) => (
+              {paginatedDepots.map((depot) => (
                 <tr key={depot.id} className="hover:bg-gray-50 transition-colors group">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -70,7 +80,7 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
             
             {/* Mobile Card View */}
             <div className="sm:hidden flex flex-col divide-y divide-gray-100">
-              {depots.map((depot) => (
+              {paginatedDepots.map((depot) => (
                 <div key={depot.id} className="p-4 hover:bg-gray-50 transition-colors">
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center">
@@ -98,6 +108,14 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
                 </div>
               ))}
             </div>
+            {depots.length > 0 && (
+              <Pagination 
+                totalItems={depots.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+              />
+            )}
           </>
         )}
       </div>
