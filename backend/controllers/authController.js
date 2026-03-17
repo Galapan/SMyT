@@ -409,11 +409,67 @@ const verifyResetCode = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/auth/security-alert/confirm
+ * Verify that the user confirmed the password change
+ */
+const confirmSecurityAlert = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'Token faltante' });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.action !== 'password_change') {
+      return res.status(400).json({ success: false, message: 'Acción no válida' });
+    }
+
+    res.json({ success: true, message: 'Cambio de contraseña confirmado' });
+  } catch (error) {
+    console.error('Error confirming security alert:', error);
+    res.status(401).json({ success: false, message: 'Token inválido o expirado' });
+  }
+};
+
+/**
+ * POST /api/auth/security-alert/reject
+ * Instantly disable an account if a user rejects a password change
+ */
+const rejectSecurityAlert = async (req, res) => {
+  try {
+    const { token } = req.body;
+    if (!token) {
+      return res.status(400).json({ success: false, message: 'Token faltante' });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token, JWT_SECRET);
+    if (decoded.action !== 'password_change') {
+      return res.status(400).json({ success: false, message: 'Acción no válida' });
+    }
+
+    // Disable the account instantly
+    await prisma.usuario.update({
+      where: { id: decoded.id },
+      data: { activo: false }
+    });
+
+    res.json({ success: true, message: 'Cuenta asegurada y desactivada correctamente' });
+  } catch (error) {
+    console.error('Error rejecting security alert:', error);
+    res.status(401).json({ success: false, message: 'Token inválido o expirado' });
+  }
+};
+
 module.exports = {
   login,
   getCurrentUser,
   verifyEmail,
   forgotPassword,
   resetPassword,
-  verifyResetCode
+  verifyResetCode,
+  confirmSecurityAlert,
+  rejectSecurityAlert
 };

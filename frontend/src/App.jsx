@@ -5,6 +5,7 @@ import Login from './components/auth/Login';
 import Verification from './components/auth/Verification';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
+import SecurityAlert from './pages/SecurityAlert';
 import AdminLayout from './layouts/AdminLayout';
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
@@ -43,6 +44,7 @@ function App() {
           <Route path="/verify" element={<Verification />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/security" element={<SecurityAlert />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLayout />}>

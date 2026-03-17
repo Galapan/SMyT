@@ -72,6 +72,13 @@ function Login() {
       // Clean up the state so it doesn't show again on refresh
       window.history.replaceState({}, document.title);
     }
+
+    // Check if user was redirected due to deactivated account
+    const deactivatedMsg = localStorage.getItem('account_deactivated_msg');
+    if (deactivatedMsg) {
+      setToast({ show: true, message: deactivatedMsg, type: "error" });
+      localStorage.removeItem('account_deactivated_msg');
+    }
   }, [navigate]);
 
   const handleSubmit = async (e) => {

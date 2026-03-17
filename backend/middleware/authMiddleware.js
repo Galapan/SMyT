@@ -1,11 +1,13 @@
 const jwt = require('jsonwebtoken');
+const { PrismaClient } = require('@prisma/client');
 
+const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'smyt-secret-key-change-in-production';
 
 /**
  * Middleware para verificar el token JWT
  */
-const verifyToken = (req, res, next) => {
+const verifyToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
 
@@ -20,6 +22,20 @@ const verifyToken = (req, res, next) => {
 
     const decoded = jwt.verify(token, JWT_SECRET);
     req.user = decoded;
+
+    // IMPORTANT: Verify that the user still exists and is active
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: decoded.id },
+      select: { activo: true }
+    });
+
+    if (!usuario || !usuario.activo) {
+      return res.status(401).json({
+        success: false,
+        errorCode: 'ACCOUNT_DEACTIVATED',
+        message: 'Tu cuenta ha sido desactivada por un administrador.'
+      });
+    }
 
     next();
   } catch (error) {

@@ -22,4 +22,10 @@ router.post('/reset-password', authController.resetPassword);
 // POST /api/auth/verify-reset-code - Verificar código de recuperación
 router.post('/verify-reset-code', authController.verifyResetCode);
 
+// POST /api/auth/security-alert/confirm - Confirmar cambio de contraseña
+router.post('/security-alert/confirm', authController.confirmSecurityAlert);
+
+// POST /api/auth/security-alert/reject - Rechazar cambio de contraseña y desactivar cuenta
+router.post('/security-alert/reject', authController.rejectSecurityAlert);
+
 module.exports = router;

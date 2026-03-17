@@ -1,9 +1,11 @@
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const { sendVerificationEmail } = require("../utils/emailService");
+const jwt = require("jsonwebtoken");
+const { sendVerificationEmail, sendSecurityAlertEmail } = require("../utils/emailService");
 
 const prisma = new PrismaClient();
+const JWT_SECRET = process.env.JWT_SECRET || 'smyt-secret-key-change-in-production';
 
 // Obtener perfil de usuario
 const getProfile = async (req, res) => {
@@ -89,7 +91,7 @@ const updateProfile = async (req, res) => {
   }
 };
 
-// Cambiar contraseña
+// ... skipped down to changePassword
 const changePassword = async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
@@ -132,6 +134,18 @@ const changePassword = async (req, res) => {
         password: hashedPassword,
       },
     });
+
+    // Generate security token and send email
+    const securityToken = jwt.sign(
+      { id: usuario.id, action: 'password_change' },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    // We send it asynchronously, don't await to block the frontend
+    sendSecurityAlertEmail(usuario.email, securityToken).catch(err => 
+      console.error("Failed to send security email:", err)
+    );
 
     res.json({
       success: true,
