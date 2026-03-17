@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle2, ShieldAlert } from 'lucide-react';
+import logoTlax from '../assets/LogoTlax.png';
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -58,68 +59,87 @@ function SecurityAlert() {
   }, [action, token]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-[#572671]">
-          SMyT Seguridad
-        </h2>
-      </div>
+    <div className="h-dvh w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
+      {/* Background Decorators if desired (like Login later) */}
+      
+      <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
+        <div className="flex flex-col items-center mb-10">
+          <div className="w-24 h-24 mb-4 flex items-center justify-center">
+            <img
+              src={logoTlax}
+              alt="Logo Tlaxcala"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h1 className="text-2xl font-semibold text-[#572671] text-center leading-tight">
+            Gestión de Seguridad
+          </h1>
+          <h2 className="text-2xl font-bold text-[#572671] text-center">
+            SMyT
+          </h2>
+          <p className="text-xs text-gray-500 mt-2">
+            Gobierno del Estado de Tlaxcala
+          </p>
+        </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 text-center">
-          
+        <div className="text-center">
           {status === 'loading' && (
-            <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#572671] mb-4"></div>
-              <p className="text-gray-600">Procesando solicitud de seguridad...</p>
+            <div className="flex flex-col items-center py-6">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#572671] mb-6"></div>
+              <p className="text-sm font-medium text-gray-600">Procesando solicitud de seguridad...</p>
             </div>
           )}
 
           {status === 'success-confirm' && (
-            <div className="flex flex-col items-center animate-fade-in">
-              <CheckCircle2 className="h-16 w-16 text-green-500 mb-4" />
-              <h3 className="text-xl font-medium text-gray-900 mb-2">Cambio Confirmado</h3>
-              <p className="text-gray-600 mb-6">Hemos verificado que fuiste tú quien realizó el cambio de contraseña. Tu cuenta está segura.</p>
+            <div className="flex flex-col items-center animate-fade-in py-2">
+              <CheckCircle2 className="h-16 w-16 text-emerald-500 mb-6 drop-shadow-sm" />
+              <h3 className="text-xl font-bold text-gray-800 mb-3">Cambio Confirmado</h3>
+              <p className="text-sm text-gray-600 mb-8 px-2">Hemos verificado que fuiste tú quien realizó el cambio de contraseña. Tu cuenta está segura.</p>
               <button 
                 onClick={() => navigate('/login')}
-                className="w-full bg-[#572671] text-white py-2 px-4 rounded hover:bg-[#451e5a] transition-colors"
+                className="w-full bg-[#572671] text-white py-3 rounded hover:bg-[#451e5a] transition-colors font-medium text-sm shadow-md hover:shadow-lg transform active:scale-95 duration-200"
               >
-                Ir a Iniciar Sesión
+                Volver al Inicio
               </button>
             </div>
           )}
 
           {status === 'success-reject' && (
-            <div className="flex flex-col items-center animate-fade-in">
-              <ShieldAlert className="h-16 w-16 text-red-500 mb-4" />
-              <h3 className="text-xl font-medium text-gray-900 mb-2">Cuenta Asegurada</h3>
-              <p className="text-gray-600 mb-6">Hemos bloqueado y desactivado tu cuenta inmediatamente para proteger tu información. Por favor, contacta a un Super Usuario o administrador del sistema SMyT para recuperar el acceso a tu cuenta.</p>
+            <div className="flex flex-col items-center animate-fade-in py-2">
+              <ShieldAlert className="h-16 w-16 text-red-500 mb-6 drop-shadow-sm" />
+              <h3 className="text-xl font-bold text-gray-800 mb-3">Cuenta Asegurada</h3>
+              <p className="text-sm text-gray-600 mb-8 px-2 leading-relaxed">Hemos bloqueado y desactivado tu cuenta de inmediato por precaución. Por favor, contacta a un administrador para recuperar el acceso a tu sistema.</p>
               <button 
                 onClick={() => navigate('/login')}
-                className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded hover:bg-gray-300 transition-colors"
+                className="w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 rounded hover:bg-gray-200 transition-colors font-medium text-sm shadow-sm hover:shadow transform active:scale-95 duration-200"
               >
-                Volver al Inicio
+                Entendido
               </button>
             </div>
           )}
 
           {status === 'error' && (
-            <div className="flex flex-col items-center animate-fade-in">
-              <div className="h-16 w-16 text-red-500 mb-4 flex items-center justify-center border-4 border-red-500 rounded-full">
+            <div className="flex flex-col items-center animate-fade-in py-2">
+              <div className="h-16 w-16 text-red-500 mb-6 flex items-center justify-center border-4 border-red-500 rounded-full shadow-sm bg-red-50">
                 <span className="text-4xl font-bold">!</span>
               </div>
-              <h3 className="text-xl font-medium text-gray-900 mb-2">Error de Verificación</h3>
-              <p className="text-red-500 mb-6">{errorMessage}</p>
-              <p className="text-gray-500 text-sm mb-6">El enlace puede haber expirado (son válidos por 24 horas) o ya fue utilizado.</p>
+              <h3 className="text-xl font-bold text-gray-800 mb-3">Error de Verificación</h3>
+              <p className="text-sm font-medium text-red-600 mb-4">{errorMessage}</p>
+              <p className="text-xs text-gray-500 mb-8 px-4">Este enlace de seguridad puede haber expirado por superar las 24 horas, o ya fue utilizado por ti u otra persona.</p>
               <button 
                 onClick={() => navigate('/login')}
-                className="w-full bg-[#572671] text-white py-2 px-4 rounded hover:bg-[#451e5a] transition-colors"
+                className="w-full bg-[#572671] text-white py-3 rounded hover:bg-[#451e5a] transition-colors font-medium text-sm shadow-md hover:shadow-lg transform active:scale-95 duration-200"
               >
-                Volver al Inicio
+                Volver a Iniciar Sesión
               </button>
             </div>
           )}
+        </div>
 
+        <div className="mt-12 text-center">
+          <p className="text-[10px] text-gray-400">
+            © 2026 Gobierno del Estado de Tlaxcala
+          </p>
         </div>
       </div>
     </div>
