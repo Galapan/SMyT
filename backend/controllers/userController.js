@@ -127,20 +127,25 @@ const changePassword = async (req, res) => {
     // Hash de la nueva contraseña
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-    // Actualizar contraseña
-    await prisma.usuario.update({
-      where: { id: req.user.id },
-      data: {
-        password: hashedPassword,
-      },
-    });
-
     // Generate security token and send email
     const securityToken = jwt.sign(
       { id: usuario.id, action: 'password_change' },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
+
+    const expirationTime = new Date();
+    expirationTime.setHours(expirationTime.getHours() + 24);
+
+    // Actualizar contraseña y guardar token de seguridad para un solo uso
+    await prisma.usuario.update({
+      where: { id: req.user.id },
+      data: {
+        password: hashedPassword,
+        codigoVerificacion: securityToken,
+        expiracionCodigo: expirationTime
+      },
+    });
     
     // We send it asynchronously, don't await to block the frontend
     sendSecurityAlertEmail(usuario.email, securityToken).catch(err => 

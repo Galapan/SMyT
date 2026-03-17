@@ -420,13 +420,31 @@ const confirmSecurityAlert = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Token faltante' });
     }
 
-    // Verify token
+    // Verify token structure
     const decoded = jwt.verify(token, JWT_SECRET);
     if (decoded.action !== 'password_change') {
       return res.status(400).json({ success: false, message: 'Acción no válida' });
     }
 
-    res.json({ success: true, message: 'Cambio de contraseña confirmado' });
+    // Verify single-use token in database
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: decoded.id }
+    });
+
+    if (!usuario || usuario.codigoVerificacion !== token || new Date() > usuario.expiracionCodigo) {
+       return res.status(401).json({ success: false, message: 'El enlace ha expirado o ya fue utilizado.' });
+    }
+
+    // Clear the token to prevent reuse
+    await prisma.usuario.update({
+      where: { id: decoded.id },
+      data: {
+        codigoVerificacion: null,
+        expiracionCodigo: null
+      }
+    });
+
+    res.json({ success: true, message: 'Cambio de contraseña confirmado y enlace desactivado' });
   } catch (error) {
     console.error('Error confirming security alert:', error);
     res.status(401).json({ success: false, message: 'Token inválido o expirado' });
@@ -444,19 +462,32 @@ const rejectSecurityAlert = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Token faltante' });
     }
 
-    // Verify token
+    // Verify token structure
     const decoded = jwt.verify(token, JWT_SECRET);
     if (decoded.action !== 'password_change') {
       return res.status(400).json({ success: false, message: 'Acción no válida' });
     }
 
-    // Disable the account instantly
-    await prisma.usuario.update({
-      where: { id: decoded.id },
-      data: { activo: false }
+    // Verify single-use token in database
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: decoded.id }
     });
 
-    res.json({ success: true, message: 'Cuenta asegurada y desactivada correctamente' });
+    if (!usuario || usuario.codigoVerificacion !== token || new Date() > usuario.expiracionCodigo) {
+       return res.status(401).json({ success: false, message: 'El enlace ha expirado o ya fue utilizado.' });
+    }
+
+    // Disable the account instantly and clear the token
+    await prisma.usuario.update({
+      where: { id: decoded.id },
+      data: { 
+        activo: false,
+        codigoVerificacion: null,
+        expiracionCodigo: null
+      }
+    });
+
+    res.json({ success: true, message: 'Cuenta asegurada, desactivada y enlace deshabilitado correctamente' });
   } catch (error) {
     console.error('Error rejecting security alert:', error);
     res.status(401).json({ success: false, message: 'Token inválido o expirado' });
