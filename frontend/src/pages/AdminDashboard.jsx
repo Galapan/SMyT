@@ -120,7 +120,7 @@ const AdminDashboard = () => {
   const { data: dashboardData, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['dashboard', user?.id],
     queryFn: fetchDashboardData,
-    refetchInterval: 10000, // Auto-refresh cada 10 segundos
+    refetchInterval: 300000, // Auto-refresh cada 5 minutos
   });
 
   const loading = isLoading || isFetching;
