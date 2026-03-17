@@ -1,4 +1,4 @@
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { Warehouse, Car, Key, Plus, RefreshCw, Bell, ChevronRight, CheckCircle, XCircle, X, AlertTriangle, Edit2 } from 'lucide-react';
@@ -56,6 +56,7 @@ function reducer(state, action) {
 const AdminDashboard = () => {
   const navigate = useNavigate();
   // Custom state for UI and Modals
+  const [selectedDepot, setSelectedDepot] = useState(null);
   const [state, dispatch] = useReducer(reducer, initialState);
   const { selectedNotif, resolving, loadingDetail, vehiculoDetail, isEditFormOpen, vehicleToEdit, editingNotifId, toast } = state;
 
@@ -82,7 +83,7 @@ const AdminDashboard = () => {
       })
     ];
 
-    if (userRol === 'SUPER_USUARIO') {
+    if (userRol === 'SUPER_USUARIO' || userRol === 'ADMINISTRADOR') {
       fetchPromises.push(
         fetch(`${API_URL}/api/solicitudes?estatus=PENDIENTE`, {
            headers: { 'Authorization': `Bearer ${token}` }
@@ -116,11 +117,13 @@ const AdminDashboard = () => {
     };
   };
 
-  const { data: dashboardData, isLoading: loading, refetch } = useQuery({
+  const { data: dashboardData, isLoading, isFetching, refetch } = useQuery({
     queryKey: ['dashboard', user?.id],
     queryFn: fetchDashboardData,
     refetchInterval: 10000, // Auto-refresh cada 10 segundos
   });
+
+  const loading = isLoading || isFetching;
 
   const stats = dashboardData?.stats || {
     totalVehiculos: 0, ingresosHoy: 0, liberadosMes: 0, totalDepositos: 0
@@ -247,13 +250,15 @@ const AdminDashboard = () => {
             <RefreshCw size={18} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
             Actualizar
           </button>
-          <button 
-            onClick={() => navigate('/admin/deposits')}
-            className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
-          >
-            <Plus size={20} className="mr-2" />
-            Nuevo Depósito
-          </button>
+          {(userRol === 'SUPER_USUARIO' || userRol === 'ADMINISTRADOR') && (
+            <button 
+              onClick={() => navigate('/admin/deposits')}
+              className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
+            >
+              <Plus size={20} className="mr-2" />
+              Nuevo Depósito
+            </button>
+          )}
         </div>
       </div>
 
@@ -606,6 +611,78 @@ const AdminDashboard = () => {
           onSuccess={handleEditSuccess}
           initialData={vehicleToEdit}
         />
+      )}
+
+      {/* Depot Details Quick View Modal (Placeholder layout matching others) */}
+      {selectedDepot && createPortal(
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur z-10">
+              <h3 className="text-xl font-bold text-gray-900">Detalles del Depósito</h3>
+              <button 
+                onClick={() => setSelectedDepot(null)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto space-y-6">
+              <div className="flex items-center gap-4">
+                <div className="h-16 w-16 rounded-full bg-violet-100 flex items-center justify-center font-bold text-2xl text-(--color-primary)">
+                  {selectedDepot.nombre?.charAt(0) || 'D'}
+                </div>
+                <div>
+                  <h4 className="text-xl font-bold text-gray-900">{selectedDepot.nombre}</h4>
+                  <p className="text-sm text-gray-500 font-mono">ID: {selectedDepot.numero || selectedDepot.id.substring(0,8)}</p>
+                </div>
+                <div className="ml-auto">
+                   <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      selectedDepot.activo 
+                        ? 'bg-(--color-verde)/15 text-(--color-verde)' 
+                        : 'bg-(--color-rosa)/15 text-(--color-rosa)'
+                    }`}>
+                      {selectedDepot.activo ? 'Activo' : 'Inactivo'}
+                    </span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
+                <div>
+                  <span className="block text-xs font-semibold text-gray-500 uppercase">Ubicación</span>
+                  <p className="mt-1 text-sm text-gray-900">{selectedDepot.municipio || 'No especificado'}</p>
+                </div>
+                <div>
+                  <span className="block text-xs font-semibold text-gray-500 uppercase">Capacidad total</span>
+                  <p className="mt-1 text-sm text-gray-900">{selectedDepot.capacidadTotal || 0} vehículos</p>
+                </div>
+                <div>
+                  <span className="block text-xs font-semibold text-gray-500 uppercase">Teléfono</span>
+                  <p className="mt-1 text-sm text-gray-900">{selectedDepot.telefono || 'No registrado'}</p>
+                </div>
+                <div>
+                  <span className="block text-xs font-semibold text-gray-500 uppercase">Representante Legal</span>
+                  <p className="mt-1 text-sm text-gray-900">{selectedDepot.representanteLegal || 'No asignado'}</p>
+                </div>
+              </div>
+
+              {selectedDepot.direccion && (
+                  <div>
+                    <span className="block text-xs font-semibold text-gray-500 uppercase">Dirección Completa</span>
+                    <p className="mt-1 text-sm text-gray-900">{selectedDepot.direccion}</p>
+                  </div>
+              )}
+            </div>
+            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end">
+              <button
+                onClick={() => setSelectedDepot(null)}
+                className="px-4 py-2 border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 rounded-lg font-medium transition-colors"
+               >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       <Toast 

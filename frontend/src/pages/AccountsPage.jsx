@@ -7,6 +7,7 @@ import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { formatRole } from '../utils/formatRole';
 import AccountWizard from '../components/dashboard/AccountWizard';
 import AccountDetailsModal from '../components/dashboard/AccountDetailsModal';
+import ActionMenu from '../components/common/ActionMenu';
 import TableSkeleton from '../components/common/TableSkeleton';
 import StatsSkeleton from '../components/common/StatsSkeleton';
 import Pagination from '../components/common/Pagination';
@@ -107,6 +108,7 @@ const AccountsTable = ({
   onToggleStatus,
   onDelete,
   pagination,
+  currentUser
 }) => (
   <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <div className="p-4 sm:p-6 border-b border-gray-100">
@@ -185,31 +187,14 @@ const AccountsTable = ({
                   </span>
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <button 
-                      onClick={() => onViewDetails(user)}
-                      className="p-2 text-gray-400 hover:text-(--color-primary) hover:bg-violet-50 rounded-lg transition-colors"
-                      title="Ver Detalles"
-                    >
-                      <Eye size={16} />
-                    </button>
-                    <button 
-                      onClick={() => onToggleStatus(user)}
-                      className={`p-2 rounded-lg transition-colors ${user.activo ? 'text-gray-400 hover:text-(--color-rojo) hover:bg-(--color-rojo)/10' : 'text-gray-400 hover:text-(--color-verde) hover:bg-(--color-verde)/10'}`}
-                      title={user.activo ? "Desactivar Cuenta" : "Activar Cuenta"}
-                    >
-                      <Power size={16} />
-                    </button>
-                    <button 
-                      onClick={() => onDelete(user)}
-                      className="p-2 text-gray-400 hover:text-(--color-rojo) hover:bg-(--color-rojo)/10 rounded-lg transition-colors"
-                      title="Eliminar Cuenta Permanente"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                      <MoreVertical size={16} />
-                    </button>
+                  <div className="flex items-center justify-end">
+                    <ActionMenu 
+                      options={[
+                        { label: 'Ver Detalles', icon: Eye, onClick: () => onViewDetails(user) },
+                        { label: user.activo ? 'Desactivar Cuenta' : 'Activar Cuenta', icon: Power, onClick: () => onToggleStatus(user), hidden: currentUser?.rol === 'ADMINISTRADOR_CONCESIONARIO' },
+                        { label: 'Eliminar Cuenta', icon: Trash2, onClick: () => onDelete(user), danger: true, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                      ]}
+                    />
                   </div>
                 </td>
               </tr>
@@ -259,31 +244,14 @@ const AccountsTable = ({
               </div>
               
               {/* Bottom row: Actions */}
-              <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-gray-50">
-                <button 
-                  onClick={() => onViewDetails(user)}
-                  className="p-1.5 text-gray-400 hover:text-(--color-primary) hover:bg-violet-50 rounded-md transition-colors"
-                  title="Ver Detalles"
-                >
-                  <Eye size={16} />
-                </button>
-                <button 
-                  onClick={() => onToggleStatus(user)}
-                  className={`p-1.5 rounded-md transition-colors ${user.activo ? 'text-gray-400 hover:text-(--color-rojo) hover:bg-(--color-rojo)/10' : 'text-gray-400 hover:text-(--color-verde) hover:bg-(--color-verde)/10'}`}
-                  title={user.activo ? "Desactivar Cuenta" : "Activar Cuenta"}
-                >
-                  <Power size={16} />
-                </button>
-                <button 
-                  onClick={() => onDelete(user)}
-                  className="p-1.5 text-gray-400 hover:text-(--color-rojo) hover:bg-(--color-rojo)/10 rounded-md transition-colors"
-                  title="Eliminar Cuenta Permanente"
-                >
-                  <Trash2 size={16} />
-                </button>
-                <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors">
-                  <MoreVertical size={16} />
-                </button>
+              <div className="flex items-center justify-end pt-3 border-t border-gray-50">
+                <ActionMenu 
+                  options={[
+                    { label: 'Ver Detalles', icon: Eye, onClick: () => onViewDetails(user) },
+                    { label: user.activo ? 'Desactivar Cuenta' : 'Activar Cuenta', icon: Power, onClick: () => onToggleStatus(user), hidden: currentUser?.rol === 'ADMINISTRADOR_CONCESIONARIO' },
+                    { label: 'Eliminar Cuenta', icon: Trash2, onClick: () => onDelete(user), danger: true, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                  ]}
+                />
               </div>
             </div>
           ))}
@@ -539,10 +507,12 @@ const AccountsPage = () => {
     return usersData.data;
   };
 
-  const { data: users = [], isLoading: loading, refetch } = useQuery({
+  const { data: users = [], isLoading, isFetching, refetch } = useQuery({
     queryKey: ['users'],
     queryFn: fetchUsers,
   });
+
+  const loading = isLoading || isFetching;
 
   const handleFormSuccess = () => {
     queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -643,6 +613,10 @@ const AccountsPage = () => {
     return colors[rol] || 'bg-gray-100 text-gray-700';
   };
 
+  // currentUser
+  const currentUserStr = sessionStorage.getItem('user') || localStorage.getItem('user');
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+
   // Stats
   const stats = useMemo(() => {
     return {
@@ -680,6 +654,7 @@ const AccountsPage = () => {
           currentPage: state.currentPage,
           onPageChange: (page) => dispatch({ type: 'SET_PAGE', payload: page }),
         }}
+        currentUser={currentUser}
       />
 
       {/* Wizard Modal */}

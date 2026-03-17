@@ -7,11 +7,20 @@ import {
   Eye,
   MoreVertical,
   ArrowUpDown,
+  Trash2,
+  Ban,
+  Check,
+  AlertTriangle
 } from "lucide-react";
+import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
+import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import DepositRegistrationForm from "../components/dashboard/DepositRegistrationForm";
 import TableSkeleton from "../components/common/TableSkeleton";
 import StatsSkeleton from "../components/common/StatsSkeleton";
 import Pagination from "../components/common/Pagination";
+import ActionMenu from "../components/common/ActionMenu";
+import Toast from "../components/common/Toast";
 
 const API_URL =
   import.meta.env.VITE_API_URL !== undefined
@@ -33,6 +42,8 @@ const initialState = {
   searchTerm: "",
   currentPage: 1,
   itemsPerPage: 7,
+  toast: { show: false, message: '', type: 'success' },
+  confirmModal: { isOpen: false, depositoId: null, currentStatus: null }
 };
 
 function reducer(state, action) {
@@ -57,10 +68,77 @@ function reducer(state, action) {
       return { ...state, searchTerm: action.payload, currentPage: 1 };
     case "SET_PAGE":
       return { ...state, currentPage: action.payload };
+    case "SHOW_TOAST":
+      return { ...state, toast: { show: true, message: action.payload.message, type: action.payload.type } };
+    case "HIDE_TOAST":
+      return { ...state, toast: { ...state.toast, show: false } };
+    case "OPEN_CONFIRM":
+      return { ...state, confirmModal: { isOpen: true, depositoId: action.payload.depositoId, currentStatus: action.payload.currentStatus } };
+    case "CLOSE_CONFIRM":
+      return { ...state, confirmModal: { ...state.confirmModal, isOpen: false } };
     default:
       return state;
   }
 }
+
+const ConfirmStatusModal = ({ isOpen, currentStatus, onClose, onConfirm }) => (
+  <>
+    {createPortal(
+      <AnimatePresence>
+        {isOpen && (
+          <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
+            <LazyMotion features={domAnimation}>
+              <m.div 
+                initial={{ opacity: 0 }} 
+                animate={{ opacity: 1 }} 
+                exit={{ opacity: 0 }} 
+                className="fixed inset-0 bg-gray-800/40 backdrop-blur-md"
+                onClick={onClose}
+              />
+              <m.div 
+                initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden mx-4"
+              >
+                <div className="p-4 sm:p-6">
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${currentStatus ? 'bg-(--color-rojo)/15 text-(--color-rojo)' : 'bg-(--color-verde)/15 text-(--color-verde)'}`}>
+                    {currentStatus ? <AlertTriangle size={24} /> : <Check size={24} />}
+                  </div>
+                  <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
+                    ¿{currentStatus ? 'Desactivar' : 'Activar'} Depósito?
+                  </h3>
+                  <p className="text-center text-gray-500 text-sm mb-6">
+                    {currentStatus 
+                      ? 'No se podrán registrar más vehículos en este depósito hasta reactivarlo.' 
+                      : 'El depósito cambiará su estado a activo y se podrá usar para nuevos registros.'}
+                  </p>
+                  
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={onClose}
+                      className="flex-1 px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button 
+                      onClick={onConfirm}
+                      className={`flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors opacity-90 hover:opacity-100 ${currentStatus ? 'bg-(--color-rojo)' : 'bg-(--color-verde)'}`}
+                    >
+                      {currentStatus ? 'Sí, Desactivar' : 'Sí, Activar'}
+                    </button>
+                  </div>
+                </div>
+              </m.div>
+            </LazyMotion>
+          </div>
+        )}
+      </AnimatePresence>,
+      document.getElementById('modal-root') || document.body
+    )}
+  </>
+);
 
 const DepositsHeader = ({ loading, onRefresh, onNew }) => (
   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -164,7 +242,10 @@ const DepositsTable = ({
   searchTerm,
   onSearchChange,
   getStatusColor,
+  onViewDetails,
+  onToggleStatus,
   pagination,
+  currentUser,
 }) => (
   <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <div className="p-4 sm:p-6 border-b border-gray-100">
@@ -257,17 +338,18 @@ const DepositsTable = ({
                   </span>
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                  <span
-                    className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(deposito.activo ? "ACTIVO" : "INACTIVO")}`}
-                  >
-                    {deposito.activo ? "ACTIVO" : "INACTIVO"}
+                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${deposito.activo ? 'bg-(--color-verde)/15 text-(--color-verde)' : 'bg-(--color-rosa)/15 text-(--color-rosa)'}`}>
+                    {deposito.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
                   <div className="flex items-center justify-end gap-2">
-                    <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                      <MoreVertical size={16} />
-                    </button>
+                    <ActionMenu 
+                      options={[
+                        { label: 'Ver Detalles', icon: Eye, onClick: () => onViewDetails(deposito) },
+                        { label: deposito.activo ? 'Desactivar Depósito' : 'Activar Depósito', icon: deposito.activo ? Ban : Check, onClick: () => onToggleStatus(deposito), danger: deposito.activo, success: !deposito.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                      ]}
+                    />
                   </div>
                 </td>
               </tr>
@@ -292,10 +374,8 @@ const DepositsTable = ({
                     {deposito.nombrePropietario}
                   </div>
                 </div>
-                <span
-                  className={`shrink-0 inline-flex px-2 py-0.5 text-[10px] font-medium rounded-full ${getStatusColor(deposito.activo ? "ACTIVO" : "INACTIVO")}`}
-                >
-                  {deposito.activo ? "ACTIVO" : "INACTIVO"}
+                <span className={`shrink-0 ml-2 px-2 py-0.5 inline-flex text-[10px] font-semibold rounded-full ${deposito.activo ? 'bg-(--color-verde)/15 text-(--color-verde)' : 'bg-(--color-rosa)/15 text-(--color-rosa)'}`}>
+                  {deposito.activo ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
 
@@ -327,12 +407,12 @@ const DepositsTable = ({
 
               {/* Bottom row: Actions */}
               <div className="flex items-center justify-end gap-1.5 pt-3 border-t border-gray-50">
-                <button
-                  className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-                  title="Más opciones"
-                >
-                  <MoreVertical size={16} />
-                </button>
+                <ActionMenu 
+                  options={[
+                    { label: 'Ver Detalles', icon: Eye, onClick: () => onViewDetails(deposito) },
+                    { label: deposito.activo ? 'Desactivar Depósito' : 'Activar Depósito', icon: deposito.activo ? Ban : Check, onClick: () => onToggleStatus(deposito), danger: deposito.activo, success: !deposito.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                  ]}
+                />
               </div>
             </div>
           ))}
@@ -354,7 +434,16 @@ const DepositsTable = ({
 
 const DepositsPage = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isFormOpen, depositos, stats, loading, searchTerm } = state;
+  const { isFormOpen, depositos, stats, loading, searchTerm, toast, confirmModal } = state;
+
+  const navigate = useNavigate();
+
+  const currentUserStr = sessionStorage.getItem("user") || localStorage.getItem("user");
+  const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+
+  const showToast = (message, type = 'success') => {
+    dispatch({ type: 'SHOW_TOAST', payload: { message, type } });
+  };
 
   const fetchData = useCallback(async () => {
     dispatch({ type: "SET_LOADING", payload: true });
@@ -398,6 +487,45 @@ const DepositsPage = () => {
     fetchData();
   };
 
+  const openConfirmModal = (depositoId, currentStatus) => {
+    dispatch({ type: 'OPEN_CONFIRM', payload: { depositoId, currentStatus } });
+  };
+
+  const closeConfirmModal = () => {
+    dispatch({ type: 'CLOSE_CONFIRM' });
+  };
+
+  const handleToggleStatus = async () => {
+    if (!confirmModal.depositoId) return;
+    
+    const { depositoId } = confirmModal;
+    closeConfirmModal();
+
+    try {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      const res = await fetch(`${API_URL}/api/depositos/${depositoId}/toggle-status`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        await fetchData();
+        showToast(data.message || 'Estado actualizado', 'success');
+      } else {
+        showToast(data.message || 'Error al cambiar estado', 'error');
+      }
+    } catch (error) {
+      console.error('Error toggling status:', error);
+      showToast('Error de conexión al cambiar estado', 'error');
+    }
+  };
+
+  const handleViewDetails = (deposito) => {
+    navigate(`/admin/auditoria/${deposito.id}`);
+  };
+
   const filteredDepositos = depositos.filter(
     (d) =>
       d.nombrePropietario.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -410,15 +538,6 @@ const DepositsPage = () => {
     (state.currentPage - 1) * state.itemsPerPage,
     state.currentPage * state.itemsPerPage
   );
-
-  const getStatusColor = (status) => {
-    const colors = {
-      ACTIVO: "bg-(--color-verde)/15 text-(--color-verde) font-bold",
-      INACTIVO: "bg-gray-100 text-gray-700 font-bold",
-      SUSPENDIDO: "bg-(--color-rojo)/15 text-(--color-rojo) font-bold",
-    };
-    return colors[status] || "bg-gray-100 text-gray-700";
-  };
 
   return (
     <div className="space-y-4 md:space-y-8">
@@ -438,13 +557,15 @@ const DepositsPage = () => {
         onSearchChange={(e) =>
           dispatch({ type: "SET_SEARCH_TERM", payload: e.target.value })
         }
-        getStatusColor={getStatusColor}
+        onViewDetails={handleViewDetails}
+        onToggleStatus={(dep) => openConfirmModal(dep.id, dep.activo)}
         pagination={{
           totalItems: filteredDepositos.length,
           itemsPerPage: state.itemsPerPage,
           currentPage: state.currentPage,
           onPageChange: (page) => dispatch({ type: "SET_PAGE", payload: page }),
         }}
+        currentUser={currentUser}
       />
 
       {/* Deposit Registration Form Modal */}
@@ -452,6 +573,20 @@ const DepositsPage = () => {
         isOpen={isFormOpen}
         onClose={() => dispatch({ type: "SET_FORM_OPEN", payload: false })}
         onSuccess={handleFormSuccess}
+      />
+
+      <ConfirmStatusModal
+        isOpen={confirmModal.isOpen}
+        currentStatus={confirmModal.currentStatus}
+        onClose={closeConfirmModal}
+        onConfirm={handleToggleStatus}
+      />
+
+      <Toast 
+        show={toast.show} 
+        message={toast.message} 
+        type={toast.type} 
+        onClose={() => dispatch({ type: 'HIDE_TOAST' })} 
       />
     </div>
   );

@@ -68,6 +68,13 @@ const getSolicitudes = async (req, res) => {
 
     if (solicitanteId) {
       whereClause.solicitanteId = solicitanteId;
+    } else {
+      // Role-based routing visibility for global inbox (when not asking for a specific user's requests)
+      if (req.user && req.user.rol === 'ADMINISTRADOR') {
+        whereClause.solicitante = { rol: 'ADMINISTRADOR_CONCESIONARIO' };
+      } else if (req.user && req.user.rol === 'SUPER_USUARIO') {
+        whereClause.solicitante = { rol: 'ADMINISTRADOR' };
+      }
     }
 
     const solicitudes = await prisma.solicitudEdicion.findMany({

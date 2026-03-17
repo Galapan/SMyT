@@ -219,7 +219,7 @@ const createUser = async (req, res) => {
         verificado: false,
         codigoVerificacion: verificationCode,
         expiracionCodigo: expirationTime,
-        depositoId: rol === "ADMINISTRADOR_CONCESIONARIO" ? depositoId : null,
+        depositoId: rol === "ADMINISTRADOR_CONCESIONARIO" ? (depositoId || null) : null,
         creadoPorId: creadorId,
       },
       select: {

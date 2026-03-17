@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, Eye, Ban } from 'lucide-react';
 import TableSkeleton from '../common/TableSkeleton';
 import Pagination from '../common/Pagination';
+import ActionMenu from '../common/ActionMenu';
 
 const EMPTY_DEPOTS = [];
 
-const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
+const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onViewDetails, onSuspend }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
@@ -41,6 +42,7 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Nombre del Concesionario</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Ubicación</th>
                 <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Estatus</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -72,6 +74,14 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
                       {depot.activo ? 'Activo' : 'Inactivo'}
                     </span>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <ActionMenu 
+                      options={[
+                        { label: 'Ver Resumen', icon: Eye, onClick: () => onViewDetails && onViewDetails(depot) },
+                        { label: depot.activo ? 'Suspender Concesionario' : 'Reactivar Concesionario', icon: Ban, onClick: () => onSuspend && onSuspend(depot), danger: depot.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                      ]}
+                    />
+                  </td>
                 </tr>
               ))}
               </tbody>
@@ -101,9 +111,17 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
                     </span>
                   </div>
                   
-                  <div className="flex items-center text-xs text-gray-600 mt-2 pl-11">
-                    <MapPin size={14} className="mr-1.5 text-gray-400 shrink-0" />
-                    <span className="truncate">{depot.municipio}</span>
+                  <div className="flex items-center text-xs text-gray-600 mt-2 pl-11 justify-between">
+                    <div className="flex items-center">
+                      <MapPin size={14} className="mr-1.5 text-gray-400 shrink-0" />
+                      <span className="truncate">{depot.municipio}</span>
+                    </div>
+                    <ActionMenu 
+                      options={[
+                        { label: 'Ver Resumen', icon: Eye, onClick: () => onViewDetails && onViewDetails(depot) },
+                        { label: depot.activo ? 'Suspender Concesionario' : 'Reactivar Concesionario', icon: Ban, onClick: () => onSuspend && onSuspend(depot), danger: depot.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                      ]}
+                    />
                   </div>
                 </div>
               ))}

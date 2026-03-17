@@ -1,8 +1,10 @@
 import { useReducer, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Plus, Car, RefreshCw, Search, Eye, MoreVertical, ArrowUpDown, Filter as FilterIcon } from 'lucide-react';
+import { Plus, Car, RefreshCw, Search, Eye, MoreVertical, ArrowUpDown, Filter as FilterIcon, LogOut, FileEdit, Trash2 } from 'lucide-react';
 import VehicleRegistrationForm from '../components/dashboard/VehicleRegistrationForm';
 import VehicleDetailsModal from '../components/dashboard/VehicleDetailsModal';
+import RequestCorrectionModal from '../components/dashboard/RequestCorrectionModal';
+import ActionMenu from '../components/common/ActionMenu';
 import TableSkeleton from '../components/common/TableSkeleton';
 import StatsSkeleton from '../components/common/StatsSkeleton';
 import Pagination from '../components/common/Pagination';
@@ -102,6 +104,10 @@ const VehiclesTable = ({
   onEstatusChange,
   getStatusColor,
   onShowDetails,
+  onRegisterDeparture,
+  onRequestEdit,
+  onDeleteVehicle,
+  currentUser,
   pagination,
 }) => (
   <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -129,6 +135,7 @@ const VehiclesTable = ({
             <option value="ROBADO">Robado</option>
             <option value="DECOMISADO">Decomisado</option>
             <option value="SINIESTRADO">Siniestrado</option>
+            <option value="OBSOLETO">Obsoleto</option>
           </select>
           <FilterIcon size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
         </div>
@@ -191,16 +198,15 @@ const VehiclesTable = ({
                   </span>
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    <button 
-                      onClick={() => onShowDetails(vehiculo)}
-                      className="p-2 text-gray-400 hover:text-(--color-primary) hover:bg-gray-100 rounded-lg transition-colors"
-                    >
-                      <Eye size={16} />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                      <MoreVertical size={16} />
-                    </button>
+                  <div className="flex items-center justify-end">
+                    <ActionMenu 
+                      options={[
+                        { label: 'Ver Detalles', icon: Eye, onClick: () => onShowDetails(vehiculo) },
+                        { label: 'Registrar Salida / Entrega', icon: LogOut, onClick: () => onRegisterDeparture && onRegisterDeparture(vehiculo), hidden: currentUser?.rol !== 'ADMINISTRADOR_CONCESIONARIO' },
+                        { label: 'Solicitar Corrección', icon: FileEdit, onClick: () => onRequestEdit && onRequestEdit(vehiculo), hidden: currentUser?.rol === 'SUPER_USUARIO' },
+                        { label: 'Eliminar Registro', icon: Trash2, onClick: () => onDeleteVehicle && onDeleteVehicle(vehiculo), danger: true, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                      ]}
+                    />
                   </div>
                 </td>
               </tr>
@@ -244,17 +250,14 @@ const VehiclesTable = ({
                 <div className="text-xs font-mono text-gray-400">
                   VIN: {vehiculo.vin}
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <button 
-                    onClick={() => onShowDetails(vehiculo)}
-                    className="p-1.5 text-gray-400 hover:text-(--color-primary) hover:bg-violet-50 rounded-md transition-colors" title="Ver Detalles"
-                  >
-                    <Eye size={16} />
-                  </button>
-                  <button className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors" title="Más opciones">
-                    <MoreVertical size={16} />
-                  </button>
-                </div>
+                <ActionMenu 
+                  options={[
+                    { label: 'Ver Detalles', icon: Eye, onClick: () => onShowDetails(vehiculo) },
+                    { label: 'Registrar Salida / Entrega', icon: LogOut, onClick: () => onRegisterDeparture && onRegisterDeparture(vehiculo), hidden: currentUser?.rol !== 'ADMINISTRADOR_CONCESIONARIO' },
+                    { label: 'Solicitar Corrección', icon: FileEdit, onClick: () => onRequestEdit && onRequestEdit(vehiculo), hidden: currentUser?.rol === 'SUPER_USUARIO' },
+                    { label: 'Eliminar Registro', icon: Trash2, onClick: () => onDeleteVehicle && onDeleteVehicle(vehiculo), danger: true, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                  ]}
+                />
               </div>
             </div>
           ))}
@@ -286,8 +289,12 @@ const initialState = {
   loading: true,
   searchTerm: '',
   estatusLegalFilter: '',
+  fechaInicioFilter: '',
+  fechaFinFilter: '',
   isDetailsOpen: false,
   selectedVehicle: null,
+  isCorrectionModalOpen: false,
+  vehicleForCorrection: null,
   currentPage: 1,
   itemsPerPage: 7,
 };
@@ -306,12 +313,18 @@ function reducer(state, action) {
       return { ...state, searchTerm: action.payload, currentPage: 1 };
     case 'SET_ESTATUS_LEGAL_FILTER':
       return { ...state, estatusLegalFilter: action.payload, currentPage: 1 };
+    case 'SET_FECHA_FILTER':
+      return { ...state, fechaInicioFilter: action.payload.inicio, fechaFinFilter: action.payload.fin, currentPage: 1 };
     case 'SET_PAGE':
       return { ...state, currentPage: action.payload };
     case 'SHOW_DETAILS':
       return { ...state, isDetailsOpen: true, selectedVehicle: action.payload };
     case 'HIDE_DETAILS':
       return { ...state, isDetailsOpen: false, selectedVehicle: null };
+    case 'OPEN_CORRECTION_MODAL':
+      return { ...state, isCorrectionModalOpen: true, vehicleForCorrection: action.payload };
+    case 'CLOSE_CORRECTION_MODAL':
+      return { ...state, isCorrectionModalOpen: false, vehicleForCorrection: null };
     default:
       return state;
   }
@@ -320,7 +333,17 @@ function reducer(state, action) {
 const VehiclesPage = () => {
   const [searchParams] = useSearchParams();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isFormOpen, vehiculos, stats, loading, searchTerm, estatusLegalFilter, isDetailsOpen, selectedVehicle } = state;
+  const { isFormOpen, vehiculos, stats, loading, searchTerm, estatusLegalFilter, fechaInicioFilter, fechaFinFilter, isDetailsOpen, selectedVehicle, isCorrectionModalOpen, vehicleForCorrection } = state;
+
+  const getStoredUser = () => {
+    try {
+      const stored = localStorage.getItem('user') || sessionStorage.getItem('user');
+      return stored ? JSON.parse(stored) : { rol: 'ADMINISTRADOR_CONCESIONARIO' }; // Fallback for safety
+    } catch {
+      return { rol: 'ADMINISTRADOR_CONCESIONARIO' };
+    }
+  };
+  const currentUser = getStoredUser();
 
   const fetchData = useCallback(async () => {
     dispatch({ type: 'SET_LOADING', payload: true });
@@ -357,14 +380,19 @@ const VehiclesPage = () => {
   useEffect(() => {
     fetchData();
     
-    // Check if there are query params from AuditSearch
     const estatusLegal = searchParams.get('estatusLegal');
     const searchTermFromUrl = searchParams.get('placa') || searchParams.get('vin') || '';
+    const fechaInicio = searchParams.get('fechaInicio');
+    const fechaFin = searchParams.get('fechaFin');
     
     if (estatusLegal) {
       dispatch({ type: 'SET_ESTATUS_LEGAL_FILTER', payload: estatusLegal });
     }
     
+    if (fechaInicio || fechaFin) {
+      dispatch({ type: 'SET_FECHA_FILTER', payload: { inicio: fechaInicio || '', fin: fechaFin || '' } });
+    }
+
     if (searchTermFromUrl) {
       dispatch({ type: 'SET_SEARCH_TERM', payload: searchTermFromUrl });
     }
@@ -383,9 +411,18 @@ const VehiclesPage = () => {
       
       const matchesEstatus = estatusLegalFilter ? v.estatusLegal === estatusLegalFilter : true;
       
-      return matchesSearch && matchesEstatus;
+      let matchesFecha = true;
+      if (fechaInicioFilter) {
+        const vDate = new Date(v.fechaIngreso);
+        const start = new Date(fechaInicioFilter + 'T00:00:00');
+        // add 24 hours to include the whole day if no end date
+        const end = fechaFinFilter ? new Date(fechaFinFilter + 'T23:59:59') : new Date(fechaInicioFilter + 'T23:59:59');
+        matchesFecha = vDate >= start && vDate <= end;
+      }
+      
+      return matchesSearch && matchesEstatus && matchesFecha;
     });
-  }, [vehiculos, searchTerm, estatusLegalFilter]);
+  }, [vehiculos, searchTerm, estatusLegalFilter, fechaInicioFilter, fechaFinFilter]);
 
   const paginatedVehiculos = useMemo(() => {
     const start = (state.currentPage - 1) * state.itemsPerPage;
@@ -401,6 +438,29 @@ const VehiclesPage = () => {
     };
     return colors[status] || 'bg-gray-100 text-gray-700';
   };
+
+  const isConcesionarioSinDeposito = currentUser?.rol === 'ADMINISTRADOR_CONCESIONARIO' && !currentUser?.depositoId;
+
+  if (isConcesionarioSinDeposito) {
+    return (
+      <div className="space-y-4 md:space-y-8">
+        <VehiclesHeader
+          loading={false}
+          onRefresh={() => {}}
+          onNew={() => {}}
+        />
+        <div className="flex items-center justify-center py-20">
+          <div className="bg-white rounded-xl border border-gray-200 p-12 flex flex-col items-center justify-center text-center shadow-sm">
+            <div className="bg-gray-50 p-4 rounded-full mb-4">
+              <Car className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">Sin concesionario asignado</h3>
+            <p className="text-gray-500 max-w-sm">No estás asignado a ningún concesionario. Contacta al administrador para vincular tu cuenta a un depósito.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 md:space-y-8">
@@ -422,6 +482,10 @@ const VehiclesPage = () => {
         onEstatusChange={(e) => dispatch({ type: 'SET_ESTATUS_LEGAL_FILTER', payload: e.target.value })}
         getStatusColor={getStatusColor}
         onShowDetails={(vehiculo) => dispatch({ type: 'SHOW_DETAILS', payload: vehiculo })}
+        onRegisterDeparture={(v) => console.log('Registrar salida', v)}
+        onRequestEdit={(v) => dispatch({ type: 'OPEN_CORRECTION_MODAL', payload: v })}
+        onDeleteVehicle={(v) => console.log('Eliminar vehiculo', v)}
+        currentUser={currentUser}
         pagination={{
           totalItems: filteredVehiculos.length,
           itemsPerPage: state.itemsPerPage,
@@ -442,6 +506,17 @@ const VehiclesPage = () => {
         isOpen={isDetailsOpen}
         onClose={() => dispatch({ type: 'HIDE_DETAILS' })}
         vehiculo={selectedVehicle}
+      />
+
+      {/* Request Correction Modal */}
+      <RequestCorrectionModal 
+        isOpen={isCorrectionModalOpen}
+        onClose={() => dispatch({ type: 'CLOSE_CORRECTION_MODAL' })}
+        vehiculo={vehicleForCorrection}
+        onSuccess={(msg) => {
+          dispatch({ type: 'CLOSE_CORRECTION_MODAL' });
+          alert(msg); // Opcionalmente usar el Toast
+        }}
       />
     </div>
   );

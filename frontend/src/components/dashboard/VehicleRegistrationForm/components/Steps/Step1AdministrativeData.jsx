@@ -20,7 +20,9 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
       });
       const result = await res.json();
       if (result.success) {
-        return result.data.map(d => ({ value: d.id, label: `${d.nombre} - ${d.municipio}` }));
+        return result.data
+          .filter(d => d.activo) // Solo permitir registrar en depósitos activos
+          .map(d => ({ value: d.id, label: `${d.nombre} - ${d.municipio}` }));
       }
       return [];
     },

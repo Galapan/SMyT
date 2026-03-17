@@ -10,7 +10,6 @@ const prisma = new PrismaClient();
 router.get('/', authenticateToken, async (req, res) => {
   try {
     const depositos = await prisma.deposito.findMany({
-      where: { activo: true },
       include: {
         _count: {
           select: {
@@ -80,7 +79,10 @@ router.get('/stats', authenticateToken, async (req, res) => {
 router.get('/audit', authenticateToken, async (req, res) => {
   try {
     const whereClause = { activo: true };
-    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO' && req.user.depositoId) {
+    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO') {
+      if (!req.user.depositoId) {
+        return res.json({ success: true, data: [] });
+      }
       whereClause.id = req.user.depositoId;
     }
 
@@ -300,6 +302,36 @@ router.put('/:id', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al actualizar el depósito'
+    });
+  }
+});
+
+// PATCH /api/depositos/:id/toggle-status - Activar/Desactivar un depósito
+router.patch('/:id/toggle-status', authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Obtener el estado actual
+    const current = await prisma.deposito.findUnique({ where: { id } });
+    if (!current) {
+      return res.status(404).json({ success: false, message: 'Depósito no encontrado' });
+    }
+
+    const deposito = await prisma.deposito.update({
+      where: { id },
+      data: { activo: !current.activo }
+    });
+
+    res.json({
+      success: true,
+      message: deposito.activo ? 'Depósito activado exitosamente' : 'Depósito desactivado exitosamente',
+      data: deposito
+    });
+  } catch (error) {
+    console.error('Error toggling deposito status:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al cambiar el estado del depósito'
     });
   }
 });

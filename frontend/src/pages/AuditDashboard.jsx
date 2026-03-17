@@ -46,7 +46,7 @@ const ConcesionarioHeader = ({ loading, onRefresh }) => (
         className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center font-medium shadow-sm active:scale-95"
       >
         <RefreshCw size={18} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
-        Refrescar
+        Actualizar
       </button>
     </div>
   </div>
@@ -283,7 +283,7 @@ const AdminHeader = ({ loading, searchTerm, onSearch, onRefresh }) => (
         className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all flex items-center justify-center font-medium shadow-sm active:scale-95"
       >
         <RefreshCw size={18} className={`mr-2 ${loading ? 'animate-spin' : ''}`} />
-        Refrescar
+        Actualizar
       </button>
     </div>
   </div>
@@ -417,10 +417,12 @@ const AuditDashboard = () => {
     return data.data;
   }, []);
 
-  const { data: depositos = [], isLoading: loading, refetch } = useQuery({
+  const { data: depositos = [], isLoading, isFetching, refetch } = useQuery({
     queryKey: ['depositosAudit'],
     queryFn: fetchAuditData,
   });
+
+  const loading = isLoading || isFetching;
 
   const filteredDepositos = useMemo(() => {
     const term = searchTerm.toLowerCase();

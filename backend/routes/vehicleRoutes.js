@@ -6,7 +6,8 @@ const {
   getAllVehicles,
   getVehicleStats,
   getVehicleById,
-  updateVehicle
+  updateVehicle,
+  registerDeparture
 } = require('../controllers/vehicleController');
 
 // Todas las rutas requieren autenticación
@@ -26,5 +27,8 @@ router.get('/:id', getVehicleById);
 
 // PUT /api/vehiculos/:id - Actualizar vehículo por ID
 router.put('/:id', updateVehicle);
+
+// POST /api/vehiculos/:id/salida - Registrar salida de vehículo
+router.post('/:id/salida', registerDeparture);
 
 module.exports = router;

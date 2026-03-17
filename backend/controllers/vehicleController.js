@@ -205,7 +205,11 @@ const createVehicle = async (req, res) => {
 const getAllVehicles = async (req, res) => {
   try {
     const whereClause = { activo: true };
-    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO' && req.user.depositoId) {
+    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO') {
+      if (!req.user.depositoId) {
+        // User not assigned to any deposit — return empty
+        return res.json({ success: true, data: [], count: 0, noDeposito: true });
+      }
       whereClause.depositoId = req.user.depositoId;
     }
 
@@ -242,16 +246,31 @@ const getAllVehicles = async (req, res) => {
 // Obtener estadísticas
 const getVehicleStats = async (req, res) => {
   try {
+    // We adjust to UTC-6 since SMyT works on Mexico timezone (-6h)
+    // Server might be in UTC. So getting new Date() directly might lead to 'tomorrow' or 'yesterday'
+    // in comparison to user's perspective.
     const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    // Move to UTC-6
+    today.setHours(today.getHours() - 6);
+    // Set to start of day
+    today.setUTCHours(0, 0, 0, 0);
+    // Move back to system tz, since Prisma uses UTC internally, we need to provide a UTC Date that represents midnight UTC-6
+    const startOfDayUTC6 = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate(), 6, 0, 0, 0));
+
+    const startOfMonth = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1, 6, 0, 0, 0));
 
     const whereBase = { activo: true };
-    const whereHoy = { fechaIngreso: { gte: today }, activo: true };
+    const whereHoy = { fechaIngreso: { gte: startOfDayUTC6 }, activo: true };
     const whereLiberados = { fechaSalida: { gte: startOfMonth }, activo: false };
 
-    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO' && req.user.depositoId) {
+    if (req.user && req.user.rol === 'ADMINISTRADOR_CONCESIONARIO') {
+      if (!req.user.depositoId) {
+        return res.json({
+          success: true,
+          data: { totalVehiculos: 0, ingresosHoy: 0, liberadosMes: 0, totalDepositos: 0 },
+          noDeposito: true
+        });
+      }
       whereBase.depositoId = req.user.depositoId;
       whereHoy.depositoId = req.user.depositoId;
       whereLiberados.depositoId = req.user.depositoId;
@@ -413,10 +432,76 @@ const updateVehicle = async (req, res) => {
   }
 };
 
+// Registrar salida de vehículo
+const registerDeparture = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { justificacionBaja } = req.body;
+
+    // Solo Administrador Concesionario (o Super Usuario) debería poder registrar salidad
+    if (req.user.rol === 'ADMINISTRADOR') {
+      return res.status(403).json({
+        success: false,
+        message: 'No tienes permisos para registrar la salida de un vehículo'
+      });
+    }
+
+    const vehiculo = await prisma.vehiculo.findUnique({
+      where: { id }
+    });
+
+    if (!vehiculo) {
+      return res.status(404).json({
+        success: false,
+        message: 'Vehículo no encontrado'
+      });
+    }
+
+    if (!vehiculo.activo) {
+       return res.status(400).json({
+         success: false,
+         message: 'El vehículo ya ha sido dado de baja o registrado como salida'
+       });
+    }
+
+    // Si es concesionario, verificar que el vehículo le pertenece
+    if (req.user.rol === 'ADMINISTRADOR_CONCESIONARIO' && vehiculo.depositoId !== req.user.depositoId) {
+       return res.status(403).json({
+         success: false,
+         message: 'No puedes registrar la salida de un vehículo que no está en tu depósito'
+       });
+    }
+
+    const vehiculoActualizado = await prisma.vehiculo.update({
+      where: { id },
+      data: {
+        activo: false,
+        fechaSalida: new Date(),
+        justificacionBaja: justificacionBaja || 'Registro de salida por concesionario'
+      }
+    });
+
+    res.json({
+      success: true,
+      message: 'Salida de vehículo registrada exitosamente',
+      data: vehiculoActualizado
+    });
+
+  } catch (error) {
+    console.error('Error al registrar salida de vehículo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al registrar la salida del vehículo',
+      error: error.message
+    });
+  }
+};
+
 module.exports = {
   createVehicle,
   getAllVehicles,
   getVehicleStats,
   getVehicleById,
-  updateVehicle
+  updateVehicle,
+  registerDeparture
 };
