@@ -147,18 +147,13 @@ const changePassword = async (req, res) => {
       },
     });
     
-    // We send it asynchronously, don't await to block the frontend
-    sendSecurityAlertEmail(usuario.email, securityToken)
-      .then(success => {
-        if (success) {
-          console.log(`✅ Security email sent to ${usuario.email}`);
-        } else {
-          console.error(`⚠️ Security email failed to send to ${usuario.email}`);
-        }
-      })
-      .catch(err => {
-        console.error("❌ Failed to send security email:", err.message);
-      });
+    // Await the email before responding — Vercel kills the function after res.json()
+    const emailSent = await sendSecurityAlertEmail(usuario.email, securityToken);
+    if (emailSent) {
+      console.log(`✅ Security email sent to ${usuario.email}`);
+    } else {
+      console.error(`⚠️ Security email failed to send to ${usuario.email}`);
+    }
 
     res.json({
       success: true,
