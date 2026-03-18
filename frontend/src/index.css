@@ -1,8 +1,7 @@
 @import "tailwindcss";
 
-/* Variables CSS con la paleta oficial SMyT */
-:root {
-  --color-primary: #42147D; /* Morado principal */
+@theme {
+  --color-primary: #42147D;
   --color-secondary: #fee6c4;
   --color-rosa: #aa0365;
   --color-rojo: #A70F26;

@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { X, UserPlus, Loader2, Check, AlertCircle, Search, Link as LinkIcon, User } from "lucide-react";
 import FormInput from "../VehicleRegistrationForm/components/FormFields/FormInput";
+import PasswordValidation from "../../common/PasswordValidation";
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -300,15 +301,18 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
               />
 
               <div className="grid grid-cols-2 gap-4">
-                <FormInput
-                  label="Contraseña *"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  error={errors.password}
-                  placeholder="••••••••"
-                />
+                <div>
+                  <FormInput
+                    label="Contraseña *"
+                    name="password"
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    error={errors.password}
+                    placeholder="••••••••"
+                  />
+                  <PasswordValidation password={formData.password} />
+                </div>
                 <FormInput
                   label="Confirmar *"
                   name="confirmPassword"

@@ -7,6 +7,7 @@ import ModalHeader from './VehicleRegistrationForm/components/UI/ModalHeader';
 import NavigationFooter from './VehicleRegistrationForm/components/UI/NavigationFooter';
 import FormInput from './VehicleRegistrationForm/components/FormFields/FormInput';
 import Toast from "../common/Toast";
+import PasswordValidation from "../common/PasswordValidation";
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -210,8 +211,9 @@ const AccountWizard = ({ isOpen, onClose, onSuccess }) => {
           value={formData.password}
           onChange={handleChange}
           error={errors.password}
-          placeholder="Mínimo 6 caracteres"
+          placeholder="••••••••"
         />
+        <PasswordValidation password={formData.password} />
       </div>
     </div>
   );

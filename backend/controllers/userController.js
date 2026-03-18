@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const { sendVerificationEmail, sendSecurityAlertEmail } = require("../utils/emailService");
+const { validatePassword } = require("../utils/passwordValidator");
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'smyt-secret-key-change-in-production';
@@ -103,6 +104,15 @@ const changePassword = async (req, res) => {
       });
     }
 
+    // Validar requisitos de la nueva contraseña
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.message,
+      });
+    }
+
     // Buscar usuario para obtener su hash actual
     const usuario = await prisma.usuario.findUnique({
       where: { id: req.user.id },
@@ -182,6 +192,15 @@ const createUser = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: "Todos los campos básicos son requeridos",
+      });
+    }
+
+    // Validar requisitos de contraseña
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.valid) {
+      return res.status(400).json({
+        success: false,
+        message: passwordValidation.message,
       });
     }
 

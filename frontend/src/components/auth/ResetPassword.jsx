@@ -2,6 +2,7 @@ import { useReducer, useEffect, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import logoTlax from "../../assets/LogoTlax.png";
 import Toast from "../common/Toast";
+import PasswordValidation from "../common/PasswordValidation";
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -263,12 +264,13 @@ function ResetPassword() {
                 type="password"
                 value={newPassword}
                 onChange={(e) => dispatch({ type: "SET_NEW_PASSWORD", payload: e.target.value })}
-                placeholder="Min. 8 caracteres"
+                placeholder="••••••••"
                 className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
                 required
                 disabled={loading}
                 minLength={8}
               />
+              <PasswordValidation password={newPassword} />
             </div>
 
             <div>

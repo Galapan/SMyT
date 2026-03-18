@@ -4,6 +4,7 @@ const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const { verifyToken: authenticateToken } = require('../middleware/authMiddleware');
 const { validateRFCFormat, consultarRFC, checkRFCExists } = require('../services/rfcValidationService');
+const { validatePassword } = require('../utils/passwordValidator');
 
 const prisma = new PrismaClient();
 
@@ -206,6 +207,15 @@ router.post('/', authenticateToken, async (req, res) => {
         return res.status(400).json({
           success: false,
           message: 'El email ya está registrado'
+        });
+      }
+
+      // Validar requisitos de contraseña
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        return res.status(400).json({
+          success: false,
+          message: passwordValidation.message
         });
       }
 

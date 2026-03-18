@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { User, Lock, Save, Camera, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import ImageCropper from '../components/common/ImageCropper';
 import Toast from '../components/common/Toast';
+import PasswordValidation from '../components/common/PasswordValidation';
 
 const initialState = {
   activeTab: 'profile',
@@ -337,8 +338,9 @@ const SettingsPage = () => {
                 onChange={(e) => dispatch({ type: 'SET_PASSWORDS', payload: { newPassword: e.target.value } })}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-(--color-primary) focus:border-transparent transition-shadow outline-none"
                 required
-                minLength={6}
+                minLength={8}
               />
+              <PasswordValidation password={passwords.newPassword} />
             </div>
 
             <div>

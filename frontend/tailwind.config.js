@@ -7,12 +7,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        gob: {
-          primary: '#572671',   // Morado oficial
-          secondary: '#FEE6C4', // Crema oficial
-          rosa: '#AA0365',      // Rosa oficial
-          verde: '#91ABA5',     // Verde oficial
-        }
+        primary: '#42147D',    // Morado principal
+        secondary: '#fee6c4',  // Crema
+        rosa: '#aa0365',       // Rosa
+        rojo: '#A70F26',       // Rojo
+        verde: '#6FB225',      // Verde
+        azul: '#55AEC9',       // Azul
+        naranja: '#EF8D00',    // Naranja
+        morado: '#42147D',     // Morado
       },
     },
   },

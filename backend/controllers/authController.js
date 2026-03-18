@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { PrismaClient } = require('@prisma/client');
 const { sendPasswordResetEmail } = require('../utils/emailService');
+const { validatePassword } = require('../utils/passwordValidator');
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'smyt-secret-key-change-in-production';
@@ -303,10 +304,12 @@ const resetPassword = async (req, res) => {
       });
     }
 
-    if (newPassword.length < 8) {
+    // Validar requisitos de contraseña
+    const passwordValidation = validatePassword(newPassword);
+    if (!passwordValidation.valid) {
       return res.status(400).json({
         success: false,
-        message: 'La contraseña debe tener al menos 8 caracteres'
+        message: passwordValidation.message
       });
     }
 
