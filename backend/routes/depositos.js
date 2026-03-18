@@ -3,6 +3,7 @@ const router = express.Router();
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
 const { verifyToken: authenticateToken } = require('../middleware/authMiddleware');
+const { validateRFCFormat, consultarRFC, checkRFCExists } = require('../services/rfcValidationService');
 
 const prisma = new PrismaClient();
 
@@ -134,15 +135,50 @@ router.post('/', authenticateToken, async (req, res) => {
       telefonoPropietario,
       crearCuenta,
       email,
-      password
+      password,
+      validarRFC // Bandera para validar RFC con API del SAT
     } = req.body;
 
-    // Validaciones
+    // Validaciones de campos requeridos
     if (!nombre || !municipio || !direccion || !capacidad || !telefono || !nombrePropietario || !rfc || !telefonoPropietario) {
       return res.status(400).json({
         success: false,
         message: 'Todos los campos son requeridos'
       });
+    }
+
+    // 1. Validar formato del RFC
+    const formatoValido = validateRFCFormat(rfc);
+    if (!formatoValido.valid) {
+      return res.status(400).json({
+        success: false,
+        message: formatoValido.message
+      });
+    }
+
+    // 2. Validar que el RFC no exista ya en la base de datos
+    const rfcExistente = await checkRFCExists(prisma, rfc);
+    if (rfcExistente) {
+      return res.status(400).json({
+        success: false,
+        message: 'El RFC ya está registrado en otro depósito. No se permiten duplicados'
+      });
+    }
+
+    // 3. Validar RFC con la API del SAT si se solicita
+    if (validarRFC) {
+      try {
+        const validacionSAT = await consultarRFC(rfc);
+        if (!validacionSAT.valid) {
+          return res.status(400).json({
+            success: false,
+            message: `El RFC no fue encontrado en el SAT: ${validacionSAT.message}`
+          });
+        }
+      } catch (error) {
+        console.error('Error al validar RFC con el SAT:', error.message);
+        // No bloquear el registro si falla la validación, solo advertir
+      }
     }
 
     // Crear el depósito
@@ -275,8 +311,51 @@ router.put('/:id', authenticateToken, async (req, res) => {
       telefono,
       nombrePropietario,
       rfc,
-      telefonoPropietario
+      telefonoPropietario,
+      validarRFC // Bandera para validar RFC con API del SAT
     } = req.body;
+
+    // Validaciones de campos requeridos
+    if (!nombre || !municipio || !direccion || !capacidad || !telefono || !nombrePropietario || !rfc || !telefonoPropietario) {
+      return res.status(400).json({
+        success: false,
+        message: 'Todos los campos son requeridos'
+      });
+    }
+
+    // 1. Validar formato del RFC
+    const formatoValido = validateRFCFormat(rfc);
+    if (!formatoValido.valid) {
+      return res.status(400).json({
+        success: false,
+        message: formatoValido.message
+      });
+    }
+
+    // 2. Validar que el RFC no exista ya en otro depósito (excluyendo el actual)
+    const rfcExistente = await checkRFCExists(prisma, rfc, id);
+    if (rfcExistente) {
+      return res.status(400).json({
+        success: false,
+        message: 'El RFC ya está registrado en otro depósito. No se permiten duplicados'
+      });
+    }
+
+    // 3. Validar RFC con la API del SAT si se solicita
+    if (validarRFC) {
+      try {
+        const validacionSAT = await consultarRFC(rfc);
+        if (!validacionSAT.valid) {
+          return res.status(400).json({
+            success: false,
+            message: `El RFC no fue encontrado en el SAT: ${validacionSAT.message}`
+          });
+        }
+      } catch (error) {
+        console.error('Error al validar RFC con el SAT:', error.message);
+        // No bloquear la actualización si falla la validación, solo advertir
+      }
+    }
 
     const deposito = await prisma.deposito.update({
       where: { id },
@@ -356,6 +435,74 @@ router.delete('/:id', authenticateToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error al desactivar el depósito'
+    });
+  }
+});
+
+// POST /api/depositos/rfc/check - Verificar si un RFC ya existe
+router.post('/rfc/check', authenticateToken, async (req, res) => {
+  try {
+    const { rfc } = req.body;
+
+    if (!rfc) {
+      return res.status(400).json({
+        success: false,
+        message: 'El RFC es requerido'
+      });
+    }
+
+    const existe = await checkRFCExists(prisma, rfc);
+
+    res.json({
+      success: true,
+      exists: existe
+    });
+  } catch (error) {
+    console.error('Error checking RFC:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al verificar el RFC'
+    });
+  }
+});
+
+// POST /api/depositos/rfc/validate - Validar RFC con el SAT
+router.post('/rfc/validate', authenticateToken, async (req, res) => {
+  try {
+    const { rfc } = req.body;
+
+    if (!rfc) {
+      return res.status(400).json({
+        success: false,
+        message: 'El RFC es requerido'
+      });
+    }
+
+    // Validar formato
+    const formatoValido = validateRFCFormat(rfc);
+    if (!formatoValido.valid) {
+      return res.status(400).json({
+        success: false,
+        valid: false,
+        message: formatoValido.message
+      });
+    }
+
+    // Consultar con el SAT
+    const validacionSAT = await consultarRFC(rfc);
+
+    res.json({
+      success: true,
+      valid: validacionSAT.valid,
+      message: validacionSAT.message,
+      data: validacionSAT.data
+    });
+  } catch (error) {
+    console.error('Error validating RFC with SAT:', error);
+    res.status(500).json({
+      success: false,
+      valid: false,
+      message: `Error al validar con el SAT: ${error.message}`
     });
   }
 });

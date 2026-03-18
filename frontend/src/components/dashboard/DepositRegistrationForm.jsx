@@ -5,6 +5,8 @@ import {
   Building2,
   User,
   AlertCircle,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
 
 // Reuse components from VehicleRegistrationForm for consistency
@@ -15,8 +17,8 @@ import StepIndicator from "./VehicleRegistrationForm/components/UI/StepIndicator
 import NavigationFooter from "./VehicleRegistrationForm/components/UI/NavigationFooter";
 import Toast from "../common/Toast";
 
-const API_URL = import.meta.env.VITE_API_URL !== undefined 
-  ? import.meta.env.VITE_API_URL 
+const API_URL = import.meta.env.VITE_API_URL !== undefined
+  ? import.meta.env.VITE_API_URL
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
 const initialState = {
@@ -34,6 +36,12 @@ const initialState = {
     nombrePropietario: "",
     rfc: "",
     telefonoPropietario: "",
+  },
+  rfcValidation: {
+    validating: false,
+    valid: null, // null = no validado, true = válido, false = inválido
+    message: "",
+    checked: false, // ya se verificó contra el backend
   }
 };
 
@@ -135,10 +143,120 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
     dispatch({ type: 'RESET' });
   };
 
+  /**
+   * Valida el formato del RFC (persona física o moral)
+   */
+  const validateRFCFormat = (rfc) => {
+    if (!rfc || typeof rfc !== 'string') {
+      return { valid: false, message: 'El RFC es requerido' };
+    }
+
+    const rfcUpper = rfc.toUpperCase().trim();
+
+    // RFC persona física: 4 letras + 6 dígitos + 3 homoclave = 13
+    // RFC persona moral: 3 letras + 6 dígitos + 3 homoclave = 12
+    const physicalPersonRegex = /^[A-ZÑ&]{4}\d{6}[A-Z0-9]{3}$/;
+    const moralPersonRegex = /^[A-ZÑ&]{3}\d{6}[A-Z0-9]{3}$/;
+
+    if (!physicalPersonRegex.test(rfcUpper) && !moralPersonRegex.test(rfcUpper)) {
+      return {
+        valid: false,
+        message: 'El RFC no tiene un formato válido. Debe ser de 12 (moral) o 13 (física) caracteres'
+      };
+    }
+
+    // Validar fecha
+    const year = parseInt(rfcUpper.substring(4, 6));
+    const month = parseInt(rfcUpper.substring(6, 8));
+    const day = parseInt(rfcUpper.substring(8, 10));
+
+    if (month < 1 || month > 12) {
+      return { valid: false, message: 'El mes del RFC no es válido' };
+    }
+
+    if (day < 1 || day > 31) {
+      return { valid: false, message: 'El día del RFC no es válido' };
+    }
+
+    return { valid: true, message: 'Formato de RFC válido' };
+  };
+
+  /**
+   * Verifica el RFC contra el backend (duplicados y SAT)
+   */
+  const verificarRFC = async (rfc) => {
+    if (!rfc || rfc.length < 12) return;
+
+    const formatoValido = validateRFCFormat(rfc);
+    if (!formatoValido.valid) {
+      return;
+    }
+
+    dispatch({ type: 'SET_LOADING', payload: true });
+
+    try {
+      const token = sessionStorage.getItem("token") || localStorage.getItem("token");
+
+      if (!token) {
+        throw new Error("Sesión expirada");
+      }
+
+      // Primero verificar si existe en la base de datos
+      const checkResponse = await fetch(`${API_URL}/api/depositos/rfc/check`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ rfc }),
+      });
+
+      const checkData = await checkResponse.json();
+
+      if (!checkResponse.ok) {
+        throw new Error(checkData.message || "Error al verificar RFC");
+      }
+
+      // Si no existe, consultar con el SAT
+      if (checkData.exists === false) {
+        const satResponse = await fetch(`${API_URL}/api/depositos/rfc/validate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ rfc }),
+        });
+
+        const satData = await satResponse.json();
+
+        if (satData.valid) {
+          dispatch({ type: 'SET_ERROR', payload: "" });
+        } else {
+          dispatch({ type: 'SET_ERROR', payload: `RFC no encontrado en el SAT: ${satData.message}` });
+        }
+      } else {
+        dispatch({ type: 'SET_ERROR', payload: 'El RFC ya está registrado en otro depósito' });
+      }
+
+    } catch (err) {
+      dispatch({ type: 'SET_ERROR', payload: err.message });
+    } finally {
+      dispatch({ type: 'SET_LOADING', payload: false });
+    }
+  };
+
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
 
     if (!validateStep(2)) return;
+
+    // Validar formato del RFC antes de enviar
+    const formatoRFC = validateRFCFormat(formData.rfc);
+    if (!formatoRFC.valid) {
+      dispatch({ type: 'SET_ERRORS', payload: { ...errors, rfc: formatoRFC.message } });
+      return;
+    }
 
     dispatch({ type: 'SET_LOADING', payload: true });
     dispatch({ type: 'SET_ERROR', payload: "" });
@@ -166,6 +284,7 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
           nombrePropietario: formData.nombrePropietario,
           rfc: formData.rfc,
           telefonoPropietario: formData.telefonoPropietario,
+          validarRFC: true
         }),
       });
 
@@ -324,15 +443,38 @@ const DepositRegistrationForm = ({ isOpen, onClose, onSuccess }) => {
                 />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                  <FormInput
-                    label="RFC *"
-                    name="rfc"
-                    value={formData.rfc}
-                    onChange={handleChange}
-                    error={errors.rfc}
-                    placeholder="ABCD123456XYZ"
-                    maxLength={13}
-                  />
+                  <div className="relative">
+                    <FormInput
+                      label="RFC *"
+                      name="rfc"
+                      value={formData.rfc}
+                      onChange={handleChange}
+                      error={errors.rfc}
+                      placeholder="ABCD123456XYZ"
+                      maxLength={13}
+                      disabled={loading}
+                    />
+                    {/* Indicador de validación del RFC */}
+                    {formData.rfc.length >= 12 && !errors.rfc && (
+                      <div className="absolute right-3 top-8 flex items-center gap-1">
+                        {!loading && (
+                          <>
+                            {validateRFCFormat(formData.rfc).valid ? (
+                              <CheckCircle size={16} className="text-(--color-verde)" />
+                            ) : (
+                              <AlertCircle size={16} className="text-(--color-rosa)" />
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                    {validateRFCFormat(formData.rfc).valid && formData.rfc.length === 13 && (
+                      <p className="text-xs text-(--color-verde) mt-1 flex items-center gap-1">
+                        <CheckCircle size={12} />
+                        Formato de RFC válido
+                      </p>
+                    )}
+                  </div>
                   <FormInput
                     label="Teléfono *"
                     name="telefonoPropietario"
