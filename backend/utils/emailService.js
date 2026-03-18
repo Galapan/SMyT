@@ -9,6 +9,18 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  logger: true, // Enable logging
+  debug: process.env.NODE_ENV !== 'production' // Enable debug in development
+});
+
+// Verify transporter configuration on startup
+transporter.verify((error, success) => {
+  if (error) {
+    console.error('❌ SMTP Transport verification failed:', error.message);
+    console.error('Check your SMTP credentials in .env file');
+  } else {
+    console.log('✅ SMTP Transport ready to send emails');
+  }
 });
 
 /**
@@ -84,8 +96,8 @@ const sendSecurityAlertEmail = async (email, token) => {
     const confirmUrl = `${frontendUrl}/security?action=confirm&token=${token}`;
     const rejectUrl = `${frontendUrl}/security?action=reject&token=${token}`;
 
-    const info = await transporter.sendMail({
-      from: `"SMyT Seguridad" <${process.env.SMTP_USER || 'noreply@smyt.com'}>`, // sender address
+    const mailOptions = {
+      from: `"SMyT Seguridad" <${process.env.SMTP_USER || 'noreply@smyt.com'}>`,
       to: email,
       subject: 'Alerta de Seguridad: Cambio de Contraseña - SMyT',
       html: `
@@ -105,12 +117,23 @@ const sendSecurityAlertEmail = async (email, token) => {
           <p style="color: #777; font-size: 12px; text-align: center; margin-top: 30px;">Estos enlaces expirarán en 24 horas.</p>
         </div>
       `,
-    });
+    };
 
-    console.log('Security alert email sent successfully:', info.messageId);
+    console.log(`📧 Attempting to send security alert email to: ${email}`);
+    
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log('✅ Security alert email sent successfully:', info.messageId);
+    console.log('📨 Accepted recipients:', info.accepted);
     return true;
   } catch (err) {
-    console.error('Error sending security alert email:', err);
+    console.error('❌ Error sending security alert email:', err.message);
+    console.error('🔍 Full error details:', {
+      name: err.name,
+      code: err.code,
+      command: err.command,
+      response: err.response
+    });
     return false;
   }
 };

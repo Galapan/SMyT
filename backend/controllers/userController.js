@@ -148,9 +148,17 @@ const changePassword = async (req, res) => {
     });
     
     // We send it asynchronously, don't await to block the frontend
-    sendSecurityAlertEmail(usuario.email, securityToken).catch(err => 
-      console.error("Failed to send security email:", err)
-    );
+    sendSecurityAlertEmail(usuario.email, securityToken)
+      .then(success => {
+        if (success) {
+          console.log(`✅ Security email sent to ${usuario.email}`);
+        } else {
+          console.error(`⚠️ Security email failed to send to ${usuario.email}`);
+        }
+      })
+      .catch(err => {
+        console.error("❌ Failed to send security email:", err.message);
+      });
 
     res.json({
       success: true,
