@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import Skeleton from '../common/Skeleton';
 
@@ -21,7 +22,7 @@ const StatCard = ({ title, value, icon: Icon, trend, trendValue, color, loading 
           )}
         </div>
       </div>
-      
+
       <div className="shrink-0 text-right">
         {loading ? (
            <Skeleton width="4rem" height="1.25rem" className="rounded-full inline-block" />
@@ -42,4 +43,4 @@ const StatCard = ({ title, value, icon: Icon, trend, trendValue, color, loading 
 };
 
 
-export default StatCard;
+export default memo(StatCard);

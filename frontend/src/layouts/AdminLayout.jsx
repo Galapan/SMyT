@@ -1,25 +1,27 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Warehouse, 
+import {
+  LayoutDashboard,
+  Warehouse,
   Car,
-  Search, 
-  Settings, 
-  Menu, 
-  X, 
+  Search,
+  Settings,
+  Menu,
+  X,
   LogOut,
   UserCircle,
   Users
 } from 'lucide-react';
 import logoSmyt from '../assets/logo_smyt.png';
 import { formatRole } from '../utils/formatRole';
+import { useQueryClient } from '@tanstack/react-query';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Helper para imagen
   const getAvatarUrl = (u) => {
@@ -51,6 +53,9 @@ const AdminLayout = () => {
     sessionStorage.removeItem('user');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Invalidar caché de React Query para evitar datos fantasma
+    queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    queryClient.invalidateQueries({ queryKey: ['dashboard'] });
     navigate('/login');
   };
 
@@ -141,9 +146,9 @@ const AdminLayout = () => {
                  }}>
               <div className="h-10 w-10 rounded-full overflow-hidden shrink-0 border border-gray-200">
                 {user ? (
-                   <img 
-                   src={getAvatarUrl(user)} 
-                   alt="Profile" 
+                   <img
+                   src={getAvatarUrl(user)}
+                   alt="Profile"
                    className="h-full w-full object-cover"
                  />
                 ) : (

@@ -21,8 +21,8 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
   const hasUsers = deposito.usuarios && deposito.usuarios.length > 0;
 
   return (
-    <div 
-      className="relative w-full h-64 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between cursor-pointer hover:border-(--color-primary)/30 transition-colors"
+    <div
+      className="content-auto relative w-full h-64 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col justify-between cursor-pointer hover:border-(--color-primary)/30 transition-colors"
       onClick={() => !isFlipped && setIsFlipped(true)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -123,11 +123,11 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
               <div key={user.id} className="group/user flex items-center p-2.5 rounded-xl border border-gray-100 hover:border-gray-200 hover:bg-gray-50 transition-colors">
                 
                 <div className="h-10 w-10 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden shadow-sm">
-                  <img 
-                    src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) 
-                      ? user.fotoUrl 
-                      : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`} 
-                    alt="avatar" 
+                  <img
+                    src={(user.fotoUrl && !user.fotoUrl.includes('name=User'))
+                      ? user.fotoUrl
+                      : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`}
+                    alt="avatar"
                     className="w-full h-full object-cover"
                   />
                 </div>

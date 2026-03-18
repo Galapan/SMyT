@@ -146,11 +146,11 @@ const CuentasVinculadasCard = ({ deposito }) => (
         deposito.usuarios.map(u => (
           <div key={u.id} className="flex items-center p-3 rounded-lg border border-gray-100 bg-gray-50/50">
             <div className="h-10 w-10 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden">
-              <img 
-                src={(u.fotoUrl && !u.fotoUrl.includes('name=User')) 
-                  ? u.fotoUrl 
-                  : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(u.nombre + ' ' + u.apellido)}`} 
-                alt="avatar" 
+              <img
+                src={(u.fotoUrl && !u.fotoUrl.includes('name=User'))
+                  ? u.fotoUrl
+                  : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(u.nombre + ' ' + u.apellido)}`}
+                alt="avatar"
                 className="w-full h-full object-cover"
               />
             </div>

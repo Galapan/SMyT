@@ -54,6 +54,14 @@ const SettingsPage = () => {
   // Helper para obtener el token esté donde esté guardado
   const getToken = () => localStorage.getItem('token') || sessionStorage.getItem('token');
 
+  // Helper para obtener el usuario actual
+  const getCurrentUser = () => {
+    const stored = localStorage.getItem('user') || sessionStorage.getItem('user');
+    return stored ? JSON.parse(stored) : null;
+  };
+
+  const currentUser = getCurrentUser();
+
   const fetchProfile = async () => {
     const response = await fetch(`${import.meta.env.VITE_API_URL !== undefined ? import.meta.env.VITE_API_URL : (import.meta.env.DEV ? "http://localhost:3000" : "")}/api/users/profile`, {
       headers: {
@@ -68,15 +76,23 @@ const SettingsPage = () => {
   };
 
   const { data: profile = { nombre: '', apellido: '', email: '', rol: '', fotoUrl: '' }, isLoading: loading } = useQuery({
-    queryKey: ['userProfile'],
+    queryKey: ['userProfile', currentUser?.id],
     queryFn: fetchProfile,
+    enabled: !!currentUser?.id, // Solo ejecutar si hay usuario autenticado
   });
 
+  // Resetear estado local cuando cambie el usuario
   useEffect(() => {
-    if (profile.nombre) {
-      dispatch({ type: 'SYNC_PROFILE', payload: profile });
+    if (currentUser?.id) {
+      // Solo sincronizar si hay un usuario válido
+      if (profile.nombre) {
+        dispatch({ type: 'SYNC_PROFILE', payload: profile });
+      }
+    } else {
+      // Si no hay usuario, resetear el estado
+      dispatch({ type: 'SYNC_PROFILE', payload: { nombre: '', apellido: '', fotoUrl: '' } });
     }
-  }, [profile]);
+  }, [profile, currentUser?.id]);
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
@@ -105,9 +121,9 @@ const SettingsPage = () => {
         const updatedUser = { ...JSON.parse(sessionStorage.getItem('user')), ...result.data };
         sessionStorage.setItem('user', JSON.stringify(updatedUser));
         localStorage.setItem('user', JSON.stringify(updatedUser));
-        
-        queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-        
+
+        queryClient.invalidateQueries({ queryKey: ['userProfile', currentUser?.id] });
+
         // Disparar evento para actualizar layout
         window.dispatchEvent(new Event('storage'));
       } else {

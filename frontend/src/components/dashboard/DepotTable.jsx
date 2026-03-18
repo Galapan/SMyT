@@ -1,10 +1,95 @@
-import { useState } from 'react';
+import { memo, useState } from 'react';
 import { MapPin, Eye, Ban } from 'lucide-react';
 import TableSkeleton from '../common/TableSkeleton';
 import Pagination from '../common/Pagination';
 import ActionMenu from '../common/ActionMenu';
 
 const EMPTY_DEPOTS = [];
+
+// Memoized Desktop Row Component
+const DesktopDepotRow = memo(({ depot, currentUser, onViewDetails, onSuspend }) => {
+  return (
+    <tr className="hover:bg-gray-50 transition-colors group">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center">
+          <div className="h-10 w-10 rounded-full bg-(--color-secondary) shrink-0 flex items-center justify-center text-(--color-primary) font-bold text-lg">
+            {depot.nombre?.charAt(0) || 'D'}
+          </div>
+          <div className="ml-4">
+            <div className="text-sm font-semibold text-gray-900">{depot.nombre}</div>
+            <div className="text-xs text-gray-500">ID: {depot.numero || depot.id.substring(0,4)}</div>
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center text-sm text-gray-600">
+          <MapPin size={16} className="mr-1.5 text-gray-400" />
+          {depot.municipio}
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+          depot.activo
+            ? 'bg-(--color-verde)/15 text-(--color-verde)'
+            : 'bg-(--color-rosa)/15 text-(--color-rosa)'
+        }`}>
+          {depot.activo ? 'Activo' : 'Inactivo'}
+        </span>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <ActionMenu
+          options={[
+            { label: 'Ver Resumen', icon: Eye, onClick: () => onViewDetails && onViewDetails(depot) },
+            { label: depot.activo ? 'Suspender Concesionario' : 'Reactivar Concesionario', icon: Ban, onClick: () => onSuspend && onSuspend(depot), danger: depot.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+          ]}
+        />
+      </td>
+    </tr>
+  );
+});
+
+DesktopDepotRow.displayName = 'DesktopDepotRow';
+
+// Memoized Mobile Card Component
+const MobileDepotCard = memo(({ depot, currentUser, onViewDetails, onSuspend }) => {
+  return (
+    <div className="p-4 hover:bg-gray-50 transition-colors">
+      <div className="flex justify-between items-start mb-2">
+        <div className="flex items-center">
+          <div className="h-8 w-8 rounded-full bg-(--color-secondary) shrink-0 flex items-center justify-center text-(--color-primary) font-bold text-sm">
+            {depot.nombre?.charAt(0) || 'D'}
+          </div>
+          <div className="ml-3">
+            <div className="text-sm font-semibold text-gray-900 line-clamp-1">{depot.nombre}</div>
+            <div className="text-xs text-gray-500">ID: {depot.numero || depot.id.substring(0,4)}</div>
+          </div>
+        </div>
+        <span className={`shrink-0 ml-2 px-2 py-0.5 inline-flex text-[10px] font-semibold rounded-full ${
+          depot.activo
+            ? 'bg-(--color-verde)/15 text-(--color-verde)'
+            : 'bg-(--color-rosa)/15 text-(--color-rosa)'
+        }`}>
+          {depot.activo ? 'Activo' : 'Inactivo'}
+        </span>
+      </div>
+
+      <div className="flex items-center text-xs text-gray-600 mt-2 pl-11 justify-between">
+        <div className="flex items-center">
+          <MapPin size={14} className="mr-1.5 text-gray-400 shrink-0" />
+          <span className="truncate">{depot.municipio}</span>
+        </div>
+        <ActionMenu
+          options={[
+            { label: 'Ver Resumen', icon: Eye, onClick: () => onViewDetails && onViewDetails(depot) },
+            { label: depot.activo ? 'Suspender Concesionario' : 'Reactivar Concesionario', icon: Ban, onClick: () => onSuspend && onSuspend(depot), danger: depot.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+          ]}
+        />
+      </div>
+    </div>
+  );
+});
+
+MobileDepotCard.displayName = 'MobileDepotCard';
 
 const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onViewDetails, onSuspend }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -23,7 +108,7 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onVie
           {/* Filter options could go here */}
         </div>
       </div>
-      
+
       <div className="flex-1 overflow-auto bg-white">
         {loading ? (
           <TableSkeleton rows={5} columns={4} />
@@ -38,96 +123,41 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onVie
             <div className="hidden sm:block">
               <table className="w-full">
                 <thead className="bg-gray-50/50 sticky top-0 z-10">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Nombre del Concesionario</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Ubicación</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Estatus</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {paginatedDepots.map((depot) => (
-                <tr key={depot.id} className="hover:bg-gray-50 transition-colors group">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-full bg-(--color-secondary) shrink-0 flex items-center justify-center text-(--color-primary) font-bold text-lg">
-                        {depot.nombre?.charAt(0) || 'D'}
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-semibold text-gray-900">{depot.nombre}</div>
-                        <div className="text-xs text-gray-500">ID: {depot.numero || depot.id.substring(0,4)}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <MapPin size={16} className="mr-1.5 text-gray-400" />
-                      {depot.municipio}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      depot.activo 
-                        ? 'bg-(--color-verde)/15 text-(--color-verde)' 
-                        : 'bg-(--color-rosa)/15 text-(--color-rosa)'
-                    }`}>
-                      {depot.activo ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <ActionMenu 
-                      options={[
-                        { label: 'Ver Resumen', icon: Eye, onClick: () => onViewDetails && onViewDetails(depot) },
-                        { label: depot.activo ? 'Suspender Concesionario' : 'Reactivar Concesionario', icon: Ban, onClick: () => onSuspend && onSuspend(depot), danger: depot.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
-                      ]}
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Nombre del Concesionario</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Ubicación</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Estatus</th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {paginatedDepots.map((depot) => (
+                    <DesktopDepotRow
+                      key={depot.id}
+                      depot={depot}
+                      currentUser={currentUser}
+                      onViewDetails={onViewDetails}
+                      onSuspend={onSuspend}
                     />
-                  </td>
-                </tr>
-              ))}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
             </div>
-            
+
             {/* Mobile Card View */}
             <div className="sm:hidden flex flex-col divide-y divide-gray-100">
               {paginatedDepots.map((depot) => (
-                <div key={depot.id} className="p-4 hover:bg-gray-50 transition-colors">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center">
-                      <div className="h-8 w-8 rounded-full bg-(--color-secondary) shrink-0 flex items-center justify-center text-(--color-primary) font-bold text-sm">
-                        {depot.nombre?.charAt(0) || 'D'}
-                      </div>
-                      <div className="ml-3">
-                        <div className="text-sm font-semibold text-gray-900 line-clamp-1">{depot.nombre}</div>
-                        <div className="text-xs text-gray-500">ID: {depot.numero || depot.id.substring(0,4)}</div>
-                      </div>
-                    </div>
-                    <span className={`shrink-0 ml-2 px-2 py-0.5 inline-flex text-[10px] font-semibold rounded-full ${
-                      depot.activo 
-                        ? 'bg-(--color-verde)/15 text-(--color-verde)' 
-                        : 'bg-(--color-rosa)/15 text-(--color-rosa)'
-                    }`}>
-                      {depot.activo ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center text-xs text-gray-600 mt-2 pl-11 justify-between">
-                    <div className="flex items-center">
-                      <MapPin size={14} className="mr-1.5 text-gray-400 shrink-0" />
-                      <span className="truncate">{depot.municipio}</span>
-                    </div>
-                    <ActionMenu 
-                      options={[
-                        { label: 'Ver Resumen', icon: Eye, onClick: () => onViewDetails && onViewDetails(depot) },
-                        { label: depot.activo ? 'Suspender Concesionario' : 'Reactivar Concesionario', icon: Ban, onClick: () => onSuspend && onSuspend(depot), danger: depot.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
-                      ]}
-                    />
-                  </div>
-                </div>
+                <MobileDepotCard
+                  key={depot.id}
+                  depot={depot}
+                  currentUser={currentUser}
+                  onViewDetails={onViewDetails}
+                  onSuspend={onSuspend}
+                />
               ))}
             </div>
             {depots.length > 0 && (
-              <Pagination 
+              <Pagination
                 totalItems={depots.length}
                 itemsPerPage={itemsPerPage}
                 currentPage={currentPage}
@@ -142,4 +172,4 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onVie
 };
 
 
-export default DepotTable;
+export default memo(DepotTable);

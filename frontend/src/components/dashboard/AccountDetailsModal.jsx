@@ -96,11 +96,11 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
                 {/* Avatar */}
                 <div className="mt-8 mb-4 relative group">
                   <div className="h-32 w-32 shrink-0 rounded-full bg-white overflow-hidden shadow-lg relative z-10 border-4 border-white">
-                    <img 
-                      src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) 
-                        ? user.fotoUrl 
-                        : `https://ui-avatars.com/api/?background=random&color=fff&size=512&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`} 
-                      alt="avatar" 
+                    <img
+                      src={(user.fotoUrl && !user.fotoUrl.includes('name=User'))
+                        ? user.fotoUrl
+                        : `https://ui-avatars.com/api/?background=random&color=fff&size=512&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`}
+                      alt="avatar"
                       className="w-full h-full object-cover"
                     />
                   </div>

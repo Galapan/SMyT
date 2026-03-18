@@ -361,11 +361,11 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
                              className="w-4 h-4 text-(--color-primary) border-gray-300 focus:ring-(--color-primary) mr-3"
                            />
                            <div className="h-10 w-10 shrink-0 rounded-full bg-gray-200 overflow-hidden mr-3">
-                              <img 
-                                src={(u.fotoUrl && !u.fotoUrl.includes('name=User')) 
-                                  ? u.fotoUrl 
-                                  : `https://ui-avatars.com/api/?background=random&color=fff&size=200&name=${encodeURIComponent(u.nombre + ' ' + u.apellido)}`} 
-                                alt="avatar" 
+                              <img
+                                src={(u.fotoUrl && !u.fotoUrl.includes('name=User'))
+                                  ? u.fotoUrl
+                                  : `https://ui-avatars.com/api/?background=random&color=fff&size=200&name=${encodeURIComponent(u.nombre + ' ' + u.apellido)}`}
+                                alt="avatar"
                                 className="w-full h-full object-cover"
                               />
                            </div>

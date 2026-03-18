@@ -157,9 +157,9 @@ const AccountsTable = ({
                   <div className="flex items-center">
                     {/* Avatar */}
                     <div className="h-10 w-10 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden shadow-sm">
-                      <img 
-                        src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) ? user.fotoUrl : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`} 
-                        alt="avatar" 
+                      <img
+                        src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) ? user.fotoUrl : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`}
+                        alt="avatar"
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -210,9 +210,9 @@ const AccountsTable = ({
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center">
                   <div className="h-10 w-10 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden shadow-sm">
-                    <img 
-                      src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) ? user.fotoUrl : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`} 
-                      alt="avatar" 
+                    <img
+                      src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) ? user.fotoUrl : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`}
+                      alt="avatar"
                       className="w-full h-full object-cover"
                     />
                   </div>
