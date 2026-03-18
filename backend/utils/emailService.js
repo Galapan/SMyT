@@ -47,7 +47,6 @@ const sendVerificationEmail = async (email, codigo) => {
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
           <div style="text-align: center; margin-bottom: 30px;">
-            <img src="https://smyt-project.vercel.app/LogoTlax.png" alt="Logo Tlaxcala" style="width: 100px; height: auto;" />
             <h1 style="color: #572671; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
             <h2 style="color: #572671; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
           </div>
@@ -91,7 +90,6 @@ const sendPasswordResetEmail = async (email, codigo) => {
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
           <div style="text-align: center; margin-bottom: 30px;">
-            <img src="https://smyt-project.vercel.app/LogoTlax.png" alt="Logo Tlaxcala" style="width: 100px; height: auto;" />
             <h1 style="color: #572671; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
             <h2 style="color: #572671; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
           </div>
@@ -128,7 +126,7 @@ const sendPasswordResetEmail = async (email, codigo) => {
  */
 const sendSecurityAlertEmail = async (email, token) => {
   try {
-    const frontendUrl = process.env.VITE_FRONTEND_URL || 'http://localhost:5173';
+    const frontendUrl = process.env.VITE_FRONTEND_URL || 'https://smyt-project.vercel.app';
     const confirmUrl = `${frontendUrl}/security?action=confirm&token=${token}`;
     const rejectUrl = `${frontendUrl}/security?action=reject&token=${token}`;
 
