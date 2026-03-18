@@ -137,27 +137,26 @@ const sendSecurityAlertEmail = async (email, token) => {
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
           <div style="text-align: center; margin-bottom: 30px;">
-            <img src="https://smyt-project.vercel.app/LogoTlax.png" alt="Logo Tlaxcala" style="width: 100px; height: auto;" />
             <h1 style="color: #572671; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
             <h2 style="color: #572671; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
           </div>
-          
+
           <div style="background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 25px;">
-            <h3 style="color: #333; font-size: 18px; margin-top: 0; margin-bottom: 15px;">Aviso de Cambio de Contraseña</h3>
+            <h3 style="color: #333; font-size: 16px; margin-top: 0; margin-bottom: 15px;">Aviso de Cambio de Contraseña</h3>
             <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 25px;">Hola, recientemente se cambió la contraseña de tu cuenta en el sistema SMyT. Si fuiste tú, por favor confirma el cambio.</p>
-            
+
             <a href="${confirmUrl}" style="display: inline-block; background-color: #572671; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(87, 38, 113, 0.2);">Sí, fui yo</a>
-            
+
             <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 0 0 25px 0;" />
-            
+
             <h4 style="color: #d9534f; font-size: 14px; margin-top: 0; margin-bottom: 15px; font-weight: 600;">¿No fuiste tú?</h4>
             <p style="color: #666; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">Si no solicitaste este cambio, alguien más tiene acceso a tu cuenta. Desactívala de inmediato.</p>
-            
+
             <a href="${rejectUrl}" style="display: inline-block; background-color: #ffffff; border: 1px solid #d9534f; color: #d9534f; padding: 10px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 13px;">No fui yo, proteger mi cuenta</a>
-            
+
             <p style="color: #999; font-size: 11px; margin-top: 30px; margin-bottom: 0;">Estos enlaces expirarán en 24 horas.</p>
           </div>
-          
+
           <div style="text-align: center;">
             <p style="color: #bbb; font-size: 11px; margin: 0;">© 2026 Gobierno del Estado de Tlaxcala</p>
           </div>

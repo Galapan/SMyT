@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import logoTlax from "../../assets/LogoTlax.png";
 import Toast from "../common/Toast";
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
@@ -116,19 +115,12 @@ function Verification() {
       />
       
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-20 h-20 mb-4 flex items-center justify-center">
-            <img
-              src={logoTlax}
-              alt="Logo Tlaxcala"
-              className="w-full h-full object-contain"
-            />
-          </div>
+        <div className="flex flex-col items-center mb-6">
           <h1 className="text-2xl font-bold text-[#572671] text-center leading-tight mb-2">
             Verifica tu cuenta
           </h1>
           <p className="text-sm text-gray-500 text-center px-4">
-            Ingresa el código de 6 dígitos que enviamos a 
+            Ingresa el código de 6 dígitos que enviamos a
             <br/><strong className="text-gray-700">{email}</strong>
           </p>
         </div>
