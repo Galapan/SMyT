@@ -23,8 +23,8 @@
       "destination": "/frontend/$1"
     },
     {
-      "source": "/(.*\\.[a-zA-Z0-9]+)",
-      "destination": "/frontend/$1"
+      "source": "/:path*.:ext(css|js|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|webp|webm|mp4)",
+      "destination": "/frontend/:path*.:ext"
     },
     {
       "source": "/(.*)",
