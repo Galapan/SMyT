@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import LandingPage from './pages/LandingPage';
 import Login from './components/auth/Login';
 import Verification from './components/auth/Verification';
 import ForgotPassword from './components/auth/ForgotPassword';
@@ -39,7 +40,7 @@ function App() {
       <BrowserRouter>
         <Suspense fallback={suspenseFallback}>
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/verify" element={<Verification />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
