@@ -144,7 +144,7 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
 
                 {/* Status Badge */}
                 <div className="shrink-0 ml-2">
-                   <div className={`w-2 h-2 rounded-full ${user.activo ? 'bg-(--color-verde)' : 'bg-(--color-rosa)'}`} title={user.activo ? 'Cuenta Activa' : 'Cuenta Inactiva'} />
+                   <div className={`w-2 h-2 rounded-full ${user.activo ? 'bg-verde' : 'bg-rosa'}`} title={user.activo ? 'Cuenta Activa' : 'Cuenta Inactiva'} />
                 </div>
               </div>
             ))

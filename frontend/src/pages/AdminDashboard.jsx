@@ -395,10 +395,10 @@ const AdminDashboard = () => {
           <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in h-100 xl:h-full">
             <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center space-x-2">
-                <CheckCircle size={18} className="text-(--color-verde)" />
+                <CheckCircle size={18} className="text-verde" />
                 <h3 className="font-semibold text-gray-800">Mis Solicitudes Aprobadas</h3>
               </div>
-              <span className="bg-(--color-verde)/15 text-(--color-verde) border border-(--color-verde)/20 text-xs font-bold px-2 py-1 rounded-full">
+              <span className="bg-verde/15 text-verde border border-verde/20 text-xs font-bold px-2 py-1 rounded-full">
                 {notificaciones.length}
               </span>
             </div>
@@ -420,7 +420,7 @@ const AdminDashboard = () => {
                 </div>
               ) : notificaciones.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
-                  <CheckCircle size={32} className="mb-2 text-(--color-verde) opacity-50" />
+                  <CheckCircle size={32} className="mb-2 text-verde opacity-50" />
                   <p className="text-sm">No tienes solicitudes pendientes de edición</p>
                 </div>
               ) : (
@@ -485,7 +485,7 @@ const AdminDashboard = () => {
             {/* Modal Header */}
             <div className="px-4 py-3 sm:px-6 sm:py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-(--color-naranja)/15 text-(--color-naranja) rounded-lg border border-(--color-naranja)/20">
+                <div className="p-2 bg-naranja/15 text-naranja rounded-lg border border-naranja/20">
                   <AlertTriangle size={20} />
                 </div>
                 <div>
@@ -565,7 +565,7 @@ const AdminDashboard = () => {
                   {/* Justification */}
                   <div>
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Motivo de la solicitud</span>
-                    <div className="bg-(--color-naranja)/5 border border-(--color-naranja)/20 rounded-xl p-4">
+                    <div className="bg-naranja/5 border border-naranja/20 rounded-xl p-4">
                       <p className="text-sm text-gray-800 leading-relaxed">
                         "{selectedNotif.motivo}"
                       </p>
@@ -638,8 +638,8 @@ const AdminDashboard = () => {
                 <div className="ml-auto">
                    <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                       selectedDepot.activo 
-                        ? 'bg-(--color-verde)/15 text-(--color-verde)' 
-                        : 'bg-(--color-rosa)/15 text-(--color-rosa)'
+                        ? 'bg-verde/15 text-verde' 
+                        : 'bg-rosa/15 text-rosa'
                     }`}>
                       {selectedDepot.activo ? 'Activo' : 'Inactivo'}
                     </span>

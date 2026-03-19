@@ -60,8 +60,8 @@ const AccountsStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-(--color-rojo)/10 rounded-lg">
-              <Shield className="w-6 h-6 text-(--color-rojo)" />
+            <div className="p-3 bg-rojo/10 rounded-lg">
+              <Shield className="w-6 h-6 text-rojo" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.superAdmins}</p>
@@ -71,8 +71,8 @@ const AccountsStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-(--color-azul)/10 rounded-lg">
-              <Shield className="w-6 h-6 text-(--color-azul)" />
+            <div className="p-3 bg-azul/10 rounded-lg">
+              <Shield className="w-6 h-6 text-azul" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.admins}</p>
@@ -82,8 +82,8 @@ const AccountsStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-(--color-verde)/10 rounded-lg">
-              <Users className="w-6 h-6 text-(--color-verde)" />
+            <div className="p-3 bg-verde/10 rounded-lg">
+              <Users className="w-6 h-6 text-verde  " />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.concesionarios}</p>
@@ -177,8 +177,8 @@ const AccountsTable = ({
                   <span className="text-sm text-gray-700">{user.deposito?.nombre || '-'}</span>
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap">
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${user.activo ? 'bg-(--color-verde)/15 text-(--color-verde)' : 'bg-(--color-rojo)/15 text-(--color-rojo)'}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${user.activo ? 'bg-(--color-verde)' : 'bg-(--color-rojo)'}`}></span>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${user.activo ? 'bg-verde/15 text-verde' : 'bg-rojo/15 text-rojo'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${user.activo ? 'bg-verde' : 'bg-rojo'}`}></span>
                     {user.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
@@ -219,8 +219,8 @@ const AccountsTable = ({
                     </div>
                   </div>
                 </div>
-                <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full ${user.activo ? 'bg-(--color-verde)/15 text-(--color-verde)' : 'bg-(--color-rojo)/15 text-(--color-rojo)'}`}>
-                  <span className={`w-1 h-1 rounded-full ${user.activo ? 'bg-(--color-verde)' : 'bg-(--color-rojo)'}`}></span>
+                <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-full ${user.activo ? 'bg-verde/15 text-verde' : 'bg-rojo/15 text-rojo'}`}>
+                  <span className={`w-1 h-1 rounded-full ${user.activo ? 'bg-verde' : 'bg-rojo'}`}></span>
                   {user.activo ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
@@ -287,7 +287,7 @@ const ConfirmStatusModal = ({ isOpen, currentStatus, onClose, onConfirm }) => (
                 className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden mx-4"
               >
                 <div className="p-4 sm:p-6">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${currentStatus ? 'bg-(--color-rojo)/15 text-(--color-rojo)' : 'bg-(--color-verde)/15 text-(--color-verde)'}`}>
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${currentStatus ? 'bg-rojo/15 text-rojo' : 'bg-verde/15 text-verde'}`}>
                     {currentStatus ? <AlertTriangle size={24} /> : <Check size={24} />}
                   </div>
                   <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
@@ -308,7 +308,7 @@ const ConfirmStatusModal = ({ isOpen, currentStatus, onClose, onConfirm }) => (
                     </button>
                     <button 
                       onClick={onConfirm}
-                      className={`flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors opacity-90 hover:opacity-100 ${currentStatus ? 'bg-(--color-rojo)' : 'bg-(--color-verde)'}`}
+                      className={`flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors opacity-90 hover:opacity-100 ${currentStatus ? 'bg-rojo' : 'bg-verde'}`}
                     >
                       {currentStatus ? 'Sí, Desactivar' : 'Sí, Activar'}
                     </button>
@@ -346,7 +346,7 @@ const DeleteUserModal = ({ isOpen, onClose, onConfirm }) => (
                 className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden mx-4"
               >
                 <div className="p-4 sm:p-6">
-                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 bg-(--color-rojo)/15 text-(--color-rojo)">
+                  <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 bg-rojo/15 text-rojo">
                     <Trash2 size={24} />
                   </div>
                   <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
@@ -355,7 +355,7 @@ const DeleteUserModal = ({ isOpen, onClose, onConfirm }) => (
                   <p className="text-center text-gray-500 text-sm mb-2">
                     ¿Estás seguro de que deseas eliminar a este usuario de forma permanente?
                   </p>
-                  <p className="text-center text-(--color-rojo) opacity-90 font-semibold text-xs mb-6">
+                  <p className="text-center text-rojo opacity-90 font-semibold text-xs mb-6">
                     Esta acción no se puede deshacer.
                   </p>
                   
@@ -368,7 +368,7 @@ const DeleteUserModal = ({ isOpen, onClose, onConfirm }) => (
                     </button>
                     <button 
                       onClick={onConfirm}
-                      className="flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors bg-(--color-rojo) opacity-90 hover:opacity-100"
+                      className="flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors bg-rojo opacity-90 hover:opacity-100"
                     >
                       Sí, Eliminar
                     </button>
@@ -396,12 +396,12 @@ const AccountsToast = ({ toast, onClose }) => (
               exit={{ opacity: 0, y: -20, scale: 0.9 }}
               className={`fixed top-4 right-4 z-110 flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg border bg-white ${
                 toast.type === 'success' 
-                  ? 'border-(--color-verde)/30 text-(--color-verde) bg-linear-to-r from-white to-(--color-verde)/5' 
-                  : 'border-(--color-rojo)/30 text-(--color-rojo) bg-linear-to-r from-white to-(--color-rojo)/5'
+                  ? 'border-verde/30 text-verde bg-linear-to-r from-white to-verde/5' 
+                  : 'border-rojo/30 text-rojo bg-linear-to-r from-white to-rojo/5'
               }`}
             >
               <div className={`flex shrink-0 w-8 h-8 rounded-full items-center justify-center ${
-                toast.type === 'success' ? 'bg-(--color-verde)/20 text-(--color-verde)' : 'bg-(--color-rojo)/20 text-(--color-rojo)'
+                toast.type === 'success' ? 'bg-verde/20 text-verde' : 'bg-rojo/20 text-rojo'
               }`}>
                 {toast.type === 'success' ? <Check size={18} /> : <AlertCircle size={18} />}
               </div>
@@ -409,7 +409,7 @@ const AccountsToast = ({ toast, onClose }) => (
               <button 
                 onClick={onClose}
                 className={`p-1 rounded-md transition-colors ${
-                  toast.type === 'success' ? 'hover:bg-(--color-verde)/20 text-(--color-verde)' : 'hover:bg-(--color-rojo)/20 text-(--color-rojo)'
+                  toast.type === 'success' ? 'hover:bg-verde/20 text-verde' : 'hover:bg-rojo/20 text-rojo'
                 }`}
               >
                 <X size={16} />

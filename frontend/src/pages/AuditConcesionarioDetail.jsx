@@ -248,8 +248,8 @@ const AuditConcesionarioDetail = () => {
                         </td>
                         <td className="px-6 py-4">
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
-                              v.estatusLegal === 'ROBADO' ? 'bg-(--color-rojo)/15 text-(--color-rojo) border border-(--color-rojo)/20 font-bold' :
-                              v.estatusLegal === 'DECOMISADO' ? 'bg-(--color-naranja)/15 text-(--color-naranja) border border-(--color-naranja)/20 font-bold' :
+                              v.estatusLegal === 'ROBADO' ? 'bg-rojo/15 text-rojo border border-rojo/20 font-bold' :
+                              v.estatusLegal === 'DECOMISADO' ? 'bg-naranja/15 text-naranja border border-naranja/20 font-bold' :
                               v.estatusLegal === 'SINIESTRADO' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 font-bold' :
                               'bg-gray-100 text-gray-700 border border-gray-200 font-bold'
                           }`}>
@@ -301,8 +301,8 @@ const AuditConcesionarioDetail = () => {
                            </div>
                         </div>
                         <span className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] uppercase font-bold ${
-                              v.estatusLegal === 'ROBADO' ? 'bg-(--color-rojo)/15 text-(--color-rojo) border border-(--color-rojo)/20 font-bold' :
-                              v.estatusLegal === 'DECOMISADO' ? 'bg-(--color-naranja)/15 text-(--color-naranja) border border-(--color-naranja)/20 font-bold' :
+                              v.estatusLegal === 'ROBADO' ? 'bg-rojo/15 text-rojo border border-rojo/20 font-bold' :
+                              v.estatusLegal === 'DECOMISADO' ? 'bg-naranja/15 text-naranja border border-naranja/20 font-bold' :
                               v.estatusLegal === 'SINIESTRADO' ? 'bg-yellow-100 text-yellow-700 border border-yellow-200 font-bold' :
                               'bg-gray-100 text-gray-700 border border-gray-200 font-bold'
                           }`}>

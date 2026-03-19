@@ -161,7 +161,7 @@ const CuentasVinculadasCard = ({ deposito }) => (
               </p>
             </div>
             <div className="shrink-0 ml-2">
-              <div className={`w-2 h-2 rounded-full ${u.activo ? 'bg-(--color-verde)' : 'bg-(--color-rosa)'}`} title={u.activo ? 'Activa' : 'Inactiva'} />
+              <div className={`w-2 h-2 rounded-full ${u.activo ? 'bg-verde' : 'bg-rosa'}`} title={u.activo ? 'Activa' : 'Inactiva'} />
             </div>
           </div>
         ))
@@ -185,8 +185,8 @@ const ConcesionarioQuickStats = ({ deposito }) => (
     </div>
     <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
       <div className="flex items-center gap-3">
-        <div className="p-3 bg-(--color-verde)/15 rounded-lg">
-          <Warehouse className="w-6 h-6 text-(--color-verde)" />
+        <div className="p-3 bg-verde/15 rounded-lg">
+          <Warehouse className="w-6 h-6 text-verde" />
         </div>
         <div>
           <p className="text-2xl font-bold text-gray-900">{deposito.capacidad}</p>
@@ -196,8 +196,8 @@ const ConcesionarioQuickStats = ({ deposito }) => (
     </div>
     <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
       <div className="flex items-center gap-3">
-        <div className="p-3 bg-(--color-naranja)/15 rounded-lg">
-          <Users className="w-6 h-6 text-(--color-naranja)" />
+        <div className="p-3 bg-naranja/15 rounded-lg">
+          <Users className="w-6 h-6 text-naranja" />
         </div>
         <div>
           <p className="text-2xl font-bold text-gray-900">{deposito.usuarios?.length || 0}</p>
