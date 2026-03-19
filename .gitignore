@@ -33,3 +33,7 @@ out
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary files
+tmp/
+*.tmp
