@@ -534,7 +534,7 @@ function ModulesSection() {
               <ul className="space-y-1.5">
                 {module.features.map((feature, j) => (
                   <li key={j} className="flex items-center gap-2 text-sm text-gray-500">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-verde flex-shrink-0" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-verde shrink-0" />
                     {feature}
                   </li>
                 ))}
@@ -579,7 +579,7 @@ function FeaturesSection() {
               <ul className="space-y-1.5">
                 {feature.details.map((detail, j) => (
                   <li key={j} className="flex items-center gap-2 text-xs text-gray-400">
-                    <div className="w-1 h-1 bg-primary/50 rounded-full flex-shrink-0" />
+                    <div className="w-1 h-1 bg-primary/50 rounded-full shrink-0" />
                     {detail}
                   </li>
                 ))}
@@ -624,7 +624,7 @@ function RolesSection() {
               <ul className="space-y-2">
                 {role.permissions.map((permission, j) => (
                   <li key={j} className="flex items-start gap-2 text-sm text-gray-500">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-verde flex-shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-verde shrink-0 mt-0.5" />
                     {permission}
                   </li>
                 ))}
@@ -803,11 +803,11 @@ function Footer() {
             <h4 className="text-sm font-medium text-gray-900 mb-3">Contacto</h4>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm text-gray-400">
-                <MapPin className="w-4 h-4 flex-shrink-0" />
+                <MapPin className="w-4 h-4 shrink-0" />
                 Tlaxcala, México
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-400">
-                <Clock className="w-4 h-4 flex-shrink-0" />
+                <Clock className="w-4 h-4 shrink-0" />
                 Lunes a Viernes 9:00 – 18:00
               </div>
             </div>
