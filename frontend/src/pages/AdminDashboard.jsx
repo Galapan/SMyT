@@ -235,7 +235,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="h-full flex flex-col space-y-4 overflow-y-auto lg:overflow-hidden pb-4">
+    <div className="h-full flex flex-col space-y-4 pb-4">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
         <div>
@@ -299,15 +299,15 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content Area (Grid for Dashboard config) */}
-      <div className="flex-1 flex flex-col xl:flex-row gap-4 xl:gap-6 min-h-100 lg:min-h-0 lg:overflow-hidden">
+      <div className="flex-1 flex flex-col xl:flex-row gap-4 xl:gap-6 min-h-0">
         {/* Depot Management Section */}
-        <div className={`flex flex-col min-h-100 xl:min-h-0 ${userRol === 'SUPER_USUARIO' ? 'xl:w-2/3' : 'w-full'} lg:overflow-hidden`}>
+        <div className={`flex flex-col min-h-0 ${userRol === 'SUPER_USUARIO' ? 'xl:w-2/3' : 'w-full'}`}>
           <DepotTable loading={loading} depots={depositos} />
         </div>
 
         {/* Notificaciones Panel (SUPER_USUARIO ve pendientes, otros ven resueltas) */}
         {userRol === 'SUPER_USUARIO' ? (
-          <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in h-100 xl:h-full">
+          <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in">
             <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center space-x-2">
                 <Bell size={18} className="text-(--color-primary)" />
@@ -317,8 +317,8 @@ const AdminDashboard = () => {
                 {notificaciones.length}
               </span>
             </div>
-            
-            <div className="flex-1 overflow-y-auto p-2">
+
+            <div className="flex-1 overflow-y-auto p-2 lg:overflow-visible">
               {loading ? (
                 <div className="space-y-2 animate-pulse">
                   {[1, 2, 3].map((item) => (
@@ -402,8 +402,8 @@ const AdminDashboard = () => {
                 {notificaciones.length}
               </span>
             </div>
-            
-            <div className="flex-1 overflow-y-auto p-2">
+
+            <div className="flex-1 overflow-y-auto p-2 lg:overflow-visible">
               {loading ? (
                 <div className="space-y-4 animate-pulse px-2 pb-2">
                   {[1, 2, 3].map((item) => (
@@ -619,14 +619,14 @@ const AdminDashboard = () => {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur z-10">
               <h3 className="text-xl font-bold text-gray-900">Detalles del Depósito</h3>
-              <button 
+              <button
                 onClick={() => setSelectedDepot(null)}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X size={20} />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto space-y-6">
+            <div className="p-6 space-y-6 max-h-[calc(100vh-300px)] overflow-y-auto">
               <div className="flex items-center gap-4">
                 <div className="h-16 w-16 rounded-full bg-violet-100 flex items-center justify-center font-bold text-2xl text-(--color-primary)">
                   {selectedDepot.nombre?.charAt(0) || 'D'}

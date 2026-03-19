@@ -1,13 +1,13 @@
 import FormInput from '../FormFields/FormInput';
 import FormSelect from '../FormFields/FormSelect';
 
-const Step2VehicleData = ({ formData, errors, onChange, onKeyDown }) => {
+const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFields, validatingFields }) => {
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
         Paso 2: Datos del Vehículo
       </h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput
           label="No. Inventario *"
@@ -15,6 +15,8 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown }) => {
           value={formData.noInventario}
           onChange={onChange}
           error={errors.noInventario}
+          isDuplicate={duplicateFields?.noInventario}
+          isValidating={validatingFields?.noInventario}
           placeholder="Ej. INV-2026-0001"
         />
         <FormInput
@@ -59,6 +61,8 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown }) => {
         value={formData.vin}
         onChange={onChange}
         error={errors.vin}
+        isDuplicate={duplicateFields?.vin}
+        isValidating={validatingFields?.vin}
         placeholder="17 caracteres alfanuméricos"
         maxLength={17}
         helperText={`${formData.vin.length}/17 caracteres`}
@@ -71,6 +75,8 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown }) => {
           value={formData.placa}
           onChange={onChange}
           error={errors.placa}
+          isDuplicate={duplicateFields?.placa}
+          isValidating={validatingFields?.placa}
           placeholder="Ej. ABC-123-D"
         />
         <FormInput
@@ -79,6 +85,8 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown }) => {
           value={formData.noMotor}
           onChange={onChange}
           error={errors.noMotor}
+          isDuplicate={duplicateFields?.noMotor}
+          isValidating={validatingFields?.noMotor}
           placeholder="Número de motor"
         />
       </div>

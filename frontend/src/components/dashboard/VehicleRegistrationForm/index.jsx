@@ -30,7 +30,9 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
     nextStep,
     prevStep,
     handleSubmit,
-    getInputClass
+    getInputClass,
+    duplicateFields,
+    validatingFields
   } = useVehicleForm(onClose, onSuccess, initialData);
 
   const steps = [
@@ -57,7 +59,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
       {isOpen && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 sm:p-6 md:p-8 overflow-y-auto">
           {/* Backdrop */}
-          <m.div 
+          <m.div
             variants={backdropVariants}
             initial="hidden"
             animate="visible"
@@ -80,7 +82,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
         </div>
 
         {/* Global Error */}
-        <Toast 
+        <Toast
           show={!!error}
           message={error}
           type="error"
@@ -89,29 +91,33 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
 
         {/* Form Content */}
         <div className="p-8 overflow-y-auto max-h-[calc(90vh-280px)]">
-          <div 
+          <div
             key={currentStep}
             className={`${direction === 'right' ? 'animate-slide-right' : 'animate-slide-left'}`}
           >
             {currentStep === 1 && (
-              <Step1AdministrativeData 
+              <Step1AdministrativeData
                 formData={formData}
                 errors={errors}
                 onChange={handleChange}
+                duplicateFields={duplicateFields}
+                validatingFields={validatingFields}
               />
             )}
 
             {currentStep === 2 && (
-              <Step2VehicleData 
+              <Step2VehicleData
                 formData={formData}
                 errors={errors}
                 onChange={handleChange}
                 onKeyDown={handleNumericKeyDown}
+                duplicateFields={duplicateFields}
+                validatingFields={validatingFields}
               />
             )}
 
             {currentStep === 3 && (
-              <Step3LegalStatus 
+              <Step3LegalStatus
                 formData={formData}
                 errors={errors}
                 onChange={handleChange}
@@ -119,7 +125,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
             )}
 
             {currentStep === 4 && (
-              <Step4PhysicalInspection 
+              <Step4PhysicalInspection
                 formData={formData}
                 setFormData={setFormData}
                 errors={errors}
@@ -132,7 +138,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
         </div>
 
         {/* Footer Navigation */}
-        <NavigationFooter 
+        <NavigationFooter
           currentStep={currentStep}
           totalSteps={4}
           onPrevious={prevStep}

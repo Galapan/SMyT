@@ -242,8 +242,8 @@ const ConcesionarioView = ({ depositos, loading, onRefresh, onInspectDeposito })
       <ConcesionarioHeader loading={loading} onRefresh={onRefresh} />
 
       {/* Main Content */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 overflow-y-auto pb-6 custom-scrollbar">
-        
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 pb-6">
+
         {/* Left Column: Dealership Info */}
         <div className="lg:col-span-1 space-y-6">
           <DealershipInfoCard deposito={deposito} ocupacion={ocupacion} />
@@ -387,7 +387,7 @@ const AdminView = ({
 const AuditDashboard = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
+  const itemsPerPage = 6;
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 

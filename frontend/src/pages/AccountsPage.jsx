@@ -153,49 +153,43 @@ const AccountsTable = ({
           <tbody className="divide-y divide-gray-100">
             {paginatedUsers.map((user) => (
               <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    {/* Avatar */}
-                    <div className="h-10 w-10 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden shadow-sm">
+                <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap">
+                  <div className="flex items-center gap-3">
+                    <div className="h-9 w-9 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden shadow-sm">
                       <img
                         src={(user.fotoUrl && !user.fotoUrl.includes('name=User')) ? user.fotoUrl : `https://ui-avatars.com/api/?background=random&color=fff&name=${encodeURIComponent(user.nombre + ' ' + user.apellido)}`}
                         alt="avatar"
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="ml-4">
+                    <div>
                       <div className="text-sm font-medium text-gray-900">{user.nombre} {user.apellido}</div>
-                      <div className="text-xs text-gray-500">Agregado: {new Date(user.createdAt).toLocaleDateString()}</div>
+                      <div className="text-xs text-gray-500">{user.email}</div>
                     </div>
                   </div>
                 </td>
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                  <span className="text-sm font-semibold text-gray-900">{user.email}</span>
-                </td>
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap">
                   <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(user.rol)}`}>
                     {getRoleLabel(user.rol)}
                   </span>
                 </td>
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap">
                   <span className="text-sm text-gray-700">{user.deposito?.nombre || '-'}</span>
                 </td>
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
+                <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap">
                   <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full ${user.activo ? 'bg-(--color-verde)/15 text-(--color-verde)' : 'bg-(--color-rojo)/15 text-(--color-rojo)'}`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${user.activo ? 'bg-(--color-verde)' : 'bg-(--color-rojo)'}`}></span>
                     {user.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
-                <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap text-right">
-                  <div className="flex items-center justify-end">
-                    <ActionMenu 
-                      options={[
-                        { label: 'Ver Detalles', icon: Eye, onClick: () => onViewDetails(user) },
-                        { label: user.activo ? 'Desactivar Cuenta' : 'Activar Cuenta', icon: Power, onClick: () => onToggleStatus(user), hidden: currentUser?.rol === 'ADMINISTRADOR_CONCESIONARIO' },
-                        { label: 'Eliminar Cuenta', icon: Trash2, onClick: () => onDelete(user), danger: true, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
-                      ]}
-                    />
-                  </div>
+                <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap text-right">
+                  <ActionMenu
+                    options={[
+                      { label: 'Ver Detalles', icon: Eye, onClick: () => onViewDetails(user) },
+                      { label: user.activo ? 'Desactivar Cuenta' : 'Activar Cuenta', icon: Power, onClick: () => onToggleStatus(user), hidden: currentUser?.rol === 'ADMINISTRADOR_CONCESIONARIO' },
+                      { label: 'Eliminar Cuenta', icon: Trash2, onClick: () => onDelete(user), danger: true, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
+                    ]}
+                  />
                 </td>
               </tr>
             ))}
@@ -628,7 +622,7 @@ const AccountsPage = () => {
   }, [users]);
 
   return (
-    <div className="space-y-4 md:space-y-8">
+    <div className="space-y-4 md:space-y-6">
       <AccountsHeader
         loading={loading}
         onRefresh={() => refetch()}

@@ -1,8 +1,20 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-const API_URL = import.meta.env.VITE_API_URL !== undefined 
-  ? import.meta.env.VITE_API_URL 
+const API_URL = import.meta.env.VITE_API_URL !== undefined
+  ? import.meta.env.VITE_API_URL
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
+
+// Campos que requieren validación de duplicados
+const DUPLICATE_CHECK_FIELDS = ['folioProceso', 'vin', 'placa', 'noMotor', 'noInventario'];
+
+// Mensajes de error para cada campo
+const DUPLICATE_MESSAGES = {
+  folioProceso: 'Ya existe un vehículo con este folio de proceso',
+  vin: 'Ya existe un vehículo con este VIN',
+  placa: 'Ya existe un vehículo con estas placas',
+  noMotor: 'Ya existe un vehículo con este número de motor',
+  noInventario: 'Ya existe un vehículo con este número de inventario'
+};
 
 export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -10,7 +22,12 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [errors, setErrors] = useState({});
-  
+  const [duplicateFields, setDuplicateFields] = useState({});
+  const [validatingFields, setValidatingFields] = useState({});
+
+  // Refs para debounce
+  const debounceRefs = useRef({});
+
   const [formData, setFormData] = useState({
     // Paso 1: Datos Administrativos
     folioProceso: '',
@@ -45,20 +62,20 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
     obsCristales: '',
     estadoEspejos: '',
     obsEspejos: '',
-    
+
     // Llantas
     cantLlantasDelanteras: '2',
     estadoLlantasDelanteras: '',
     cantLlantasTraseras: '2',
     estadoLlantasTraseras: '',
-    
+
     // Mecánica
     estadoMotor: '',
     estadoBateria: '',
     tipoTransmision: '',
     estadoFrenos: '',
     aireAcondicionadoFunciona: false,
-    
+
     // Interior
     estadoAsientos: '',
     obsAsientos: '',
@@ -68,7 +85,7 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
     obsVolanteTablero: '',
     estadoBolsasAire: '',
     obsBolsasAire: '',
-    
+
     // Ambiental
     estatusAceite: '',
     cantAceite: '',
@@ -76,7 +93,7 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
     cantAnticongelante: '',
     estatusCombustible: '',
     cantCombustible: '',
-    
+
     // Inventario
     objetosPersonales: [],
     observacionesInspector: ''
@@ -115,36 +132,122 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
     }
   }, [initialData]);
 
+  // Función para validar duplicados en un campo específico
+  const validateFieldDuplicate = useCallback(async (fieldName, fieldValue) => {
+    if (!fieldValue || fieldValue.trim() === '') {
+      setDuplicateFields(prev => ({ ...prev, [fieldName]: false }));
+      setErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[fieldName];
+        return newErrors;
+      });
+      return;
+    }
+
+    // Marcar campo como validando
+    setValidatingFields(prev => ({ ...prev, [fieldName]: true }));
+
+    // Limpiar validación anterior
+    setDuplicateFields(prev => ({ ...prev, [fieldName]: false }));
+
+    try {
+      const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+      
+      const validateData = {
+        folioProceso: fieldName === 'folioProceso' ? fieldValue : undefined,
+        vin: fieldName === 'vin' ? fieldValue : undefined,
+        placa: fieldName === 'placa' ? fieldValue : undefined,
+        noMotor: fieldName === 'noMotor' ? fieldValue : undefined,
+        noInventario: fieldName === 'noInventario' ? fieldValue : undefined,
+        excludeId: initialData?.id || undefined
+      };
+
+      const response = await fetch(`${API_URL}/api/vehiculos/validar-duplicados`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(validateData)
+      });
+
+      const result = await response.json();
+
+      if (result.success && result.hasDuplicate && result.duplicates[fieldName]) {
+        setDuplicateFields(prev => ({ ...prev, [fieldName]: true }));
+        setErrors(prev => ({
+          ...prev,
+          [fieldName]: DUPLICATE_MESSAGES[fieldName]
+        }));
+      } else {
+        setDuplicateFields(prev => ({ ...prev, [fieldName]: false }));
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          if (newErrors[fieldName] === DUPLICATE_MESSAGES[fieldName]) {
+            delete newErrors[fieldName];
+          }
+          return newErrors;
+        });
+      }
+    } catch (err) {
+      console.error('Error al validar duplicado:', err);
+    } finally {
+      setValidatingFields(prev => ({ ...prev, [fieldName]: false }));
+    }
+  }, [initialData]);
+
   // Validation rules per step
   const validateStep = (step) => {
     const newErrors = {};
-    
+
     if (step === 1) {
       if (!formData.folioProceso.trim()) newErrors.folioProceso = 'El folio es requerido';
+      else if (duplicateFields.folioProceso) newErrors.folioProceso = DUPLICATE_MESSAGES.folioProceso;
+      
       if (!formData.fechaIngreso) newErrors.fechaIngreso = 'La fecha es requerida';
       if (!formData.autoridad.trim()) newErrors.autoridad = 'La autoridad es requerida';
-      
+
       const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
       if ((user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR') && !formData.depositoId) {
         newErrors.depositoId = 'Debe seleccionar un concesionario';
       }
     }
-    
+
     if (step === 2) {
-      if (!formData.noInventario.trim()) newErrors.noInventario = 'El número de inventario es requerido';
+      if (!formData.noInventario.trim()) {
+        newErrors.noInventario = 'El número de inventario es requerido';
+      } else if (duplicateFields.noInventario) {
+        newErrors.noInventario = DUPLICATE_MESSAGES.noInventario;
+      }
+      
       if (!formData.marcaTipo.trim()) newErrors.marcaTipo = 'La marca/tipo es requerido';
       if (!formData.anio) newErrors.anio = 'El año es requerido';
       if (formData.anio && (formData.anio < 1900 || formData.anio > 2030)) newErrors.anio = 'Año inválido';
       if (!formData.tipoServicio) newErrors.tipoServicio = 'Seleccione tipo de servicio';
-      if (!formData.vin.trim()) newErrors.vin = 'El VIN es requerido';
-      if (formData.vin && formData.vin.length !== 17) newErrors.vin = 'El VIN debe tener 17 caracteres';
-      if (!formData.placa.trim()) newErrors.placa = 'Las placas son requeridas';
-      if (!formData.noMotor.trim()) newErrors.noMotor = 'El número de motor es requerido';
+      
+      if (!formData.vin.trim()) {
+        newErrors.vin = 'El VIN es requerido';
+      } else if (duplicateFields.vin) {
+        newErrors.vin = DUPLICATE_MESSAGES.vin;
+      }
+      
+      if (!formData.placa.trim()) {
+        newErrors.placa = 'Las placas son requeridas';
+      } else if (duplicateFields.placa) {
+        newErrors.placa = DUPLICATE_MESSAGES.placa;
+      }
+      
+      if (!formData.noMotor.trim()) {
+        newErrors.noMotor = 'El número de motor es requerido';
+      } else if (duplicateFields.noMotor) {
+        newErrors.noMotor = DUPLICATE_MESSAGES.noMotor;
+      }
+      
       if (!formData.colorOriginal.trim()) newErrors.colorOriginal = 'El color original es requerido';
       if (!formData.colorActual.trim()) newErrors.colorActual = 'El color actual es requerido';
       if (!formData.odometro) newErrors.odometro = 'El odómetro es requerido';
     }
-    
+
     if (step === 3) {
       if (!formData.estatusLegal) newErrors.estatusLegal = 'Seleccione estatus legal';
       if (formData.tieneActaBaja) {
@@ -152,14 +255,14 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
         if (!formData.fechaActaBaja) newErrors.fechaActaBaja = 'La fecha del acta es requerida';
       }
     }
-    
+
     if (step === 4) {
       if (!formData.estadoCarroceria) newErrors.estadoCarroceria = 'Seleccione estado de carrocería';
       if (!formData.estadoCristales) newErrors.estadoCristales = 'Seleccione estado de cristales';
       if (!formData.estadoEspejos) newErrors.estadoEspejos = 'Seleccione estado de espejos';
       if (!formData.estadoLlantasDelanteras) newErrors.estadoLlantasDelanteras = 'Seleccione estado llantas delanteras';
       if (!formData.estadoLlantasTraseras) newErrors.estadoLlantasTraseras = 'Seleccione estado llantas traseras';
-      
+
       // Conditional observations validation
       if ((formData.estadoCristales === 'DAÑADOS' || formData.estadoCristales === 'INCOMPLETOS') && !formData.obsCristales?.trim()) {
         newErrors.obsCristales = 'Especifique el daño en cristales';
@@ -173,7 +276,7 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
       if (!formData.estatusAnticongelante) newErrors.estatusAnticongelante = 'Seleccione estatus de anticongelante';
       if (!formData.estatusCombustible) newErrors.estatusCombustible = 'Seleccione estatus de combustible';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -200,7 +303,7 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
 
   const handleChange = (e) => {
     let { name, value, type, checked } = e.target;
-    
+
     // Prevención de Errores: Filtrado de Datos
     if (['vin', 'placa', 'noInventario', 'folioProceso', 'noOficio', 'noMotor'].includes(name)) {
       value = value.toUpperCase().replace(/[^A-Z0-9-]/g, '');
@@ -217,26 +320,26 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
 
     // Lógica para Ambiental: Desactivar/Limpiar cantidad si está DRENADO
     if (name === 'estatusAceite') {
-      setFormData(prev => ({ 
-        ...prev, 
-        estatusAceite: value, 
-        cantAceite: value === 'DRENADO' ? '0% (DRENADO)' : '' 
+      setFormData(prev => ({
+        ...prev,
+        estatusAceite: value,
+        cantAceite: value === 'DRENADO' ? '0% (DRENADO)' : ''
       }));
       return;
     }
     if (name === 'estatusAnticongelante') {
-      setFormData(prev => ({ 
-        ...prev, 
-        estatusAnticongelante: value, 
-        cantAnticongelante: value === 'DRENADO' ? '0% (DRENADO)' : '' 
+      setFormData(prev => ({
+        ...prev,
+        estatusAnticongelante: value,
+        cantAnticongelante: value === 'DRENADO' ? '0% (DRENADO)' : ''
       }));
       return;
     }
     if (name === 'estatusCombustible') {
-      setFormData(prev => ({ 
-        ...prev, 
-        estatusCombustible: value, 
-        cantCombustible: value === 'DRENADO' ? '0% (DRENADO)' : '' 
+      setFormData(prev => ({
+        ...prev,
+        estatusCombustible: value,
+        cantCombustible: value === 'DRENADO' ? '0% (DRENADO)' : ''
       }));
       return;
     }
@@ -245,10 +348,34 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     // Limpiar error al modificar campo
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: undefined }));
+    }
+
+    // Validar duplicados con debounce para campos importantes
+    if (DUPLICATE_CHECK_FIELDS.includes(name)) {
+      // Limpiar debounce anterior si existe
+      if (debounceRefs.current[name]) {
+        clearTimeout(debounceRefs.current[name]);
+      }
+
+      // Si el campo está vacío, limpiar validación inmediatamente
+      if (!value || value.trim() === '') {
+        setDuplicateFields(prev => ({ ...prev, [name]: false }));
+        setErrors(prev => {
+          const newErrors = { ...prev };
+          delete newErrors[name];
+          return newErrors;
+        });
+        return;
+      }
+
+      // Nuevo debounce de 500ms
+      debounceRefs.current[name] = setTimeout(() => {
+        validateFieldDuplicate(name, value);
+      }, 500);
     }
   };
 
@@ -288,6 +415,12 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
     setCurrentStep(1);
     setErrors({});
     setError('');
+    setDuplicateFields({});
+    setValidatingFields({});
+    
+    // Limpiar todos los debounce
+    Object.values(debounceRefs.current).forEach(timeout => clearTimeout(timeout));
+    debounceRefs.current = {};
   };
 
   const handleSubmit = async () => {
@@ -295,20 +428,20 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
       scrollToFirstError(errors);
       return;
     }
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
       const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user'));
-      
+
       if (!token || !user) {
         throw new Error('Sesión expirada. Inicie sesión nuevamente.');
       }
 
       const isEditMode = !!(initialData && initialData.id);
-      const url = isEditMode 
+      const url = isEditMode
         ? `${API_URL}/api/vehiculos/${initialData.id}`
         : `${API_URL}/api/vehiculos`;
 
@@ -339,7 +472,7 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
       resetForm();
       onClose();
       if (onSuccess) onSuccess();
-      
+
     } catch (err) {
       setError(err.message);
     } finally {
@@ -349,8 +482,8 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
 
   const getInputClass = (fieldName) => {
     const baseClass = "w-full px-4 py-2.5 bg-white border rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all text-sm";
-    return errors[fieldName] 
-      ? `${baseClass} border-red-500 focus:ring-red-500` 
+    return errors[fieldName]
+      ? `${baseClass} border-red-500 focus:ring-red-500`
       : `${baseClass} border-gray-300`;
   };
 
@@ -368,6 +501,8 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
     nextStep,
     prevStep,
     handleSubmit,
-    getInputClass
+    getInputClass,
+    duplicateFields,
+    validatingFields
   };
 };

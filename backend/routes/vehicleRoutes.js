@@ -7,11 +7,15 @@ const {
   getVehicleStats,
   getVehicleById,
   updateVehicle,
-  registerDeparture
+  registerDeparture,
+  validateDuplicateData
 } = require('../controllers/vehicleController');
 
 // Todas las rutas requieren autenticación
 router.use(verifyToken);
+
+// POST /api/vehiculos/validar-duplicados - Validar datos duplicados en tiempo real
+router.post('/validar-duplicados', validateDuplicateData);
 
 // POST /api/vehiculos - Crear nuevo vehículo
 router.post('/', createVehicle);

@@ -4,7 +4,7 @@ import FormInput from '../FormFields/FormInput';
 import FormSelect from '../FormFields/FormSelect';
 import { Upload } from 'lucide-react';
 
-const Step1AdministrativeData = ({ formData, errors, onChange }) => {
+const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, validatingFields }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
@@ -102,7 +102,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
       <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
         Paso 1: Datos Administrativos
       </h3>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FormInput
           label="Folio de Proceso *"
@@ -110,6 +110,8 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
           value={formData.folioProceso}
           onChange={onChange}
           error={errors.folioProceso}
+          isDuplicate={duplicateFields?.folioProceso}
+          isValidating={validatingFields?.folioProceso}
           placeholder="Ej. SMT-2026-001234"
           helperText="Folio único de identificación del proceso"
         />
@@ -146,7 +148,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
 
       <div>
         <label htmlFor="fotos-upload" className="block text-sm font-medium text-gray-700 mb-2">Fotografías del Vehículo</label>
-        
+
         {/* Lista de fotos subidas */}
         {formData.fotos && formData.fotos.length > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
@@ -188,7 +190,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange }) => {
             <p className="text-xs text-gray-400 mt-1">JPG, PNG (máx. 10MB)</p>
           </div>
         </div>
-        
+
         {uploadError && (
           <p className="text-xs text-gob-rosa mt-2">{uploadError}</p>
         )}

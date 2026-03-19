@@ -1,6 +1,97 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// Validar datos duplicados (para usar en tiempo real durante el registro)
+const validateDuplicateData = async (req, res) => {
+  try {
+    const { folioProceso, vin, placa, noMotor, noInventario, excludeId } = req.body;
+
+    if (!folioProceso && !vin && !placa && !noMotor && !noInventario) {
+      return res.status(400).json({
+        success: false,
+        message: 'Debe proporcionar al menos un campo para validar'
+      });
+    }
+
+    const whereConditions = [];
+
+    if (folioProceso) {
+      whereConditions.push({ folioProceso: folioProceso.toUpperCase() });
+    }
+    if (vin) {
+      whereConditions.push({ vin: vin.toUpperCase() });
+    }
+    if (placa) {
+      whereConditions.push({ placa: placa.toUpperCase() });
+    }
+    if (noMotor) {
+      whereConditions.push({ noMotor: noMotor.toUpperCase() });
+    }
+    if (noInventario) {
+      whereConditions.push({ noInventario: noInventario.toUpperCase() });
+    }
+
+    // Si estamos en modo edición, excluir el vehículo actual
+    if (excludeId) {
+      const existingVehicle = await prisma.vehiculo.findUnique({ where: { id: excludeId } });
+      if (!existingVehicle) {
+        return res.status(404).json({
+          success: false,
+          message: 'Vehículo no encontrado'
+        });
+      }
+    }
+
+    const duplicateVehicle = await prisma.vehiculo.findFirst({
+      where: {
+        AND: [
+          { OR: whereConditions },
+          excludeId ? { id: { not: excludeId } } : {},
+          { activo: true }
+        ].filter(Boolean)
+      },
+      select: {
+        id: true,
+        folioProceso: true,
+        vin: true,
+        placa: true,
+        noMotor: true,
+        noInventario: true
+      }
+    });
+
+    if (duplicateVehicle) {
+      const duplicates = {
+        folioProceso: duplicateVehicle.folioProceso === folioProceso?.toUpperCase(),
+        vin: duplicateVehicle.vin === vin?.toUpperCase(),
+        placa: duplicateVehicle.placa === placa?.toUpperCase(),
+        noMotor: duplicateVehicle.noMotor === noMotor?.toUpperCase(),
+        noInventario: duplicateVehicle.noInventario === noInventario?.toUpperCase()
+      };
+
+      return res.json({
+        success: true,
+        hasDuplicate: true,
+        duplicates
+      });
+    }
+
+    res.json({
+      success: true,
+      hasDuplicate: false,
+      duplicates: {}
+    });
+
+  } catch (error) {
+    console.error('Error al validar datos duplicados:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al validar datos duplicados',
+      error: error.message
+    });
+  }
+};
+
 // Crear nuevo vehículo
 const createVehicle = async (req, res) => {
   try {
@@ -503,5 +594,6 @@ module.exports = {
   getVehicleStats,
   getVehicleById,
   updateVehicle,
-  registerDeparture
+  registerDeparture,
+  validateDuplicateData
 };

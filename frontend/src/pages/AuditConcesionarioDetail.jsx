@@ -117,7 +117,7 @@ const AuditConcesionarioDetail = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 overflow-y-auto pb-6 custom-scrollbar">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0 pb-6">
         
         {/* Columna Izquierda: Detalles del Depósito y Propietario */}
         <div className="lg:col-span-1 space-y-6">
