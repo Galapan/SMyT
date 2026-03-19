@@ -8,32 +8,77 @@
 
 Plataforma integral diseñada para la Secretaría de Movilidad y Transporte (SMyT) destinada a la **digitalización, control y auditoría de depósitos vehiculares, concesionarios y gestión de inventarios**. Este sistema centraliza la operación administrativa y técnica, asegurando el cumplimiento normativo y la transparencia en cada proceso.
 
+> **Plataforma Oficial · Gobierno de Tlaxcala**
+
 ---
 
-## 🔥 Características Principales
+## 🎯 Módulos del Sistema
 
-### 📋 Gestión de Inventario Vehicular
+### 🚛 Gestión de Depósitos
 
-- **Registro Multietapa**: Formulario dinámico de 4 pasos (Datos Administrativos, Vehículo, Estatus Legal e Inspección Física).
-- **Inspección Técnica**: Control detallado de estado de carrocería, mecánica, interior y sistemas.
-- **Cumplimiento Ambiental**: Registro crítico de drenado de líquidos y estado de bolsas de aire.
-- **Expediente Digital**: Almacenamiento de documentos adjuntos y galería de fotos por vehículo.
+Administración completa de vehículos en depósitos vehiculares con control de capacidad, ubicación y estado legal.
 
-### 🏢 Administración de Depósitos y Concesionarios
+- Control de entrada/salida de vehículos
+- Capacidad en tiempo real
+- Estado legal de vehículos
+- Documentación digital asociada
 
-- **Control de Capacidad**: Monitoreo de cupo máximo por depósito.
-- **Datos Legales**: Gestión de RFC, representantes y contactos operativos.
-- **Auditoría**: Sistema de revisión de concesionarios con visualización de estatus y cumplimiento.
+### 🏢 Concesionarios
 
-### 🔐 Seguridad y Roles (RBAC)
+Registro y control de concesionarios autorizados para la venta y distribución de vehículos en el estado.
 
-- **Super Usuario**: Control total del sistema.
-- **Administrador SMyT**: Supervisión de depósitos y gestión de solicitudes de edición.
-- **Usuario Concesionario**: Operación diaria de registros y salidas de vehículos.
+- Registro de establecimientos
+- Inventario autorizado
+- Verificación de permisos
+- Auditorías periódicas
 
-### 📧 Sistema de Solicitudes
+### 📋 Registro Vehicular
 
-- Flujo de solicitudes para la edición de expedientes ya registrados, permitiendo un control estricto sobre la integridad de los datos originales.
+Sistema de registro en 4 etapas con validación de datos administrativos, técnicos y de inspección física.
+
+1. **Datos Administrativos**: Información legal y propietarios
+2. **Especificaciones Técnicas**: Características del vehículo
+3. **Inspección Física**: Estado de carrocería, mecánica e interior
+4. **Carga de Documentos**: Expediente digital completo
+
+### 📝 Solicitudes de Edición
+
+Flujo de trabajo para solicitar modificaciones a registros vehiculares ya capturados.
+
+- Creación de solicitudes
+- Revisión por administrador
+- Aprobación o rechazo
+- Historial de cambios con trazabilidad completa
+
+---
+
+## ✨ Características Principales
+
+### 📊 Inventario Vehicular
+
+- **Registro Multietapa**: Formulario dinámico de 4 pasos
+- **Inspección Técnica**: Control detallado de carrocería, mecánica, interior y sistemas
+- **Cumplimiento Ambiental**: Registro de drenado de líquidos y bolsas de aire
+- **Expediente Digital**: Documentos adjuntos y galería de fotos
+
+### 🏭 Depósitos y Concesionarios
+
+- **Control de Capacidad**: Monitoreo de cupo máximo por depósito
+- **Datos Legales**: RFC, representantes y contactos operativos
+- **Auditoría**: Revisión de concesionarios con estatus y cumplimiento
+- **Georreferenciación**: Ubicaciones mapeadas
+
+### 🔐 Seguridad RBAC
+
+| Rol | Permisos Principales |
+|-----|----------------------|
+| **Super Usuario** | Acceso completo, gestión de usuarios, configuración global |
+| **Administrador SMyT** | Gestión de vehículos, concesionarios, auditorías estatales |
+| **Administrador Concesionario** | Registro de vehículos, inventario propio, solicitudes de edición |
+
+### 🔄 Sistema de Solicitudes
+
+Flujo de trabajo para edición de expedientes con aprobaciones en cascada y notificaciones automáticas.
 
 ---
 
