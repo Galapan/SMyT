@@ -503,7 +503,7 @@ const updateVehicle = async (req, res) => {
       where: { id },
       data: updateData,
       include: {
-        deposito: true,
+        deposito: true
       }
     });
 

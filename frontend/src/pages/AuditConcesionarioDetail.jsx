@@ -88,7 +88,7 @@ const AuditConcesionarioDetail = () => {
   if (!deposito) return null;
 
   return (
-    <div className="h-full flex flex-col space-y-6 overflow-hidden">
+    <div className="lg:h-full flex flex-col space-y-6 lg:overflow-hidden">
       
       {/* Header */}
       <div className="shrink-0 bg-white rounded-xl border border-gray-200 p-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
@@ -190,7 +190,7 @@ const AuditConcesionarioDetail = () => {
 
         {/* Columna Derecha: Inventario de Vehículos */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm h-full flex flex-col overflow-hidden">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm lg:h-full flex flex-col overflow-hidden">
             <div className="px-4 py-4 md:px-6 md:py-5 border-b border-gray-100 flex flex-col sm:flex-row justify-between sm:items-center gap-4 bg-gray-50/30">
               <div className="flex flex-wrap items-center gap-2">
                 <Car size={20} className="text-gray-700" />

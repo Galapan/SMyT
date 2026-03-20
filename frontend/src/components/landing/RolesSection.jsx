@@ -28,6 +28,11 @@ export default function RolesSection() {
         >
           {roles.map((role, i) => {
             const { accent, bg } = roleColors[i % roleColors.length];
+            const bgClasses = {
+              "bg-azul": "bg-azul/15",
+              "bg-naranja": "bg-naranja/15",
+              "bg-verde": "bg-verde/15",
+            };
 
             return (
               <motion.div
@@ -40,7 +45,7 @@ export default function RolesSection() {
                 <motion.div
                   variants={{ hidden: { rotate: 0, scale: 1 }, show: { rotate: 0, scale: 1 }, hover: { rotate: -6, scale: 1.06 } }}
                   transition={{ type: "spring", stiffness: 500, damping: 26 }}
-                  className={`w-9 h-9 rounded-lg ${bg}/15 flex items-center justify-center mb-4`}
+                  className={`w-9 h-9 rounded-lg ${bgClasses[bg]} flex items-center justify-center mb-4`}
                 >
                   <role.icon className={`w-5 h-5 text-${accent}`} />
                 </motion.div>

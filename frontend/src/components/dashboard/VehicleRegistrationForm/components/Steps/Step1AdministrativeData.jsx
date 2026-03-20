@@ -195,13 +195,6 @@ const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, 
           <p className="text-xs text-gob-rosa mt-2">{uploadError}</p>
         )}
       </div>
-
-      <div>
-        <p className="block text-sm font-medium text-gray-700 mb-1">Documentos Adjuntos (Opcional)</p>
-        <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center bg-gray-50">
-           <p className="text-sm text-gray-500">Funcionalidad de documentos en desarrollo...</p>
-        </div>
-      </div>
     </div>
   );
 };

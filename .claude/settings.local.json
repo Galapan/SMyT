@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find c:SMyTsmyt-projectfrontend -name *.css -type f)"
+    ]
+  }
+}
