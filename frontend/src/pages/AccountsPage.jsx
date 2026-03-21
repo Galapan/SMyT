@@ -164,9 +164,12 @@ const AccountsTable = ({
                     </div>
                     <div>
                       <div className="text-sm font-medium text-gray-900">{user.nombre} {user.apellido}</div>
-                      <div className="text-xs text-gray-500">{user.email}</div>
                     </div>
                   </div>
+                </td>
+                <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap">
+                  <div className="text-sm text-gray-700">{user.email}</div>
+                  {user.telefono && <div className="text-xs text-gray-500">{user.telefono}</div>}
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap">
                   <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getRoleColor(user.rol)}`}>

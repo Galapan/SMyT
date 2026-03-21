@@ -104,6 +104,13 @@ function Login() {
             return;
         }
 
+        // Check if session is already active
+        if (data.sessionActive) {
+          dispatch({ type: 'LOGIN_SUCCESS' }); // Stop loading
+          setToast({ show: true, message: data.message, type: "error" });
+          return;
+        }
+
         throw new Error(data.message || "Error al iniciar sesión");
       }
 

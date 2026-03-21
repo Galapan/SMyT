@@ -6,6 +6,9 @@ const { verifyToken } = require('../middleware/authMiddleware');
 // POST /api/auth/login - Autenticar usuario
 router.post('/login', authController.login);
 
+// POST /api/auth/logout - Cerrar sesión
+router.post('/logout', authController.logout);
+
 // POST /api/auth/verify-email
 // Verificar cuenta de usuario con código
 router.post('/verify-email', authController.verifyEmail);

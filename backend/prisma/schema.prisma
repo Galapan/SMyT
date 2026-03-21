@@ -51,6 +51,7 @@ model Usuario {
   verificado      Boolean   @default(true) // Set to true by default for existing users, false for new ones
   codigoVerificacion String?
   expiracionCodigo   DateTime?
+  tokenSesion     String?   // Token de sesión activa para prevenir múltiples sesiones
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

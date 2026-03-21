@@ -67,6 +67,26 @@ const login = async (req, res) => {
       });
     }
 
+    // Verificar si ya hay una sesión activa (token válido)
+    if (usuario.tokenSesion) {
+      try {
+        // Verificar si el token almacenado aún es válido
+        jwt.verify(usuario.tokenSesion, JWT_SECRET);
+        // Si el token es válido, bloquear el login
+        return res.status(401).json({
+          success: false,
+          message: 'Ya hay una sesión activa con esta cuenta. Si crees que esto es un error, cierra sesión en el otro dispositivo o contacta al administrador.',
+          sessionActive: true
+        });
+      } catch (jwtError) {
+        // El token expiró o es inválido, limpiar el tokenSesion y continuar
+        await prisma.usuario.update({
+          where: { id: usuario.id },
+          data: { tokenSesion: null }
+        });
+      }
+    }
+
     // Generar JWT con información del usuario
     const token = jwt.sign(
       {
@@ -78,6 +98,12 @@ const login = async (req, res) => {
       JWT_SECRET,
       { expiresIn: JWT_EXPIRES_IN }
     );
+
+    // Guardar el token en la base de datos para prevenir múltiples sesiones
+    await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: { tokenSesion: token }
+    });
 
     // Responder sin incluir el password
     const { password: _, ...usuarioSinPassword } = usuario;
@@ -497,8 +523,60 @@ const rejectSecurityAlert = async (req, res) => {
   }
 };
 
+/**
+ * POST /api/auth/logout
+ * Cerrar sesión y limpiar token de sesión
+ */
+const logout = async (req, res) => {
+  try {
+    const { token } = req.body;
+    
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Token es requerido'
+      });
+    }
+
+    // Verificar el token para obtener el ID del usuario
+    let decoded;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (jwtError) {
+      // Token inválido o expirado, pero igual limpiamos por si acaso
+      await prisma.usuario.updateMany({
+        where: { tokenSesion: token },
+        data: { tokenSesion: null }
+      });
+      return res.json({
+        success: true,
+        message: 'Sesión cerrada exitosamente'
+      });
+    }
+
+    // Limpiar el token de sesión del usuario
+    await prisma.usuario.update({
+      where: { id: decoded.id },
+      data: { tokenSesion: null }
+    });
+
+    res.json({
+      success: true,
+      message: 'Sesión cerrada exitosamente'
+    });
+
+  } catch (error) {
+    console.error('Error en logout:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error interno del servidor'
+    });
+  }
+};
+
 module.exports = {
   login,
+  logout,
   getCurrentUser,
   verifyEmail,
   forgotPassword,

@@ -16,6 +16,10 @@ import logoSmyt from '../assets/logo_smyt.png';
 import { formatRole } from '../utils/formatRole';
 import { useQueryClient } from '@tanstack/react-query';
 
+const API_URL = import.meta.env.VITE_API_URL !== undefined
+  ? import.meta.env.VITE_API_URL
+  : (import.meta.env.DEV ? "http://localhost:3000" : "");
+
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -48,7 +52,22 @@ const AdminLayout = () => {
     return () => window.removeEventListener('storage', loadUser);
   }, [navigate]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    
+    // Llamar al backend para limpiar el token de sesión
+    if (token) {
+      try {
+        await fetch(`${API_URL}/api/auth/logout`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token })
+        });
+      } catch (error) {
+        console.error('Error al cerrar sesión en el backend:', error);
+      }
+    }
+    
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
     localStorage.removeItem('token');
