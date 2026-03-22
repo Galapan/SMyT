@@ -153,8 +153,8 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
 
         {/* Footer Button to navigate to details */}
         <div className="p-3 border-t border-gray-100 bg-white rounded-b-xl shrink-0">
-          <button 
-            onClick={(e) => { e.stopPropagation(); navigate(`/admin/auditoria/${deposito.id}`); }}
+          <button
+            onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/auditoria/${deposito.id}`); }}
             className="w-full py-2.5 bg-(--color-primary) text-white font-medium text-sm rounded-lg hover:bg-violet-900 transition-colors shadow-sm flex items-center justify-center gap-2"
           >
             <Eye size={16} />

@@ -20,7 +20,7 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
   ? import.meta.env.VITE_API_URL
   : (import.meta.env.DEV ? "http://localhost:3000" : "");
 
-const AdminLayout = () => {
+const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
   const location = useLocation();
@@ -79,12 +79,12 @@ const AdminLayout = () => {
   };
 
   const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Depósitos', href: '/admin/deposits', icon: Warehouse, roles: ['SUPER_USUARIO', 'ADMINISTRADOR'] },
-    { name: 'Vehículos', href: '/admin/vehicles', icon: Car },
-    { name: 'Auditoría', href: '/admin/auditoria', icon: Search },
-    { name: 'Cuentas', href: '/admin/accounts', icon: Users, roles: ['SUPER_USUARIO'] },
-    { name: 'Configuración', href: '/admin/settings', icon: Settings },
+    { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    { name: 'Depósitos', href: '/dashboard/deposits', icon: Warehouse, roles: ['SUPER_USUARIO', 'ADMINISTRADOR'] },
+    { name: 'Vehículos', href: '/dashboard/vehicles', icon: Car, roles: ['ADMINISTRADOR', 'ADMINISTRADOR_CONCESIONARIO'] },
+    { name: 'Auditoría', href: '/dashboard/auditoria', icon: Search },
+    { name: 'Cuentas', href: '/dashboard/accounts', icon: Users, roles: ['SUPER_USUARIO'] },
+    { name: 'Configuración', href: '/dashboard/settings', icon: Settings },
   ];
 
   return (
@@ -149,17 +149,17 @@ const AdminLayout = () => {
 
           {/* User Profile / Logout */}
           <div className="p-4 border-t border-gray-100 shrink-0">
-            <div 
+            <div
                  role="button"
                  tabIndex={0}
                  className="flex items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
                  onClick={() => {
-                   navigate('/admin/settings');
+                   navigate('/dashboard/settings');
                    setIsSidebarOpen(false);
                  }}
                  onKeyDown={(e) => {
                    if (e.key === 'Enter' || e.key === ' ') {
-                     navigate('/admin/settings');
+                     navigate('/dashboard/settings');
                      setIsSidebarOpen(false);
                    }
                  }}>
@@ -223,4 +223,4 @@ const AdminLayout = () => {
   );
 };
 
-export default AdminLayout;
+export default DashboardLayout;

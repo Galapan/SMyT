@@ -60,8 +60,8 @@ const AccountsStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-rojo/10 rounded-lg">
-              <Shield className="w-6 h-6 text-rojo" />
+            <div className="p-3 bg-azul/10 rounded-lg">
+              <Shield className="w-6 h-6 text-azul" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.superAdmins}</p>
@@ -71,8 +71,8 @@ const AccountsStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-azul/10 rounded-lg">
-              <Shield className="w-6 h-6 text-azul" />
+            <div className="p-3 bg-naranja/10 rounded-lg">
+              <Shield className="w-6 h-6 text-naranja" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.admins}</p>
@@ -485,7 +485,7 @@ const AccountsPage = () => {
     if (userStr) {
       const user = JSON.parse(userStr);
       if (user.rol !== 'SUPER_USUARIO') {
-        navigate('/admin');
+        navigate('/dashboard');
       }
     } else {
       navigate('/login');
@@ -603,8 +603,8 @@ const AccountsPage = () => {
 
   const getRoleColor = (rol) => {
     const colors = {
-      'SUPER_USUARIO': 'bg-(--color-rojo)/10 text-(--color-rojo) shadow-[0_2px_10px_rgba(167,15,38,0.1)] font-bold border border-(--color-rojo)/20',
-      'ADMINISTRADOR': 'bg-(--color-azul)/10 text-(--color-azul) shadow-[0_2px_10px_rgba(85,174,201,0.1)] font-bold border border-(--color-azul)/20',
+      'SUPER_USUARIO': 'bg-(--color-azul)/10 text-(--color-azul) shadow-[0_2px_10px_rgba(85,174,201,0.1)] font-bold border border-(--color-azul)/20',
+      'ADMINISTRADOR': 'bg-(--color-naranja)/10 text-(--color-naranja) shadow-[0_2px_10px_rgba(234,88,6,0.1)] font-bold border border-(--color-naranja)/20',
       'ADMINISTRADOR_CONCESIONARIO': 'bg-(--color-verde)/15 text-(--color-verde) shadow-[0_2px_10px_rgba(111,178,37,0.1)] font-bold border border-(--color-verde)/20'
     };
     return colors[rol] || 'bg-gray-100 text-gray-700';

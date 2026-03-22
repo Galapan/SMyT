@@ -31,6 +31,7 @@ const BcryptIcon = (props) => React.createElement(Lock, props);
 
 export const roles = [
   {
+    id: 'super-usuario',
     title: "Super Usuario",
     icon: Shield,
     description:
@@ -44,6 +45,7 @@ export const roles = [
     ],
   },
   {
+    id: 'administrador-smyt',
     title: "Administrador SMyT",
     icon: Building2,
     description:
@@ -57,6 +59,7 @@ export const roles = [
     ],
   },
   {
+    id: 'administrador-concesionario',
     title: "Administrador Concesionario",
     icon: Users,
     description:
@@ -73,6 +76,7 @@ export const roles = [
 
 export const features = [
   {
+    id: 'inventario',
     icon: Car,
     title: "Inventario Vehicular",
     description:
@@ -85,6 +89,7 @@ export const features = [
     ],
   },
   {
+    id: 'depositos',
     icon: Building2,
     title: "Depósitos y Concesionarios",
     description: "Control de capacidad, ubicación y cumplimiento normativo.",
@@ -96,6 +101,7 @@ export const features = [
     ],
   },
   {
+    id: 'solicitudes',
     icon: FileCheck,
     title: "Sistema de Solicitudes",
     description:
@@ -108,6 +114,7 @@ export const features = [
     ],
   },
   {
+    id: 'database',
     icon: Database,
     title: "Base de Datos Centralizada",
     description: "Información accesible y segura en tiempo real.",
@@ -119,6 +126,7 @@ export const features = [
     ],
   },
   {
+    id: 'seguridad',
     icon: Lock,
     title: "Seguridad RBAC",
     description: "Control de acceso basado en roles con autenticación JWT.",
@@ -130,6 +138,7 @@ export const features = [
     ],
   },
   {
+    id: 'auditorias',
     icon: TrendingUp,
     title: "Auditorías",
     description: "Seguimiento y verificación de operaciones del sistema.",
@@ -144,6 +153,7 @@ export const features = [
 
 export const systemModules = [
   {
+    id: 'depositos',
     icon: Truck,
     title: "Gestión de Depósitos",
     description:
@@ -156,6 +166,7 @@ export const systemModules = [
     ],
   },
   {
+    id: 'concesionarios',
     icon: Building2,
     title: "Concesionarios",
     description:
@@ -168,6 +179,7 @@ export const systemModules = [
     ],
   },
   {
+    id: 'registro',
     icon: ClipboardList,
     title: "Registro Vehicular",
     description:
@@ -180,6 +192,7 @@ export const systemModules = [
     ],
   },
   {
+    id: 'solicitudes',
     icon: FileText,
     title: "Solicitudes de Edición",
     description:
@@ -194,26 +207,29 @@ export const systemModules = [
 ];
 
 export const stats = [
-  { number: "3", label: "Módulos Principales" },
-  { number: "4", label: "Etapas de Registro" },
-  { number: "3", label: "Roles de Usuario" },
-  { number: "24/7", label: "Disponibilidad" },
+  { id: 'modules', number: "3", label: "Módulos Principales" },
+  { id: 'stages', number: "4", label: "Etapas de Registro" },
+  { id: 'roles', number: "3", label: "Roles de Usuario" },
+  { id: 'availability', number: "24/7", label: "Disponibilidad" },
 ];
 
 export const frontendStack = [
   {
+    id: 'react',
     name: "React 19",
     Logo: SiReact,
     description: "Última versión con concurrent features",
   },
-  { name: "Vite", Logo: SiVite, description: "Build tool ultrarrápido" },
+  { id: 'vite', name: "Vite", Logo: SiVite, description: "Build tool ultrarrápido" },
   {
+    id: 'tailwind',
     name: "Tailwind CSS v4",
     Logo: SiTailwindcss,
     description: "Estilos utilitarios modernos",
   },
-  { name: "Framer Motion", Logo: SiFramer, description: "Animaciones fluidas" },
+  { id: 'framer', name: "Framer Motion", Logo: SiFramer, description: "Animaciones fluidas" },
   {
+    id: 'router',
     name: "React Router 7",
     Logo: SiReactrouter,
     description: "Navegación SPA",
@@ -221,21 +237,24 @@ export const frontendStack = [
 ];
 
 export const backendStack = [
-  { name: "Node.js", Logo: SiNodedotjs, description: "Runtime JavaScript" },
+  { id: 'node', name: "Node.js", Logo: SiNodedotjs, description: "Runtime JavaScript" },
   {
+    id: 'express',
     name: "Express.js",
     Logo: SiExpress,
     description: "Framework web minimalista",
   },
-  { name: "Prisma ORM", Logo: SiPrisma, description: "Type-safe ORM" },
+  { id: 'prisma', name: "Prisma ORM", Logo: SiPrisma, description: "Type-safe ORM" },
   {
+    id: 'postgres',
     name: "PostgreSQL",
     Logo: SiPostgresql,
     description: "Base de datos relacional",
   },
-  { name: "Supabase", Logo: SiSupabase, description: "Backend as a Service" },
-  { name: "JWT", Logo: JwtIcon, description: "Autenticación segura" },
+  { id: 'supabase', name: "Supabase", Logo: SiSupabase, description: "Backend as a Service" },
+  { id: 'jwt', name: "JWT", Logo: JwtIcon, description: "Autenticación segura" },
   {
+    id: 'bcrypt',
     name: "bcrypt.js",
     Logo: BcryptIcon,
     description: "Encriptación de contraseñas",

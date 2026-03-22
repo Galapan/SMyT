@@ -1,5 +1,6 @@
 import { useReducer, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { useQuery } from "@tanstack/react-query";
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { X, UserPlus, Loader2, Check, AlertCircle, Search, Link as LinkIcon, User } from "lucide-react";
 import FormInput from "../VehicleRegistrationForm/components/FormFields/FormInput";
@@ -58,34 +59,31 @@ function reducer(state, action) {
 
 const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombre }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { activeTab, loading, error, errors, formData, availableUsers, selectedUserId, searchTerm, loadingUsers } = state;
+  const { activeTab, loading, error, errors, formData, selectedUserId, searchTerm } = state;
 
-  useEffect(() => {
-    if (isOpen && activeTab === 'existente') {
-      fetchAvailableUsers();
-    }
-  }, [isOpen, activeTab]);
-
-  const fetchAvailableUsers = async () => {
-    dispatch({ type: 'SET_LOADING_USERS', payload: true });
-    dispatch({ type: 'SET_ERROR', payload: "" });
-    try {
+  // Fetch available users con React Query
+  const { data: usersData, isLoading: loadingUsers } = useQuery({
+    queryKey: ['users-disponibles', isOpen, activeTab],
+    queryFn: async () => {
       const token = sessionStorage.getItem("token") || localStorage.getItem("token");
       const res = await fetch(`${API_URL}/api/users/concesionarios/disponibles`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       const data = await res.json();
-      if (data.success) {
-        dispatch({ type: 'SET_AVAILABLE_USERS', payload: data.data });
-      } else {
+      if (!data.success) {
         throw new Error(data.message || "Error al obtener usuarios disponibles");
       }
-    } catch (err) {
-      dispatch({ type: 'SET_ERROR', payload: err.message });
-    } finally {
-      dispatch({ type: 'SET_LOADING_USERS', payload: false });
+      return data.data;
+    },
+    enabled: isOpen && activeTab === 'existente',
+  });
+
+  // Sync availableUsers desde React Query al reducer local
+  useEffect(() => {
+    if (usersData) {
+      dispatch({ type: 'SET_AVAILABLE_USERS', payload: usersData });
     }
-  };
+  }, [usersData]);
 
   const validateForm = () => {
     const newErrors = {};

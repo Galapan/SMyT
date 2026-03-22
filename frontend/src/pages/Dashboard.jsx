@@ -53,7 +53,7 @@ function reducer(state, action) {
   }
 }
 
-const AdminDashboard = () => {
+const Dashboard = () => {
   const navigate = useNavigate();
   // Custom state for UI and Modals
   const [selectedDepot, setSelectedDepot] = useState(null);
@@ -132,15 +132,15 @@ const AdminDashboard = () => {
   const notificaciones = dashboardData?.notificaciones || [];
 
   const handleSearch = (searchParams) => {
-    // Navigate to vehicles page with search params
+    // Navigate to audit page with search params (SUPER_USUARIO no tiene acceso a Vehículos)
     const queryParams = new URLSearchParams();
     if (searchParams.placa) queryParams.append('placa', searchParams.placa);
     if (searchParams.vin) queryParams.append('vin', searchParams.vin);
     if (searchParams.fechaInicio) queryParams.append('fechaInicio', searchParams.fechaInicio);
     if (searchParams.fechaFin) queryParams.append('fechaFin', searchParams.fechaFin);
     if (searchParams.estatusLegal) queryParams.append('estatusLegal', searchParams.estatusLegal);
-    
-    navigate(`/admin/vehicles?${queryParams.toString()}`);
+
+    navigate(`/dashboard/auditoria?${queryParams.toString()}`);
   };
 
   const handleOpenNotif = async (notif) => {
@@ -251,8 +251,8 @@ const AdminDashboard = () => {
             Actualizar
           </button>
           {(userRol === 'SUPER_USUARIO' || userRol === 'ADMINISTRADOR') && (
-            <button 
-              onClick={() => navigate('/admin/deposits')}
+            <button
+              onClick={() => navigate('/dashboard/deposits')}
               className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
             >
               <Plus size={20} className="mr-2" />
@@ -536,9 +536,9 @@ const AdminDashboard = () => {
                   <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 cursor-pointer hover:border-(--color-primary) hover:shadow-md transition-all group"
                        role="button"
                        tabIndex={0}
-                       onClick={() => navigate(`/admin/auditoria/vehiculo/${selectedNotif.vehiculoId}`)}
+                       onClick={() => navigate(`/dashboard/auditoria/vehiculo/${selectedNotif.vehiculoId}`)}
                        onKeyDown={(e) => {
-                         if (e.key === 'Enter' || e.key === ' ') navigate(`/admin/auditoria/vehiculo/${selectedNotif.vehiculoId}`);
+                         if (e.key === 'Enter' || e.key === ' ') navigate(`/dashboard/auditoria/vehiculo/${selectedNotif.vehiculoId}`);
                        }}
                        title="Ver expediente completo del vehículo">
                     <div className="flex justify-between items-center mb-1">
@@ -696,4 +696,4 @@ const AdminDashboard = () => {
 
 };
 
-export default AdminDashboard;
+export default Dashboard;

@@ -32,7 +32,7 @@ const AuditConcesionarioDetail = () => {
     if (data.success) {
       return data.data;
     } else {
-      navigate('/admin/auditoria');
+      navigate('/dashboard/auditoria');
       throw new Error('Deposito no encontrado');
     }
   };
@@ -93,8 +93,8 @@ const AuditConcesionarioDetail = () => {
       {/* Header */}
       <div className="shrink-0 bg-white rounded-xl border border-gray-200 p-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div className="flex items-center gap-4">
-          <button 
-            onClick={() => navigate('/admin/auditoria')}
+          <button
+            onClick={() => navigate('/dashboard/auditoria')}
             className="p-2 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors border border-transparent hover:border-gray-200"
             title="Volver a la Auditoría Global"
           >
@@ -265,8 +265,8 @@ const AuditConcesionarioDetail = () => {
                           </p>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button 
-                            onClick={() => navigate(`/admin/auditoria/vehiculo/${v.id}`)}
+                          <button
+                            onClick={() => navigate(`/dashboard/auditoria/vehiculo/${v.id}`)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-600 hover:text-(--color-primary) hover:bg-violet-50 hover:border-violet-200 border border-gray-200 rounded-lg text-xs font-semibold transition-colors focus:ring-2 focus:ring-(--color-primary)/20 outline-none"
                             title="Ver Expediente de Registro"
                           >
@@ -324,13 +324,13 @@ const AuditConcesionarioDetail = () => {
                           </p>
                         </div>
                       </div>
-                      
+
                       <div className="pt-3 border-t border-gray-50 flex items-center justify-between">
                          <div className="text-xs font-mono text-gray-400 truncate max-w-[50%]">
                            VIN: {v.vin}
                          </div>
-                         <button 
-                            onClick={() => navigate(`/admin/auditoria/vehiculo/${v.id}`)}
+                         <button
+                            onClick={() => navigate(`/dashboard/auditoria/vehiculo/${v.id}`)}
                             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 text-gray-600 hover:text-(--color-primary) hover:bg-violet-50 border border-gray-200 rounded-lg text-xs font-semibold transition-colors focus:outline-none"
                             title="Ver Expediente de Registro"
                           >

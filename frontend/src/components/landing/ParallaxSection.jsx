@@ -1,4 +1,4 @@
-import { useScroll, useTransform, motion } from "framer-motion";
+import { useScroll, useTransform, LazyMotion, domAnimation, m } from "framer-motion";
 import { useRef } from "react";
 
 export default function ParallaxSection({ id, className, intensity = 48, children }) {
@@ -10,10 +10,12 @@ export default function ParallaxSection({ id, className, intensity = 48, childre
   const y = useTransform(scrollYProgress, [0, 1], [intensity, -intensity]);
 
   return (
-    <section id={id} ref={ref} className={`${className} relative overflow-hidden`}>
-      <motion.div style={{ y }} className="will-change-transform">
-        {children}
-      </motion.div>
-    </section>
+    <LazyMotion features={domAnimation}>
+      <section id={id} ref={ref} className={`${className} relative overflow-hidden`}>
+        <m.div style={{ y }} className="will-change-transform">
+          {children}
+        </m.div>
+      </section>
+    </LazyMotion>
   );
 }

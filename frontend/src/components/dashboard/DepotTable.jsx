@@ -1,13 +1,12 @@
 import { memo, useState } from 'react';
-import { MapPin, Eye, Ban } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import TableSkeleton from '../common/TableSkeleton';
 import Pagination from '../common/Pagination';
-import ActionMenu from '../common/ActionMenu';
 
 const EMPTY_DEPOTS = [];
 
 // Memoized Desktop Row Component
-const DesktopDepotRow = memo(({ depot, currentUser, onViewDetails, onSuspend }) => {
+const DesktopDepotRow = memo(({ depot }) => {
   return (
     <tr className="hover:bg-gray-50 transition-colors group">
       <td className="px-6 py-4 whitespace-nowrap">
@@ -36,14 +35,6 @@ const DesktopDepotRow = memo(({ depot, currentUser, onViewDetails, onSuspend }) 
           {depot.activo ? 'Activo' : 'Inactivo'}
         </span>
       </td>
-      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-        <ActionMenu
-          options={[
-            { label: 'Ver Resumen', icon: Eye, onClick: () => onViewDetails && onViewDetails(depot) },
-            { label: depot.activo ? 'Suspender Concesionario' : 'Reactivar Concesionario', icon: Ban, onClick: () => onSuspend && onSuspend(depot), danger: depot.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
-          ]}
-        />
-      </td>
     </tr>
   );
 });
@@ -51,7 +42,7 @@ const DesktopDepotRow = memo(({ depot, currentUser, onViewDetails, onSuspend }) 
 DesktopDepotRow.displayName = 'DesktopDepotRow';
 
 // Memoized Mobile Card Component
-const MobileDepotCard = memo(({ depot, currentUser, onViewDetails, onSuspend }) => {
+const MobileDepotCard = memo(({ depot }) => {
   return (
     <div className="p-4 hover:bg-gray-50 transition-colors">
       <div className="flex justify-between items-start mb-2">
@@ -73,17 +64,11 @@ const MobileDepotCard = memo(({ depot, currentUser, onViewDetails, onSuspend }) 
         </span>
       </div>
 
-      <div className="flex items-center text-xs text-gray-600 mt-2 pl-11 justify-between">
+      <div className="flex items-center text-xs text-gray-600 mt-2 pl-11">
         <div className="flex items-center">
           <MapPin size={14} className="mr-1.5 text-gray-400 shrink-0" />
           <span className="truncate">{depot.municipio}</span>
         </div>
-        <ActionMenu
-          options={[
-            { label: 'Ver Resumen', icon: Eye, onClick: () => onViewDetails && onViewDetails(depot) },
-            { label: depot.activo ? 'Suspender Concesionario' : 'Reactivar Concesionario', icon: Ban, onClick: () => onSuspend && onSuspend(depot), danger: depot.activo, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
-          ]}
-        />
       </div>
     </div>
   );
@@ -91,7 +76,7 @@ const MobileDepotCard = memo(({ depot, currentUser, onViewDetails, onSuspend }) 
 
 MobileDepotCard.displayName = 'MobileDepotCard';
 
-const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onViewDetails, onSuspend }) => {
+const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
@@ -111,7 +96,7 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onVie
 
       <div className="flex-1 overflow-auto bg-white">
         {loading ? (
-          <TableSkeleton rows={5} columns={4} />
+          <TableSkeleton rows={5} columns={3} />
         ) : depots.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center p-12 text-center">
             <MapPin className="w-16 h-16 mx-auto text-gray-300 mb-4" />
@@ -127,7 +112,6 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onVie
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Nombre del Concesionario</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Ubicación</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Estatus</th>
-                    <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -135,9 +119,6 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onVie
                     <DesktopDepotRow
                       key={depot.id}
                       depot={depot}
-                      currentUser={currentUser}
-                      onViewDetails={onViewDetails}
-                      onSuspend={onSuspend}
                     />
                   ))}
                 </tbody>
@@ -150,9 +131,6 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS, currentUser, onVie
                 <MobileDepotCard
                   key={depot.id}
                   depot={depot}
-                  currentUser={currentUser}
-                  onViewDetails={onViewDetails}
-                  onSuspend={onSuspend}
                 />
               ))}
             </div>

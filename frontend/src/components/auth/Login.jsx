@@ -56,9 +56,9 @@ function Login() {
           usuario.rol === "ADMINISTRADOR" ||
           usuario.rol === "ADMINISTRADOR_CONCESIONARIO"
         ) {
-          navigate("/admin");
+          navigate("/dashboard");
         } else {
-          navigate("/admin"); // temporal mapping since there is no concesionario dashboard yet
+          navigate("/dashboard"); // temporal mapping since there is no concesionario dashboard yet
         }
       } catch (err) {
         // Si hay error en el parseo, el usuario se queda en el login
@@ -127,9 +127,9 @@ function Login() {
         usuario.rol === "ADMINISTRADOR" ||
         usuario.rol === "ADMINISTRADOR_CONCESIONARIO"
       ) {
-        navigate("/admin");
+        navigate("/dashboard");
       } else {
-        navigate("/admin"); // Futuro: dashboard de concesionario
+        navigate("/dashboard"); // Futuro: dashboard de concesionario
       }
     } catch (err) {
       dispatch({ type: 'LOGIN_ERROR', payload: err.message });

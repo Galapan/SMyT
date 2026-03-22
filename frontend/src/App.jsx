@@ -7,12 +7,12 @@ import Verification from './components/auth/Verification';
 import ForgotPassword from './components/auth/ForgotPassword';
 import ResetPassword from './components/auth/ResetPassword';
 import SecurityAlert from './pages/SecurityAlert';
-import AdminLayout from './layouts/AdminLayout';
+import DashboardLayout from './layouts/Layout';
 
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
 const AuditDashboard = lazy(() => import('./pages/AuditDashboard'));
 const AuditConcesionarioDetail = lazy(() => import('./pages/AuditConcesionarioDetail'));
-const VehicleAdminDetail = lazy(() => import('./pages/VehicleAdminDetail'));
+const VehicleDetail = lazy(() => import('./pages/VehicleDetail'));
 const VehiclesPage = lazy(() => import('./pages/VehiclesPage'));
 const DepositsPage = lazy(() => import('./pages/DepositsPage'));
 const SettingsPage = lazy(() => import('./pages/SettingsPage'));
@@ -46,19 +46,19 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/security" element={<SecurityAlert />} />
-          
-          {/* Admin Routes */}
-          <Route path="/admin" element={<AdminLayout />}>
-            <Route index element={<AdminDashboard />} />
-            
+
+          {/* Dashboard Routes */}
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<Dashboard />} />
+
             {/* Deposits */}
             <Route path="deposits" element={<DepositsPage />} />
-            
+
             {/* Vehicles with multi-step form */}
             <Route path="vehicles" element={<VehiclesPage />} />
             <Route path="auditoria" element={<AuditDashboard />} />
             <Route path="auditoria/:id" element={<AuditConcesionarioDetail />} />
-            <Route path="auditoria/vehiculo/:id" element={<VehicleAdminDetail />} />
+            <Route path="auditoria/vehiculo/:id" element={<VehicleDetail />} />
             <Route path="accounts" element={<AccountsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>

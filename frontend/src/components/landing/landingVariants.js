@@ -41,17 +41,5 @@ export const scaleIn = {
   },
 };
 
-
-/** Exact same hover used by Tech Stack cards */
-export const cardHover = {
-  whileHover: { y: -6, scale: 1.06 },
-  transition: {
-    type: "spring",
-    stiffness: 420,
-    damping: 22,
-    mass: 0.6,
-  },
-};
-
 // Viewport settings reutilizables
 export const vp = { once: true, amount: 0.18, margin: "0px 0px -15% 0px" };

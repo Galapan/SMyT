@@ -448,7 +448,7 @@ const AuditDashboard = () => {
         depositos={depositos}
         loading={loading}
         onRefresh={() => refetch()}
-        onInspectDeposito={(depositoId) => navigate(`/admin/auditoria/${depositoId}`)}
+        onInspectDeposito={(depositoId) => navigate(`/dashboard/auditoria/${depositoId}`)}
       />
     );
   }

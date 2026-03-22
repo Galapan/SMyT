@@ -4,7 +4,9 @@ import { MoreVertical } from 'lucide-react';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { useFloating, offset, flip, shift, autoUpdate } from '@floating-ui/react';
 
-const ActionMenu = ({ options = [] }) => {
+const EMPTY_OPTIONS = [];
+
+const ActionMenu = ({ options = EMPTY_OPTIONS }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -95,22 +97,22 @@ const ActionMenu = ({ options = [] }) => {
                 left: Math.round(x) || 0,
               }}
               className="absolute w-48 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden py-1 z-50 origin-top-right focus:outline-none"
-              onClick={(e) => e.stopPropagation()} 
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="flex flex-col">
-                {visibleOptions.map((option, idx) => {
+                {visibleOptions.map((option) => {
                   const Icon = option.icon;
                   return (
                     <button
-                      key={idx}
+                      key={option.label}
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsOpen(false);
                         option.onClick();
                       }}
                       className={`flex items-center w-full px-4 py-2.5 text-sm text-left transition-colors
-                        ${option.danger 
-                          ? 'text-(--color-rojo) hover:bg-(--color-rojo)/5' 
+                        ${option.danger
+                          ? 'text-(--color-rojo) hover:bg-(--color-rojo)/5'
                           : option.success
                             ? 'text-(--color-verde) hover:bg-(--color-verde)/5'
                             : 'text-gray-700 hover:bg-gray-50'

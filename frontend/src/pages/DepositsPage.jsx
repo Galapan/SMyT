@@ -523,7 +523,7 @@ const DepositsPage = () => {
   };
 
   const handleViewDetails = (deposito) => {
-    navigate(`/admin/auditoria/${deposito.id}`);
+    navigate(`/dashboard/auditoria/${deposito.id}`);
   };
 
   const filteredDepositos = depositos.filter(
