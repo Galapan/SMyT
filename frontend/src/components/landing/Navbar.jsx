@@ -168,8 +168,8 @@ export default function Navbar() {
             <div className="flex items-center justify-between">
               {/* Logo */}
               <div className="flex items-center gap-3">
-                <img src={LogoTlax} alt="Gobierno de Tlaxcala" className="h-9 w-9 object-contain" />
-                <img src={LogoSMyT} alt="SMyT" className="hidden md:block h-8 lg:h-9 w-auto object-contain" />
+                <img src={LogoTlax} alt="Gobierno de Tlaxcala" className="h-9 w-9 md:hidden object-contain" />
+                <img src={LogoSMyT} alt="SMyT" className="hidden md:block h-10 w-auto object-contain" />
               </div>
 
               {/* Desktop Navigation */}
