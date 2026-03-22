@@ -1,7 +1,7 @@
 import { LazyMotion, domAnimation, m, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import LogoSMyT from "../../assets/logo_smyt.png";
 import LogoTlax from "../../assets/LogoTlax.png";
 
@@ -13,44 +13,71 @@ const navLinks = [
   { href: "#tecnologia", label: "Tecnología" },
 ];
 
-// Animaciones para el overlay de pantalla completa
+/* ─── Animaciones del overlay móvil ─── */
 const overlayVariants = {
-  hidden: { opacity: 0 },
-  show: { 
-    opacity: 1,
-    transition: { duration: 0.25 }
-  },
-  exit: { 
+  hidden: {
+    clipPath: "circle(0% at calc(100% - 36px) 32px)",
     opacity: 0,
-    transition: { duration: 0.2 }
+  },
+  show: {
+    clipPath: "circle(150% at calc(100% - 36px) 32px)",
+    opacity: 1,
+    transition: {
+      clipPath: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+      opacity: { duration: 0.15 },
+    },
+  },
+  exit: {
+    clipPath: "circle(0% at calc(100% - 36px) 32px)",
+    opacity: 0,
+    transition: {
+      clipPath: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+      opacity: { duration: 0.3, delay: 0.15 },
+    },
   },
 };
 
-const menuContentVariants = {
-  hidden: { opacity: 0, y: 10 },
+const menuListVariants = {
+  hidden: {},
   show: {
-    opacity: 1,
-    y: 0,
     transition: {
-      duration: 0.35,
-      ease: [0.16, 1, 0.3, 1],
-      staggerChildren: 0.04,
-      delayChildren: 0
-    }
+      staggerChildren: 0.07,
+      delayChildren: 0.2,
+    },
   },
   exit: {
-    opacity: 0,
-    y: 10,
-    transition: { duration: 0.15 }
-  }
+    transition: {
+      staggerChildren: 0.03,
+      staggerDirection: -1,
+    },
+  },
 };
 
 const menuItemVariants = {
-  hidden: { opacity: 0, y: 8 },
-  show: { 
-    opacity: 1, 
+  hidden: { opacity: 0, x: -20 },
+  show: {
+    opacity: 1,
+    x: 0,
+    transition: { type: "spring", stiffness: 300, damping: 30 },
+  },
+  exit: {
+    opacity: 0,
+    x: -20,
+    transition: { duration: 0.15 },
+  },
+};
+
+const ctaVariants = {
+  hidden: { opacity: 0, y: 16 },
+  show: {
+    opacity: 1,
     y: 0,
-    transition: { duration: 0.3 }
+    transition: { type: "spring", stiffness: 200, damping: 25, delay: 0.45 },
+  },
+  exit: {
+    opacity: 0,
+    y: 16,
+    transition: { duration: 0.15 },
   },
 };
 
@@ -77,83 +104,110 @@ export default function Navbar() {
   const scrollToSection = (e, href) => {
     e.preventDefault();
     setIsOpen(false);
-    document.body.style.overflow = "";
     const section = document.querySelector(href);
-    if (section) setTimeout(() => section.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+    if (section) {
+      // Esperar a que termine la animación de cierre antes de hacer scroll
+      setTimeout(() => {
+        document.body.style.overflow = "";
+        section.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 450);
+    }
   };
 
   return (
     <LazyMotion features={domAnimation}>
       <>
-        {/* Overlay de Pantalla Completa */}
+        {/* ═══ Overlay Móvil a Pantalla Completa ═══ */}
         <AnimatePresence>
           {isOpen && (
-            <>
-              {/* Backdrop con glassmorphism */}
-              <m.div
-                key="backdrop"
-                variants={overlayVariants}
-                initial="hidden"
-                animate="show"
-                exit="exit"
-                onClick={() => setIsOpen(false)}
-                className="fixed inset-0 bg-white/60 backdrop-blur-2xl z-50"
-              />
-
-              {/* Contenido del Menú */}
-              <m.div
-                key="menu"
-                variants={menuContentVariants}
-                initial="hidden"
-                animate="show"
-                exit="exit"
-                className="fixed inset-0 z-50 flex flex-col pointer-events-none"
-              >
-                {/* Header - Logo y Botón Cerrar */}
-                <div className="flex items-center justify-between px-6 py-4 pointer-events-auto">
-                  <img src={LogoTlax} alt="Gobierno de Tlaxcala" className="h-9 w-9 object-contain" />
-                  <button
+            <m.div
+              key="mobile-menu"
+              variants={overlayVariants}
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              className="fixed inset-0 z-50 flex flex-col bg-white/70 backdrop-blur-2xl"
+            >
+              {/* ── Header: misma estructura que navbar para alinear logo ── */}
+              <div className="max-w-6xl mx-auto w-full px-4 sm:px-6 py-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <img src={LogoTlax} alt="Gobierno de Tlaxcala" className="h-9 w-9 object-contain" />
+                  </div>
+                  <m.button
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.15 }}
                     onClick={() => setIsOpen(false)}
-                    className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100/80 rounded-full transition-all"
+                    className="p-2 text-gray-500 hover:text-gray-900 hover:bg-white/60 rounded-full transition-colors"
                   >
                     <X size={24} strokeWidth={2} />
-                  </button>
-                </div>
-
-                {/* Enlaces Centrados */}
-                <div className="flex-1 flex flex-col items-center justify-center pointer-events-auto pb-20">
-                  <nav className="flex flex-col items-center gap-1">
-                    {navLinks.map((link) => (
-                      <m.a
-                        key={link.href}
-                        variants={menuItemVariants}
-                        href={link.href}
-                        onClick={(e) => scrollToSection(e, link.href)}
-                        className="text-2xl sm:text-3xl font-semibold text-gray-800 hover:text-primary transition-colors"
-                      >
-                        {link.label}
-                      </m.a>
-                    ))}
-                  </nav>
-
-                  {/* Botón Iniciar Sesión */}
-                  <m.button
-                    variants={menuItemVariants}
-                    onClick={() => {
-                      setIsOpen(false);
-                      navigate("/login");
-                    }}
-                    className="mt-6 bg-primary hover:bg-primary/90 px-8 py-3 rounded-lg text-white font-medium transition-all"
-                  >
-                    Iniciar Sesión
                   </m.button>
                 </div>
+              </div>
+
+              {/* ── Links de Navegación ── */}
+              <m.nav
+                variants={menuListVariants}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                className="flex-1 flex flex-col justify-center px-10 sm:px-16 -mt-10"
+              >
+                {navLinks.map((link, i) => (
+                  <m.a
+                    key={link.href}
+                    variants={menuItemVariants}
+                    href={link.href}
+                    onClick={(e) => scrollToSection(e, link.href)}
+                    className="group flex items-center gap-4 py-3 border-b border-gray-200/60 last:border-b-0"
+                  >
+                    {/* Número decorativo */}
+                    <span className="text-xs font-mono text-gray-300 group-hover:text-primary/50 transition-colors w-5 shrink-0">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+
+                    {/* Label con underline animado */}
+                    <span className="relative text-2xl sm:text-3xl font-semibold text-gray-800 group-hover:text-primary transition-colors duration-200">
+                      {link.label}
+                      <span
+                        className="absolute bottom-0 left-0 h-0.5 bg-primary origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-300"
+                        style={{ width: "100%" }}
+                      />
+                    </span>
+
+                    {/* Flecha al hacer hover */}
+                    <ArrowRight
+                      size={18}
+                      className="ml-auto text-gray-300 group-hover:text-primary group-hover:translate-x-1 transition-all duration-200 opacity-0 group-hover:opacity-100"
+                    />
+                  </m.a>
+                ))}
+              </m.nav>
+
+              {/* ── CTA Botón Iniciar Sesión ── */}
+              <m.div
+                variants={ctaVariants}
+                initial="hidden"
+                animate="show"
+                exit="exit"
+                className="px-10 sm:px-16 pb-12"
+              >
+                <button
+                  onClick={() => {
+                    setIsOpen(false);
+                    navigate("/login");
+                  }}
+                  className="w-full bg-primary hover:bg-primary/90 active:scale-[0.98] px-8 py-4 rounded-2xl text-white font-semibold text-lg transition-all duration-200 shadow-lg shadow-primary/20"
+                >
+                  Iniciar Sesión
+                </button>
               </m.div>
-            </>
+            </m.div>
           )}
         </AnimatePresence>
 
-        {/* Navbar Principal */}
+        {/* ═══ Navbar Principal ═══ */}
         <m.nav
           initial={{ y: -64, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
