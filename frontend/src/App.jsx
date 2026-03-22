@@ -1,26 +1,25 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Core layout
 import DashboardLayout from './layouts/Layout';
 
-// Refactoring all pages to use React.lazy for automatic code splitting
-const LandingPage = lazy(() => import('./pages/LandingPage'));
-const Login = lazy(() => import('./components/auth/Login'));
-const Verification = lazy(() => import('./components/auth/Verification'));
-const ForgotPassword = lazy(() => import('./components/auth/ForgotPassword'));
-const ResetPassword = lazy(() => import('./components/auth/ResetPassword'));
-const SecurityAlert = lazy(() => import('./pages/SecurityAlert'));
+// Static imports for instant navigation
+import LandingPage from './pages/LandingPage';
+import Login from './components/auth/Login';
+import Verification from './components/auth/Verification';
+import ForgotPassword from './components/auth/ForgotPassword';
+import ResetPassword from './components/auth/ResetPassword';
+import SecurityAlert from './pages/SecurityAlert';
 
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const AuditDashboard = lazy(() => import('./pages/AuditDashboard'));
-const AuditConcesionarioDetail = lazy(() => import('./pages/AuditConcesionarioDetail'));
-const VehicleDetail = lazy(() => import('./pages/VehicleDetail'));
-const VehiclesPage = lazy(() => import('./pages/VehiclesPage'));
-const DepositsPage = lazy(() => import('./pages/DepositsPage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const AccountsPage = lazy(() => import('./pages/AccountsPage'));
+import Dashboard from './pages/Dashboard';
+import AuditDashboard from './pages/AuditDashboard';
+import AuditConcesionarioDetail from './pages/AuditConcesionarioDetail';
+import VehicleDetail from './pages/VehicleDetail';
+import VehiclesPage from './pages/VehiclesPage';
+import DepositsPage from './pages/DepositsPage';
+import SettingsPage from './pages/SettingsPage';
+import AccountsPage from './pages/AccountsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,16 +32,9 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const suspenseFallback = (
-    <div className="flex h-screen w-screen items-center justify-center bg-gray-50">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-violet-900"></div>
-    </div>
-  );
-
   return (
     <QueryClientProvider client={queryClient}>
       <HashRouter>
-        <Suspense fallback={suspenseFallback}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
@@ -67,8 +59,7 @@ function App() {
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Routes>
-      </Suspense>
-    </HashRouter>
+      </HashRouter>
     </QueryClientProvider>
   );
 }
