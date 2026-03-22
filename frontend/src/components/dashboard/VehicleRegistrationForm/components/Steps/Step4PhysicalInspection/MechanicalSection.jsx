@@ -1,11 +1,27 @@
 import FormSelect from '../../FormFields/FormSelect';
 import { Cog } from 'lucide-react';
 
-const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
-  
+const MechanicalSection = ({ formData, errors, onChange, getInputClass, isCampoEditable }) => {
+  // Verificar si los campos son editables
+  const editable = {
+    estadoMotor: isCampoEditable ? isCampoEditable('estadoMotor') : true,
+    estadoBateria: isCampoEditable ? isCampoEditable('estadoBateria') : true,
+    tipoTransmision: isCampoEditable ? isCampoEditable('tipoTransmision') : true,
+    estadoFrenos: isCampoEditable ? isCampoEditable('estadoFrenos') : true,
+    aireAcondicionadoFunciona: isCampoEditable ? isCampoEditable('aireAcondicionadoFunciona') : true
+  };
+
   const getStatusStyle = (val, fieldName) => {
+      if (!editable[fieldName]) return 'border-gray-200 bg-gray-50 text-gray-500';
       if (errors[fieldName]) return 'border-gob-rosa bg-white';
       return 'border-gray-200 bg-white';
+  };
+
+  const getSelectClass = (fieldName) => {
+    const base = "w-full h-10 px-3 pr-8 border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm";
+    if (!editable[fieldName]) return `${base} bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed`;
+    if (errors[fieldName]) return `${base} bg-white border-gob-rosa`;
+    return `${base} bg-white border-gray-200`;
   };
 
   return (
@@ -25,7 +41,8 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
                     name="estadoMotor"
                     value={formData.estadoMotor}
                     onChange={onChange}
-                    className="w-full bg-transparent border-none p-0 focus:ring-0 font-medium text-base cursor-pointer outline-none"
+                    disabled={!editable.estadoMotor}
+                    className={`w-full bg-transparent border-none p-0 focus:ring-0 font-medium text-base cursor-pointer outline-none ${!editable.estadoMotor ? 'cursor-not-allowed text-gray-500' : ''}`}
                  >
                     <option value="">Seleccionar...</option>
                     <option value="BUENO">Bueno / Completo</option>
@@ -42,7 +59,8 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
                     name="estadoBateria"
                     value={formData.estadoBateria}
                     onChange={onChange}
-                    className="w-full bg-transparent border-none p-0 focus:ring-0 font-medium text-base cursor-pointer outline-none"
+                    disabled={!editable.estadoBateria}
+                    className={`w-full bg-transparent border-none p-0 focus:ring-0 font-medium text-base cursor-pointer outline-none ${!editable.estadoBateria ? 'cursor-not-allowed text-gray-500' : ''}`}
                  >
                     <option value="">Seleccionar...</option>
                     <option value="BUENO">Presente / Funciona</option>
@@ -58,12 +76,13 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
           <div>
             <label htmlFor="tipoTransmision" className="block text-sm font-semibold text-gray-600 mb-2">Transmisión</label>
             <div className="relative">
-                <select 
+                <select
                   id="tipoTransmision"
-                  name="tipoTransmision" 
-                  value={formData.tipoTransmision} 
-                  onChange={onChange} 
-                  className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors.tipoTransmision ? 'border-gob-rosa' : 'border-gray-200'}`}
+                  name="tipoTransmision"
+                  value={formData.tipoTransmision}
+                  onChange={onChange}
+                  disabled={!editable.tipoTransmision}
+                  className={getSelectClass('tipoTransmision')}
                 >
                   <option value="">Tipo...</option>
                   <option value="MANUAL">Manual</option>
@@ -78,12 +97,13 @@ const MechanicalSection = ({ formData, errors, onChange, getInputClass }) => {
           <div>
             <label htmlFor="estadoFrenos" className="block text-sm font-semibold text-gray-600 mb-2">Sistema de Frenos</label>
              <div className="relative">
-                <select 
+                <select
                   id="estadoFrenos"
-                  name="estadoFrenos" 
-                  value={formData.estadoFrenos} 
-                  onChange={onChange} 
-                  className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors.estadoFrenos ? 'border-gob-rosa' : 'border-gray-200'}`}
+                  name="estadoFrenos"
+                  value={formData.estadoFrenos}
+                  onChange={onChange}
+                  disabled={!editable.estadoFrenos}
+                  className={getSelectClass('estadoFrenos')}
                 >
                   <option value="">Estado...</option>
                   <option value="FUNCIONAL">Funcional</option>

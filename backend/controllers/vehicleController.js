@@ -442,7 +442,7 @@ const getVehicleById = async (req, res) => {
 const updateVehicle = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     // Obtener datos del body (similar a createVehicle)
     const {
       folioProceso, fechaIngreso, autoridad, documentosAdjuntos, fotos,
@@ -453,7 +453,8 @@ const updateVehicle = async (req, res) => {
       estadoFrenos, aireAcondicionadoFunciona, liquidosDrenados, estadoBolsasAire,
       estatusAceite, cantAceite, estatusAnticongelante, cantAnticongelante, estatusCombustible, cantCombustible,
       objetosPersonales, observacionesInspector,
-      depositoId
+      depositoId,
+      camposPermitidos // Array de campos que se permiten editar (viene de una solicitud aprobada)
     } = req.body;
 
     // Verificar que el vehículo exista
@@ -461,6 +462,10 @@ const updateVehicle = async (req, res) => {
     if (!vehiculoExistente) {
       return res.status(404).json({ success: false, message: 'Vehículo no encontrado' });
     }
+
+    // En lugar de rechazar toda la petición porque el frontend envía el formData completo,
+    // simplemente filtraremos el objeto updateData más adelante para asegurar que
+    // solo se modifiquen los campos permitidos.
 
     // Preparar objeto de actualización
     const updateData = {
@@ -498,6 +503,16 @@ const updateVehicle = async (req, res) => {
 
     // Filtrar campos undefined
     Object.keys(updateData).forEach(key => updateData[key] === undefined && delete updateData[key]);
+
+    // Aplicar filtro estricto: Si hay campos permitidos, eliminar cualquier actualización
+    // a campos que no estén explícitamente en la lista de permitidos.
+    if (camposPermitidos && Array.isArray(camposPermitidos) && camposPermitidos.length > 0) {
+      Object.keys(updateData).forEach(key => {
+        if (!camposPermitidos.includes(key)) {
+          delete updateData[key];
+        }
+      });
+    }
 
     const vehiculoActualizado = await prisma.vehiculo.update({
       where: { id },

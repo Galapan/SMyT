@@ -4,11 +4,21 @@ import FormInput from '../FormFields/FormInput';
 import FormSelect from '../FormFields/FormSelect';
 import { Upload } from 'lucide-react';
 
-const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, validatingFields }) => {
+const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, validatingFields, isCampoEditable }) => {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState(null);
   const user = JSON.parse(sessionStorage.getItem('user') || localStorage.getItem('user') || '{}');
   const isAdmin = user.rol === 'SUPER_USUARIO' || user.rol === 'ADMINISTRADOR';
+
+  // Verificar si los campos son editables
+  const editable = {
+    folioProceso: isCampoEditable ? isCampoEditable('folioProceso') : true,
+    fechaIngreso: isCampoEditable ? isCampoEditable('fechaIngreso') : true,
+    autoridad: isCampoEditable ? isCampoEditable('autoridad') : true,
+    depositoId: isCampoEditable ? isCampoEditable('depositoId') : true,
+    documentosAdjuntos: isCampoEditable ? isCampoEditable('documentosAdjuntos') : true,
+    fotos: isCampoEditable ? isCampoEditable('fotos') : true
+  };
 
   const { data: depositos = [] } = useQuery({
     queryKey: ['depositosSelect'],
@@ -114,6 +124,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, 
           isValidating={validatingFields?.folioProceso}
           placeholder="Ej. SMT-2026-001234"
           helperText="Folio único de identificación del proceso"
+          disabled={!editable.folioProceso}
         />
         <FormInput
           label="Fecha de Ingreso *"
@@ -122,6 +133,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, 
           value={formData.fechaIngreso}
           onChange={onChange}
           error={errors.fechaIngreso}
+          disabled={!editable.fechaIngreso}
         />
       </div>
 
@@ -132,6 +144,7 @@ const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, 
         onChange={onChange}
         error={errors.autoridad}
         placeholder="Ej. Fiscalía General del Estado de Tlaxcala"
+        disabled={!editable.autoridad}
       />
 
       {isAdmin && (
@@ -143,11 +156,14 @@ const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, 
           options={depositos}
           error={errors.depositoId}
           placeholder={depositos.length === 0 ? "Cargando corralones..." : "Seleccione un concesionario"}
+          disabled={!editable.depositoId}
         />
       )}
 
       <div>
-        <label htmlFor="fotos-upload" className="block text-sm font-medium text-gray-700 mb-2">Fotografías del Vehículo</label>
+        <label htmlFor="fotos-upload" className="block text-sm font-medium text-gray-700 mb-2">
+          Fotografías del Vehículo {!editable.fotos && '(Solo lectura)'}
+        </label>
 
         {/* Lista de fotos subidas */}
         {formData.fotos && formData.fotos.length > 0 && (
@@ -155,41 +171,51 @@ const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, 
             {formData.fotos.map((url, index) => (
               <div key={url} className="relative group border rounded-lg overflow-hidden h-24 bg-gray-100">
                 <img src={url} alt={`Foto ${index + 1}`} className="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => removeFoto(index)}
-                  className="absolute top-1 right-1 bg-gob-rosa text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                  </svg>
-                </button>
+                {editable.fotos && (
+                  <button
+                    type="button"
+                    onClick={() => removeFoto(index)}
+                    className="absolute top-1 right-1 bg-gob-rosa text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                )}
               </div>
             ))}
           </div>
         )}
 
-        <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-(--color-primary) transition-colors relative">
-          <input
-            id="fotos-upload"
-            type="file"
-            accept="image/*,application/pdf"
-            onChange={handleFileUpload}
-            disabled={uploading}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
-          />
-          <div className="flex flex-col items-center justify-center pointer-events-none">
-            {uploading ? (
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-(--color-primary) mb-3"></div>
-            ) : (
-              <Upload className="w-10 h-10 text-gray-400 mb-3" />
-            )}
-            <p className="text-sm text-gray-600">
-              {uploading ? 'Subiendo archivo...' : 'Haz clic para cargar fotos o arrástralas aquí'}
-            </p>
-            <p className="text-xs text-gray-400 mt-1">JPG, PNG (máx. 10MB)</p>
+        {editable.fotos && (
+          <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-(--color-primary) transition-colors relative">
+            <input
+              id="fotos-upload"
+              type="file"
+              accept="image/*,application/pdf"
+              onChange={handleFileUpload}
+              disabled={uploading}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+            />
+            <div className="flex flex-col items-center justify-center pointer-events-none">
+              {uploading ? (
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-(--color-primary) mb-3"></div>
+              ) : (
+                <Upload className="w-10 h-10 text-gray-400 mb-3" />
+              )}
+              <p className="text-sm text-gray-600">
+                {uploading ? 'Subiendo archivo...' : 'Haz clic para cargar fotos o arrástralas aquí'}
+              </p>
+              <p className="text-xs text-gray-400 mt-1">JPG, PNG (máx. 10MB)</p>
+            </div>
           </div>
-        </div>
+        )}
+
+        {!editable.fotos && formData.fotos && formData.fotos.length > 0 && (
+          <p className="text-xs text-gray-500 italic">
+            Las fotografías no se pueden modificar en esta edición.
+          </p>
+        )}
 
         {uploadError && (
           <p className="text-xs text-gob-rosa mt-2">{uploadError}</p>

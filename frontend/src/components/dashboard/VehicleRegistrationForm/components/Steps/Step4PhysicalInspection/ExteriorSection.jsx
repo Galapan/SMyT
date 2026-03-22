@@ -3,17 +3,39 @@ import FormInput from '../../FormFields/FormInput';
 import ConditionalTextarea from '../../FormFields/ConditionalTextarea';
 import { Truck } from 'lucide-react';
 
-const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass }) => {
+const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass, isCampoEditable }) => {
+  // Verificar si los campos son editables
+  const editable = {
+    estadoCarroceria: isCampoEditable ? isCampoEditable('estadoCarroceria') : true,
+    estadoCristales: isCampoEditable ? isCampoEditable('estadoCristales') : true,
+    obsCristales: isCampoEditable ? isCampoEditable('obsCristales') : true,
+    estadoEspejos: isCampoEditable ? isCampoEditable('estadoEspejos') : true,
+    obsEspejos: isCampoEditable ? isCampoEditable('obsEspejos') : true,
+    cantLlantasDelanteras: isCampoEditable ? isCampoEditable('cantLlantasDelanteras') : true,
+    estadoLlantasDelanteras: isCampoEditable ? isCampoEditable('estadoLlantasDelanteras') : true,
+    cantLlantasTraseras: isCampoEditable ? isCampoEditable('cantLlantasTraseras') : true,
+    estadoLlantasTraseras: isCampoEditable ? isCampoEditable('estadoLlantasTraseras') : true
+  };
+
   const exteriorFields = [
     { label: 'Estado Carrocería', name: 'estadoCarroceria', options: ['BUENO', 'REGULAR', 'MALO'] },
     { label: 'Cristales', name: 'estadoCristales', options: ['COMPLETOS', 'INCOMPLETOS', 'DAÑADOS'], obsName: 'obsCristales' },
     { label: 'Espejos', name: 'estadoEspejos', options: ['COMPLETOS', 'INCOMPLETOS'], obsName: 'obsEspejos' }
   ];
 
-  const getStatusColor = (status, fieldName) => {
-    if (errors[fieldName]) return 'border-gob-rosa';
-    if (!status) return 'border-gray-200 text-gray-500';
-    return 'border-gray-200 text-gray-900';
+  const getSelectClass = (status, fieldName) => {
+    const base = "w-full h-10 px-3 border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm";
+    if (!editable[fieldName]) return `${base} bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed`;
+    if (errors[fieldName]) return `${base} bg-white border-gob-rosa text-gray-900`;
+    if (!status) return `${base} bg-white border-gray-200 text-gray-500`;
+    return `${base} bg-white border-gray-200 text-gray-900`;
+  };
+
+  const getNumberInputClass = (fieldName) => {
+    const base = "w-full h-10 px-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm";
+    if (!editable[fieldName]) return `${base} bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed`;
+    if (errors[fieldName]) return `${base} bg-white border-gob-rosa`;
+    return `${base} bg-white border-gray-300`;
   };
 
   return (
@@ -34,7 +56,8 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                   name={item.name}
                   value={formData[item.name]}
                   onChange={onChange}
-                  className={`w-full h-10 px-3 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${getStatusColor(formData[item.name], item.name)}`}
+                  disabled={!editable[item.name]}
+                  className={getSelectClass(formData[item.name], item.name)}
                 >
                   <option value="">Seleccionar...</option>
                   {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -44,7 +67,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                 </div>
               </div>
               {errors[item.name] && <span className="text-xs text-gob-rosa font-medium">{errors[item.name]}</span>}
-              
+
               {(formData[item.name] === 'DAÑADOS' || formData[item.name] === 'INCOMPLETOS' || formData[item.name] === 'MALO') && item.obsName && (
                  <ConditionalTextarea
                   name={item.obsName}
@@ -54,6 +77,7 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                   placeholder={`Detalles sobre ${item.label.toLowerCase()}...`}
                   rows={2}
                   className="mt-2 text-sm"
+                  disabled={!editable[item.obsName]}
                 />
               )}
             </div>
@@ -82,14 +106,15 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
               <div className="space-y-4">
                 <div>
                   <label htmlFor="cantLlantasDelanteras" className="text-xs font-semibold text-gray-600 mb-1 block">Cantidad (Máx. 2)</label>
-                  <input 
+                  <input
                     id="cantLlantasDelanteras"
-                    type="number" 
-                    name="cantLlantasDelanteras" 
-                    value={formData.cantLlantasDelanteras} 
+                    type="number"
+                    name="cantLlantasDelanteras"
+                    value={formData.cantLlantasDelanteras}
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors.cantLlantasDelanteras ? 'border-gob-rosa' : 'border-gray-300'}`}
+                    disabled={!editable.cantLlantasDelanteras}
+                    className={getNumberInputClass('cantLlantasDelanteras')}
                     min="0"
                     max="2"
                   />
@@ -97,12 +122,13 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                 <div>
                   <label htmlFor="estadoLlantasDelanteras" className="text-xs font-semibold text-gray-600 mb-1 block">Condición</label>
                    <div className="relative">
-                        <select 
+                        <select
                             id="estadoLlantasDelanteras"
-                            name="estadoLlantasDelanteras" 
-                            value={formData.estadoLlantasDelanteras} 
+                            name="estadoLlantasDelanteras"
+                            value={formData.estadoLlantasDelanteras}
                             onChange={onChange}
-                            className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${getStatusColor(formData.estadoLlantasDelanteras, 'estadoLlantasDelanteras')}`}
+                            disabled={!editable.estadoLlantasDelanteras}
+                            className={getSelectClass(formData.estadoLlantasDelanteras, 'estadoLlantasDelanteras')}
                         >
                             <option value="">Seleccionar...</option>
                             <option value="NUEVAS">Nuevas</option>
@@ -130,14 +156,15 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
               <div className="space-y-4">
                 <div>
                   <label htmlFor="cantLlantasTraseras" className="text-xs font-semibold text-gray-600 mb-1 block">Cantidad (Máx. 2)</label>
-                  <input 
+                  <input
                     id="cantLlantasTraseras"
-                    type="number" 
-                    name="cantLlantasTraseras" 
-                    value={formData.cantLlantasTraseras} 
+                    type="number"
+                    name="cantLlantasTraseras"
+                    value={formData.cantLlantasTraseras}
                     onChange={onChange}
                     onKeyDown={onKeyDown}
-                    className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors.cantLlantasTraseras ? 'border-gob-rosa' : 'border-gray-300'}`}
+                    disabled={!editable.cantLlantasTraseras}
+                    className={getNumberInputClass('cantLlantasTraseras')}
                     min="0"
                     max="2"
                   />
@@ -145,12 +172,13 @@ const ExteriorSection = ({ formData, errors, onChange, onKeyDown, getInputClass 
                 <div>
                   <label htmlFor="estadoLlantasTraseras" className="text-xs font-semibold text-gray-600 mb-1 block">Condición</label>
                    <div className="relative">
-                        <select 
+                        <select
                             id="estadoLlantasTraseras"
-                            name="estadoLlantasTraseras" 
-                            value={formData.estadoLlantasTraseras} 
+                            name="estadoLlantasTraseras"
+                            value={formData.estadoLlantasTraseras}
                             onChange={onChange}
-                            className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${getStatusColor(formData.estadoLlantasTraseras, 'estadoLlantasTraseras')}`}
+                            disabled={!editable.estadoLlantasTraseras}
+                            className={getSelectClass(formData.estadoLlantasTraseras, 'estadoLlantasTraseras')}
                         >
                             <option value="">Seleccionar...</option>
                             <option value="NUEVAS">Nuevas</option>

@@ -14,7 +14,8 @@ import {
 } from "lucide-react";
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
+import { m, LazyMotion, domAnimation, AnimatePresence, motion } from 'framer-motion';
+import useDebounce from '../hooks/useDebounce';
 import DepositRegistrationForm from "../components/dashboard/DepositRegistrationForm";
 import TableSkeleton from "../components/common/TableSkeleton";
 import StatsSkeleton from "../components/common/StatsSkeleton";
@@ -103,7 +104,7 @@ const ConfirmStatusModal = ({ isOpen, currentStatus, onClose, onConfirm }) => (
                 className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden mx-4"
               >
                 <div className="p-4 sm:p-6">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${currentStatus ? 'bg-(--color-rojo)/15 text-(--color-rojo)' : 'bg-(--color-verde)/15 text-(--color-verde)'}`}>
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4 ${currentStatus ? 'bg-rojo/15 text-rojo' : 'bg-verde/15 text-verde'}`}>
                     {currentStatus ? <AlertTriangle size={24} /> : <Check size={24} />}
                   </div>
                   <h3 className="text-xl font-bold text-center text-gray-900 mb-2">
@@ -124,7 +125,7 @@ const ConfirmStatusModal = ({ isOpen, currentStatus, onClose, onConfirm }) => (
                     </button>
                     <button 
                       onClick={onConfirm}
-                      className={`flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors opacity-90 hover:opacity-100 ${currentStatus ? 'bg-(--color-rojo)' : 'bg-(--color-verde)'}`}
+                      className={`flex-1 px-4 py-2.5 text-white font-medium rounded-xl transition-colors opacity-90 hover:opacity-100 ${currentStatus ? 'bg-rojo' : 'bg-verde'}`}
                     >
                       {currentStatus ? 'Sí, Desactivar' : 'Sí, Activar'}
                     </button>
@@ -193,8 +194,8 @@ const DepositsStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-(--color-verde)/15 rounded-lg">
-              <Warehouse className="w-6 h-6 text-(--color-verde)" />
+            <div className="p-3 bg-verde/15 rounded-lg">
+              <Warehouse className="w-6 h-6 text-verde" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">
@@ -311,10 +312,20 @@ const DepositsTable = ({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <motion.tbody 
+            key={pagination.currentPage}
+            className="divide-y divide-gray-100"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+            }}
+          >
             {paginatedDepositos.map((deposito) => (
-              <tr
+              <motion.tr
                 key={deposito.id}
+                variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
                 className="hover:bg-gray-50 transition-colors"
               >
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
@@ -338,7 +349,7 @@ const DepositsTable = ({
                   </span>
                 </td>
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
-                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${deposito.activo ? 'bg-(--color-verde)/15 text-(--color-verde)' : 'bg-(--color-rosa)/15 text-(--color-rosa)'}`}>
+                  <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${deposito.activo ? 'bg-verde/15 text-verde' : 'bg-rosa/15 text-rosa'}`}>
                     {deposito.activo ? 'Activo' : 'Inactivo'}
                   </span>
                 </td>
@@ -352,16 +363,26 @@ const DepositsTable = ({
                     />
                   </div>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
-          </tbody>
+          </motion.tbody>
         </table>
 
         {/* Card view for smaller screens */}
-        <div className="md:hidden flex flex-col divide-y divide-gray-100">
+        <motion.div 
+          key={pagination.currentPage}
+          className="md:hidden flex flex-col divide-y divide-gray-100"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+          }}
+        >
           {paginatedDepositos.map((deposito) => (
-            <div
+            <motion.div
               key={deposito.id}
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
               className="p-4 hover:bg-gray-50 transition-colors"
             >
               {/* Top row: Name, Number, Status */}
@@ -374,7 +395,7 @@ const DepositsTable = ({
                     {deposito.nombrePropietario}
                   </div>
                 </div>
-                <span className={`shrink-0 ml-2 px-2 py-0.5 inline-flex text-[10px] font-semibold rounded-full ${deposito.activo ? 'bg-(--color-verde)/15 text-(--color-verde)' : 'bg-(--color-rosa)/15 text-(--color-rosa)'}`}>
+                <span className={`shrink-0 ml-2 px-2 py-0.5 inline-flex text-[10px] font-semibold rounded-full ${deposito.activo ? 'bg-verde/15 text-verde' : 'bg-rosa/15 text-rosa'}`}>
                   {deposito.activo ? 'Activo' : 'Inactivo'}
                 </span>
               </div>
@@ -414,9 +435,9 @@ const DepositsTable = ({
                   ]}
                 />
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     )}
 
@@ -435,6 +456,7 @@ const DepositsTable = ({
 const DepositsPage = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isFormOpen, depositos, stats, loading, searchTerm, toast, confirmModal } = state;
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const navigate = useNavigate();
 
@@ -528,10 +550,10 @@ const DepositsPage = () => {
 
   const filteredDepositos = depositos.filter(
     (d) =>
-      d.nombrePropietario.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.municipio.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.direccion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.numero.includes(searchTerm),
+      d.nombrePropietario.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      d.municipio.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      d.direccion.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      d.numero.includes(debouncedSearchTerm),
   );
 
   const paginatedDepositos = filteredDepositos.slice(

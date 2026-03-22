@@ -1,6 +1,12 @@
 import { Wrench, Check } from 'lucide-react';
 
-const InventorySection = ({ formData, setFormData, errors, onChange, getInputClass }) => {
+const InventorySection = ({ formData, setFormData, errors, onChange, getInputClass, isCampoEditable }) => {
+  // Verificar si los campos son editables
+  const editable = {
+    objetosPersonales: isCampoEditable ? isCampoEditable('objetosPersonales') : true,
+    observacionesInspector: isCampoEditable ? isCampoEditable('observacionesInspector') : true
+  };
+
   const inventoryTags = [
     'Gato Hidráulico', 
     'Llave de Cruz', 
@@ -28,16 +34,18 @@ const InventorySection = ({ formData, setFormData, errors, onChange, getInputCla
                 key={tag}
                 type="button"
                 onClick={() => {
+                  if (!editable.objetosPersonales) return;
                   const newTags = isSelected
                     ? formData.objetosPersonales.filter(t => t !== tag)
                     : [...formData.objetosPersonales, tag];
                   setFormData(prev => ({ ...prev, objetosPersonales: newTags }));
                 }}
+                disabled={!editable.objetosPersonales}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  isSelected 
-                    ? 'bg-gray-800 text-white shadow-sm' 
+                  isSelected
+                    ? 'bg-gray-800 text-white shadow-sm'
                     : 'bg-white border text-gray-600 hover:bg-gray-50 border-gray-200'
-                }`}
+                } ${!editable.objetosPersonales ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {isSelected && <Check size={12} className="inline mr-1" />}
                 {tag}
@@ -53,8 +61,9 @@ const InventorySection = ({ formData, setFormData, errors, onChange, getInputCla
             value={formData.observacionesInspector}
             onChange={onChange}
             rows={3}
+            disabled={!editable.observacionesInspector}
             placeholder="Describa otros objetos personales o detalles adicionales..."
-            className={`${getInputClass('observacionesInspector')} resize-none`}
+            className={`${getInputClass('observacionesInspector')} resize-none ${!editable.observacionesInspector ? 'bg-gray-100 cursor-not-allowed' : ''}`}
           />
         </div>
       </div>

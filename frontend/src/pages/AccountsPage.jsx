@@ -3,7 +3,8 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Users, RefreshCw, Search, Eye, MoreVertical, Shield, Power, Check, AlertCircle, X, AlertTriangle, Trash2 } from 'lucide-react';
-import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
+import { motion, m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
+import useDebounce from '../hooks/useDebounce';
 import { formatRole } from '../utils/formatRole';
 import AccountWizard from '../components/dashboard/AccountWizard';
 import AccountDetailsModal from '../components/dashboard/AccountDetailsModal';
@@ -32,7 +33,7 @@ const AccountsHeader = ({ loading, onRefresh, onNewAccount }) => (
       </button>
       <button 
         onClick={onNewAccount}
-        className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
+        className="px-4 py-2 bg-(--color-primary) hover:brightness-90 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
       >
         <Plus size={20} className="mr-2" />
         Nueva Cuenta
@@ -49,7 +50,7 @@ const AccountsStats = ({ loading, stats }) => (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-violet-100 rounded-lg">
+            <div className="p-3 bg-(--color-primary)/15 rounded-lg">
               <Users className="w-6 h-6 text-(--color-primary)" />
             </div>
             <div>
@@ -150,9 +151,22 @@ const AccountsTable = ({
               <th className="px-4 py-3 sm:px-6 sm:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <motion.tbody 
+            key={pagination.currentPage}
+            className="divide-y divide-gray-100"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+            }}
+          >
             {paginatedUsers.map((user) => (
-              <tr key={user.id} className="hover:bg-gray-50 transition-colors">
+              <motion.tr 
+                key={user.id} 
+                className="hover:bg-gray-50 transition-colors"
+                variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
+              >
                 <td className="px-4 py-3 sm:px-6 sm:py-3.5 whitespace-nowrap">
                   <div className="flex items-center gap-3">
                     <div className="h-9 w-9 shrink-0 rounded-full border border-gray-200 bg-white overflow-hidden shadow-sm">
@@ -194,15 +208,28 @@ const AccountsTable = ({
                     ]}
                   />
                 </td>
-              </tr>
+              </motion.tr>
             ))}
-          </tbody>
+          </motion.tbody>
         </table>
         
         {/* Card view for smaller screens */}
-        <div className="md:hidden flex flex-col divide-y divide-gray-100">
+        <motion.div 
+          key={pagination.currentPage}
+          className="md:hidden flex flex-col divide-y divide-gray-100"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+          }}
+        >
           {paginatedUsers.map((user) => (
-            <div key={user.id} className="p-4 hover:bg-gray-50 transition-colors">
+            <motion.div 
+              key={user.id} 
+              className="p-4 hover:bg-gray-50 transition-colors"
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+            >
               {/* Top row: Avatar, Name, Status */}
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center">
@@ -250,9 +277,9 @@ const AccountsTable = ({
                   ]}
                 />
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     )}
 
@@ -470,6 +497,7 @@ function reducer(state, action) {
 const AccountsPage = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isFormOpen, isDetailsOpen, selectedUser, searchTerm, toast, confirmModal, deleteModal } = state;
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -587,12 +615,12 @@ const AccountsPage = () => {
 
   const filteredUsers = useMemo(() => {
     return users.filter(u => 
-      u.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      u.rol.toLowerCase().includes(searchTerm.toLowerCase())
+      u.nombre.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      u.apellido.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      u.email.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+      u.rol.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
     );
-  }, [users, searchTerm]);
+  }, [users, debouncedSearchTerm]);
 
   const paginatedUsers = useMemo(() => {
     const start = (state.currentPage - 1) * state.itemsPerPage;

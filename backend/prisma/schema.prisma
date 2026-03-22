@@ -1,24 +1,155 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
-// Enum para los 3 tipos de rol
+model Usuario {
+  id                   String             @id @default(uuid())
+  email                String             @unique
+  password             String
+  nombre               String
+  apellido             String
+  rol                  Rol
+  activo               Boolean            @default(true)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  depositoId           String?
+  creadoPorId          String?
+  fotoUrl              String?            @default("https://ui-avatars.com/api/?background=random&color=fff&name=User")
+  codigoVerificacion   String?
+  expiracionCodigo     DateTime?
+  verificado           Boolean            @default(true)
+  tokenSesion          String?
+  solicitudesResueltas SolicitudEdicion[] @relation("UsuarioResolutor")
+  solicitudesCreadas   SolicitudEdicion[] @relation("UsuarioSolicitante")
+  solicitudesAprobadas SolicitudEdicion[] @relation("UsuarioAprobador")
+  solicitudesCompletadas SolicitudEdicion[] @relation("UsuarioCompletador")
+  creadoPor            Usuario?           @relation("UsuarioCreador", fields: [creadoPorId], references: [id])
+  usuariosCreados      Usuario[]          @relation("UsuarioCreador")
+  deposito             Deposito?          @relation(fields: [depositoId], references: [id])
+  vehiculos            Vehiculo[]
+
+  @@map("usuarios")
+}
+
+model Deposito {
+  id                  String     @id @default(uuid())
+  nombre              String
+  municipio           String
+  direccion           String
+  capacidad           Int
+  telefono            String
+  nombrePropietario   String
+  rfc                 String
+  telefonoPropietario String
+  activo              Boolean    @default(true)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  usuarios            Usuario[]
+  vehiculos           Vehiculo[]
+
+  @@map("depositos")
+}
+
+model Vehiculo {
+  id                        String             @id @default(uuid())
+  folioProceso              String             @unique
+  fechaIngreso              DateTime           @default(now())
+  autoridad                 String
+  documentosAdjuntos        String[]
+  noInventario              String             @unique
+  marcaTipo                 String
+  anio                      Int
+  tipoServicio              TipoServicio
+  vin                       String             @unique
+  placa                     String             @unique
+  noMotor                   String
+  colorOriginal             String
+  colorActual               String
+  odometro                  Int
+  estatusLegal              EstatusLegal
+  tieneActaBaja             Boolean            @default(false)
+  noOficio                  String?
+  fechaActaBaja             DateTime?
+  tieneTituloFactura        Boolean            @default(false)
+  estadoCarroceria          String?
+  estadoCristales           String?
+  estadoEspejos             String?
+  estadoLlantasDelanteras   String?
+  estadoLlantasTraseras     String?
+  motorCompleto             Boolean?
+  bateriaPresente           Boolean?
+  tipoTransmision           TipoTransmision?
+  estadoAsientos            String?
+  estadoCinturones          String?
+  estadoVolanteTablero      String?
+  estadoFrenos              String?
+  aireAcondicionadoFunciona Boolean?
+  liquidosDrenados          Boolean            @default(false)
+  estadoBolsasAire          String?
+  observacionesInspector    String?
+  activo                    Boolean            @default(true)
+  fechaSalida               DateTime?
+  justificacionBaja         String?
+  documentoPdfUrl           String?
+  depositoId                String
+  registradoPorId           String?
+  createdAt                 DateTime           @default(now())
+  updatedAt                 DateTime           @updatedAt
+  fotos                     String[]
+  cantAceite                String?
+  cantAnticongelante        String?
+  cantCombustible           String?
+  estatusAceite             String?
+  estatusAnticongelante     String?
+  estatusCombustible        String?
+  objetosPersonales         String[]
+  solicitudesEdicion        SolicitudEdicion[]
+  deposito                  Deposito           @relation(fields: [depositoId], references: [id])
+  registradoPor             Usuario?           @relation(fields: [registradoPorId], references: [id])
+
+  @@map("vehiculos")
+}
+
+model SolicitudEdicion {
+  id                String          @id @default(uuid())
+  motivo            String
+  camposIncorrectos String[]
+  estatus           EstatusSolicitud @default(PENDIENTE)
+  fechaSolicitud    DateTime        @default(now())
+  fechaResolucion   DateTime?
+  vehiculoId        String
+  solicitanteId     String?
+  resolutorId       String?
+  aprobadoPorId     String?
+  completadoPorId   String?
+  resolutor         Usuario?        @relation("UsuarioResolutor", fields: [resolutorId], references: [id])
+  solicitante       Usuario?        @relation("UsuarioSolicitante", fields: [solicitanteId], references: [id])
+  aprobadoPor       Usuario?        @relation("UsuarioAprobador", fields: [aprobadoPorId], references: [id])
+  completadoPor     Usuario?        @relation("UsuarioCompletador", fields: [completadoPorId], references: [id])
+  vehiculo          Vehiculo        @relation(fields: [vehiculoId], references: [id])
+
+  @@map("solicitudes_edicion")
+}
+
 enum Rol {
   SUPER_USUARIO
   ADMINISTRADOR
   ADMINISTRADOR_CONCESIONARIO
 }
 
-// Enum para estatus legal del vehículo
+enum EstatusSolicitud {
+  PENDIENTE
+  APROBADA
+  RECHAZADA
+  COMPLETADA
+}
+
 enum EstatusLegal {
   ROBADO
   DECOMISADO
@@ -26,191 +157,12 @@ enum EstatusLegal {
   SINIESTRADO
 }
 
-// Enum para tipo de servicio
 enum TipoServicio {
   PARTICULAR
   PUBLICO
 }
 
-// Enum para tipo de transmisión
 enum TipoTransmision {
   MANUAL
   AUTOMATICA
-}
-
-// Tabla de usuarios (todos los roles)
-model Usuario {
-  id              String    @id @default(uuid())
-  email           String    @unique
-  password        String
-  nombre          String
-  apellido        String
-  rol             Rol
-  fotoUrl         String?   @default("https://ui-avatars.com/api/?background=random&color=fff&name=User")
-  activo          Boolean   @default(true)
-  verificado      Boolean   @default(true) // Set to true by default for existing users, false for new ones
-  codigoVerificacion String?
-  expiracionCodigo   DateTime?
-  tokenSesion     String?   // Token de sesión activa para prevenir múltiples sesiones
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  // Relación: Usuario Concesionario pertenece a un depósito
-  depositoId      String?
-  deposito        Deposito? @relation(fields: [depositoId], references: [id])
-
-  // Relación: Administrador que creó este usuario
-  creadoPorId     String?
-  creadoPor       Usuario?  @relation("UsuarioCreador", fields: [creadoPorId], references: [id], onDelete: SetNull)
-  usuariosCreados Usuario[] @relation("UsuarioCreador")
-
-  // Vehículos registrados por este usuario
-  vehiculos       Vehiculo[]
-
-  // Solicitudes de Edición de Expedientes
-  solicitudesCreadas   SolicitudEdicion[] @relation("UsuarioSolicitante")
-  solicitudesResueltas SolicitudEdicion[] @relation("UsuarioResolutor")
-
-  @@map("usuarios")
-}
-
-// Depósitos vehiculares
-model Deposito {
-  id                    String    @id @default(uuid())
-  nombre                String
-  municipio             String
-  direccion             String
-  capacidad             Int       // Capacidad máxima de vehículos
-  telefono              String
-  
-  // Datos del propietario/concesionario
-  nombrePropietario     String
-  rfc                   String
-  telefonoPropietario   String
-  
-  activo                Boolean   @default(true)
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-
-  // Usuarios asignados a este depósito
-  usuarios    Usuario[]
-  
-  // Vehículos en este depósito
-  vehiculos   Vehiculo[]
-
-  @@map("depositos")
-}
-
-// Vehículos (inventario) - Expandido para 4 pasos del formulario
-model Vehiculo {
-  id                String    @id @default(uuid())
-
-  // ===== PASO 1: DATOS ADMINISTRATIVOS =====
-  folioProceso        String    @unique
-  fechaIngreso        DateTime  @default(now())
-  autoridad           String
-  documentosAdjuntos  String[]  // URLs de archivos subidos
-  fotos               String[]  // URLs de fotos del vehículo
-
-  // ===== PASO 2: DATOS DEL VEHÍCULO =====
-  noInventario        String    @unique
-  marcaTipo           String
-  anio                Int
-  tipoServicio        TipoServicio
-  vin                 String    @unique
-  placa               String    @unique
-  noMotor             String
-  colorOriginal       String
-  colorActual         String
-  odometro            Int
-
-  // ===== PASO 3: ESTATUS LEGAL =====
-  estatusLegal        EstatusLegal
-  tieneActaBaja       Boolean   @default(false)
-  noOficio            String?
-  fechaActaBaja       DateTime?
-  tieneTituloFactura  Boolean   @default(false)
-
-  // ===== PASO 4: INSPECCIÓN FÍSICA =====
-  // Carrocería
-  estadoCarroceria          String?
-  estadoCristales           String?
-  estadoEspejos             String?
-  estadoLlantasDelanteras   String?
-  estadoLlantasTraseras     String?
-  
-  // Mecánica
-  motorCompleto             Boolean?
-  bateriaPresente           Boolean?
-  tipoTransmision           TipoTransmision?
-  
-  // Interior
-  estadoAsientos            String?
-  estadoCinturones          String?
-  estadoVolanteTablero      String?
-  
-  // Sistemas
-  estadoFrenos              String?
-  aireAcondicionadoFunciona Boolean?
-  
-  // Ambiental (CRÍTICO)
-  liquidosDrenados          Boolean   @default(false)
-  estadoBolsasAire          String?
-  estatusAceite             String?
-  cantAceite                String?
-  estatusAnticongelante     String?
-  cantAnticongelante        String?
-  estatusCombustible        String?
-  cantCombustible           String?
-  
-  // Inventario
-  objetosPersonales         String[]
-  
-  // Observaciones
-  observacionesInspector    String?
-
-  // ===== CONTROL =====
-  activo            Boolean   @default(true)
-  fechaSalida       DateTime?
-  justificacionBaja String?
-  documentoPdfUrl   String?
-
-  // Depósito donde está el vehículo
-  depositoId        String
-  deposito          Deposito  @relation(fields: [depositoId], references: [id])
-
-  // Usuario que registró el vehículo
-  registradoPorId   String?
-  registradoPor     Usuario?   @relation(fields: [registradoPorId], references: [id], onDelete: SetNull)
-
-  // Solicitudes de Edición recibidas
-  solicitudesEdicion SolicitudEdicion[]
-
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-
-  @@map("vehiculos")
-}
-
-// Solicitudes de Edición de Expedientes por parte del SMyT
-model SolicitudEdicion {
-  id              String   @id @default(uuid())
-  motivo          String   @db.Text
-  estatus         String   @default("PENDIENTE") // PENDIENTE, RESUELTA, CANCELADA
-  fechaSolicitud  DateTime @default(now())
-  fechaResolucion DateTime?
-
-  // Vehículo afectado
-  vehiculoId      String
-  vehiculo        Vehiculo @relation(fields: [vehiculoId], references: [id])
-
-  // Admin SMyT que solicita el cambio
-  solicitanteId   String?
-  solicitante     Usuario?  @relation("UsuarioSolicitante", fields: [solicitanteId], references: [id], onDelete: SetNull)
-
-  // Usuario (Concesionario o Admin) que resolvió la solicitud
-  resolutorId     String?
-  resolutor       Usuario? @relation("UsuarioResolutor", fields: [resolutorId], references: [id], onDelete: SetNull)
-
-  @@map("solicitudes_edicion")
 }

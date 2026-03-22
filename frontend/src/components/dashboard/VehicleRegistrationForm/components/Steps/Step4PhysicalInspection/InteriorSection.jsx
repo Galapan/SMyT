@@ -1,6 +1,18 @@
 import { Armchair } from 'lucide-react';
 
-const InteriorSection = ({ formData, errors, onChange, getInputClass }) => {
+const InteriorSection = ({ formData, errors, onChange, getInputClass, isCampoEditable }) => {
+  // Verificar si los campos son editables
+  const editable = {
+    estadoAsientos: isCampoEditable ? isCampoEditable('estadoAsientos') : true,
+    obsAsientos: isCampoEditable ? isCampoEditable('obsAsientos') : true,
+    estadoCinturones: isCampoEditable ? isCampoEditable('estadoCinturones') : true,
+    obsCinturones: isCampoEditable ? isCampoEditable('obsCinturones') : true,
+    estadoVolanteTablero: isCampoEditable ? isCampoEditable('estadoVolanteTablero') : true,
+    obsVolanteTablero: isCampoEditable ? isCampoEditable('obsVolanteTablero') : true,
+    estadoBolsasAire: isCampoEditable ? isCampoEditable('estadoBolsasAire') : true,
+    obsBolsasAire: isCampoEditable ? isCampoEditable('obsBolsasAire') : true
+  };
+
   const interiorFields = [
     { label: 'Asientos', name: 'estadoAsientos', options: ['BUENO', 'REGULAR', 'MALO'], obsName: 'obsAsientos' },
     { label: 'Cinturones', name: 'estadoCinturones', options: ['COMPLETOS', 'INCOMPLETOS'], obsName: 'obsCinturones' },
@@ -8,10 +20,19 @@ const InteriorSection = ({ formData, errors, onChange, getInputClass }) => {
     { label: 'Bolsas de Aire', name: 'estadoBolsasAire', options: ['PRESENTES', 'DESPLEGADAS', 'AUSENTES'], obsName: 'obsBolsasAire' }
   ];
 
-  const getStatusColor = (status, fieldName) => {
-    if (errors[fieldName]) return 'border-gob-rosa';
-    if (!status) return 'border-gray-200 text-gray-500';
-    return 'border-gray-200 text-gray-900';
+  const getSelectClass = (status, fieldName) => {
+    const base = "w-full h-10 px-3 border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm";
+    if (!editable[fieldName]) return `${base} bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed`;
+    if (errors[fieldName]) return `${base} bg-white border-gob-rosa text-gray-900`;
+    if (!status) return `${base} bg-white border-gray-200 text-gray-500`;
+    return `${base} bg-white border-gray-200 text-gray-900`;
+  };
+
+  const getObservationClass = (fieldName) => {
+    const base = "w-full text-sm border focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 rounded-lg py-2 px-3 transition-all placeholder-gray-400";
+    if (!editable[fieldName]) return `${base} bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed`;
+    if (errors[fieldName]) return `${base} border-gob-rosa bg-gob-rosa/10 text-gob-rosa`;
+    return `${base} border-gray-200 bg-white text-gray-700`;
   };
 
   return (
@@ -30,12 +51,13 @@ const InteriorSection = ({ formData, errors, onChange, getInputClass }) => {
               </div>
               
               <div className="relative">
-                 <select 
+                 <select
                   id={item.name}
-                  name={item.name} 
-                  value={formData[item.name]} 
-                  onChange={onChange} 
-                  className={`w-full h-10 px-3 bg-white rounded-lg border appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${getStatusColor(formData[item.name], item.name)}`}
+                  name={item.name}
+                  value={formData[item.name]}
+                  onChange={onChange}
+                  disabled={!editable[item.name]}
+                  className={getSelectClass(formData[item.name], item.name)}
                 >
                   <option value="">Seleccionar...</option>
                   {item.options.map(opt => <option key={opt} value={opt}>{opt}</option>)}
@@ -53,8 +75,9 @@ const InteriorSection = ({ formData, errors, onChange, getInputClass }) => {
                         name={item.obsName}
                         value={formData[item.obsName]}
                         onChange={onChange}
+                        disabled={!editable[item.obsName]}
                         placeholder={`Observaciones sobre ${item.label.toLowerCase()}...`}
-                        className={`w-full text-sm border focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 rounded-lg py-2 px-3 transition-all ${errors[item.obsName] ? 'border-gob-rosa bg-gob-rosa/10 placeholder-gob-rosa/50 text-gob-rosa' : 'border-gray-200 bg-white placeholder-gray-400 text-gray-700'}`}
+                        className={getObservationClass(item.obsName)}
                     />
                     {errors[item.obsName] && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors[item.obsName]}</span>}
                 </div>

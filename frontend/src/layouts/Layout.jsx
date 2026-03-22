@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useOutlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard,
   Warehouse,
@@ -25,7 +26,16 @@ const DashboardLayout = () => {
   const [user, setUser] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Scroll al inicio al cambiar de ruta
+  useEffect(() => {
+    const mainContent = document.getElementById('main-scroll-container');
+    if (mainContent) {
+      mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [location.pathname]);
   const queryClient = useQueryClient();
+  const outlet = useOutlet();
 
   // Helper para imagen
   const getAvatarUrl = (u) => {
@@ -212,9 +222,22 @@ const DashboardLayout = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 lg:p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto lg:h-full animate-fade-in">
-            <Outlet />
+        <main id="main-scroll-container" className="flex-1 p-4 lg:p-8 overflow-x-hidden overflow-y-auto bg-gray-50/50">
+          <div className="max-w-7xl mx-auto lg:h-full">
+            <AnimatePresence mode="wait">
+              {outlet && (
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0, scale: 0.98, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.98, y: -15, transition: { duration: 0.15 } }}
+                  transition={{ duration: 0.3, type: 'spring', bounce: 0, damping: 20 }}
+                  className="h-full w-full"
+                >
+                  {outlet}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </main>
       </div>

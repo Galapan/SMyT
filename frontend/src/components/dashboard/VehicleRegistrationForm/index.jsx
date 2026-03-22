@@ -15,7 +15,7 @@ import Step2VehicleData from './components/Steps/Step2VehicleData';
 import Step3LegalStatus from './components/Steps/Step3LegalStatus';
 import Step4PhysicalInspection from './components/Steps/Step4PhysicalInspection';
 
-const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) => {
+const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData, camposIncorrectos = [] }) => {
   const {
     currentStep,
     direction,
@@ -32,8 +32,10 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
     handleSubmit,
     getInputClass,
     duplicateFields,
-    validatingFields
-  } = useVehicleForm(onClose, onSuccess, initialData);
+    validatingFields,
+    isCampoEditable,
+    camposPermitidos
+  } = useVehicleForm(onClose, onSuccess, initialData, camposIncorrectos);
 
   const steps = [
     { id: 1, name: 'Datos Administrativos', icon: FileText },
@@ -41,6 +43,9 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
     { id: 3, name: 'Estatus Legal', icon: Shield },
     { id: 4, name: 'Inspección Física', icon: ClipboardCheck }
   ];
+
+  // Determinar si es edición con campos restringidos
+  const esEdicionRestringida = camposPermitidos && camposPermitidos.length > 0;
 
   const backdropVariants = {
     hidden: { opacity: 0 },
@@ -79,6 +84,20 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
         <div className="sticky top-0 bg-white z-10 px-8 pt-6 pb-4 border-b border-gray-100">
           <ModalHeader onClose={onClose} />
           <StepIndicator steps={steps} currentStep={currentStep} />
+          
+          {/* Alerta de edición restringida */}
+          {esEdicionRestringida && (
+            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-3">
+              <AlertCircle size={18} className="text-amber-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-amber-800">Edición Restringida</p>
+                <p className="text-xs text-amber-700 mt-0.5">
+                  Solo puedes editar <strong>{camposPermitidos.length} campo(s)</strong> autorizado(s). 
+                  Los demás campos aparecen deshabilitados.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Global Error */}
@@ -102,6 +121,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
                 onChange={handleChange}
                 duplicateFields={duplicateFields}
                 validatingFields={validatingFields}
+                isCampoEditable={isCampoEditable}
               />
             )}
 
@@ -113,6 +133,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
                 onKeyDown={handleNumericKeyDown}
                 duplicateFields={duplicateFields}
                 validatingFields={validatingFields}
+                isCampoEditable={isCampoEditable}
               />
             )}
 
@@ -121,6 +142,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
                 formData={formData}
                 errors={errors}
                 onChange={handleChange}
+                isCampoEditable={isCampoEditable}
               />
             )}
 
@@ -132,6 +154,7 @@ const VehicleRegistrationForm = ({ isOpen, onClose, onSuccess, initialData }) =>
                 onChange={handleChange}
                 onKeyDown={handleNumericKeyDown}
                 getInputClass={getInputClass}
+                isCampoEditable={isCampoEditable}
               />
             )}
           </div>

@@ -1,6 +1,31 @@
 import { AlertTriangle } from 'lucide-react';
 
-const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => {
+const EnvironmentalSection = ({ formData, errors, onChange, getInputClass, isCampoEditable }) => {
+  // Verificar si los campos son editables
+  const editable = {
+    estatusAceite: isCampoEditable ? isCampoEditable('estatusAceite') : true,
+    cantAceite: isCampoEditable ? isCampoEditable('cantAceite') : true,
+    estatusAnticongelante: isCampoEditable ? isCampoEditable('estatusAnticongelante') : true,
+    cantAnticongelante: isCampoEditable ? isCampoEditable('cantAnticongelante') : true,
+    estatusCombustible: isCampoEditable ? isCampoEditable('estatusCombustible') : true,
+    cantCombustible: isCampoEditable ? isCampoEditable('cantCombustible') : true,
+    liquidosDrenados: isCampoEditable ? isCampoEditable('liquidosDrenados') : true
+  };
+
+  const getSelectClass = (fieldName) => {
+    const base = "w-full h-10 px-3 pr-8 border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm";
+    if (!editable[fieldName]) return `${base} bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed`;
+    if (errors[fieldName]) return `${base} bg-white border-gob-rosa`;
+    return `${base} bg-white border-gray-300`;
+  };
+
+  const getInputClassStatus = (isDisabled, fieldName) => {
+    const base = "w-full h-10 px-3 border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm";
+    if (isDisabled || !editable[fieldName]) return `${base} bg-gray-50 border-gray-200 text-gray-500 cursor-not-allowed placeholder-gray-400`;
+    if (errors[fieldName]) return `${base} bg-white border-gob-rosa`;
+    return `${base} bg-white border-gray-300`;
+  };
+
   const environmentalItems = [
     { label: 'Aceite de Motor', statusKey: 'estatusAceite', cantKey: 'cantAceite' },
     { label: 'Anticongelante', statusKey: 'estatusAnticongelante', cantKey: 'cantAnticongelante' },
@@ -21,11 +46,12 @@ const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => 
               <span className="text-sm font-semibold text-gray-700 mt-2">{row.label}</span>
               <div className="w-full">
                 <div className="relative">
-                  <select 
-                    name={row.statusKey} 
-                    value={formData[row.statusKey]} 
-                    onChange={onChange} 
-                    className={`w-full h-10 px-3 pr-8 bg-white border rounded-lg appearance-none focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-all text-sm ${errors[row.statusKey] ? 'border-gob-rosa' : 'border-gray-300'}`}
+                  <select
+                    name={row.statusKey}
+                    value={formData[row.statusKey]}
+                    onChange={onChange}
+                    disabled={!editable[row.statusKey]}
+                    className={getSelectClass(row.statusKey)}
                   >
                     <option value="">Estatus...</option>
                     <option value="DRENADO">Drenado</option>
@@ -39,14 +65,14 @@ const EnvironmentalSection = ({ formData, errors, onChange, getInputClass }) => 
               </div>
               
               <div className="w-full">
-                <input 
-                  type="text" 
-                  name={row.cantKey} 
-                  value={formData[row.cantKey]} 
-                  onChange={onChange} 
-                  disabled={isDisabled}
+                <input
+                  type="text"
+                  name={row.cantKey}
+                  value={formData[row.cantKey]}
+                  onChange={onChange}
+                  disabled={isDisabled || !editable[row.cantKey]}
                   placeholder={isDisabled ? "N/A - Drenado" : "Cantidad (ej. 25%, 2L)"}
-                  className={`w-full h-10 px-3 bg-white border rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors text-sm ${errors[row.cantKey] ? 'border-gob-rosa' : 'border-gray-300'} ${isDisabled ? 'bg-gray-100 cursor-not-allowed text-gray-400' : ''}`}
+                  className={getInputClassStatus(isDisabled, row.cantKey)}
                 />
                 {errors[row.cantKey] && <span className="text-xs text-gob-rosa font-medium mt-1 block">{errors[row.cantKey]}</span>}
               </div>

@@ -16,7 +16,7 @@ const DUPLICATE_MESSAGES = {
   noInventario: 'Ya existe un vehículo con este número de inventario'
 };
 
-export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
+export const useVehicleForm = (onClose, onSuccess, initialData = null, camposIncorrectos = []) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [direction, setDirection] = useState('right');
   const [loading, setLoading] = useState(false);
@@ -24,9 +24,26 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
   const [errors, setErrors] = useState({});
   const [duplicateFields, setDuplicateFields] = useState({});
   const [validatingFields, setValidatingFields] = useState({});
+  const [camposPermitidos, setCamposPermitidos] = useState(camposIncorrectos);
 
   // Refs para debounce
   const debounceRefs = useRef({});
+
+  // Actualizar campos permitidos cuando cambie el parámetro
+  useEffect(() => {
+    setCamposPermitidos(camposIncorrectos);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(camposIncorrectos)]);
+
+  // Función para verificar si un campo es editable
+  const isCampoEditable = useCallback((campoId) => {
+    // Si no hay camposPermitidos (edición normal), todos los campos son editables
+    if (!camposPermitidos || camposPermitidos.length === 0) {
+      return true;
+    }
+    // Si hay camposPermitidos, solo esos campos son editables
+    return camposPermitidos.includes(campoId);
+  }, [camposPermitidos]);
 
   const [formData, setFormData] = useState({
     // Paso 1: Datos Administrativos
@@ -447,20 +464,28 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
 
       const method = isEditMode ? 'PUT' : 'POST';
 
+      // Preparar body de la solicitud
+      const requestBody = {
+        ...formData,
+        anio: parseInt(formData.anio),
+        odometro: parseInt(formData.odometro),
+        fechaIngreso: new Date(formData.fechaIngreso).toISOString(),
+        fechaActaBaja: formData.fechaActaBaja ? new Date(formData.fechaActaBaja).toISOString() : null,
+        registradoPorId: user.id
+      };
+
+      // Si hay camposIncorrectos, enviarlos como camposPermitidos para validación en backend
+      if (camposIncorrectos && camposIncorrectos.length > 0) {
+        requestBody.camposPermitidos = camposIncorrectos;
+      }
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({
-          ...formData,
-          anio: parseInt(formData.anio),
-          odometro: parseInt(formData.odometro),
-          fechaIngreso: new Date(formData.fechaIngreso).toISOString(),
-          fechaActaBaja: formData.fechaActaBaja ? new Date(formData.fechaActaBaja).toISOString() : null,
-          registradoPorId: user.id
-        })
+        body: JSON.stringify(requestBody)
       });
 
       const data = await response.json();
@@ -503,6 +528,8 @@ export const useVehicleForm = (onClose, onSuccess, initialData = null) => {
     handleSubmit,
     getInputClass,
     duplicateFields,
-    validatingFields
+    validatingFields,
+    isCampoEditable,
+    camposPermitidos
   };
 };

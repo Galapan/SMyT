@@ -8,6 +8,8 @@ import ActionMenu from '../components/common/ActionMenu';
 import TableSkeleton from '../components/common/TableSkeleton';
 import StatsSkeleton from '../components/common/StatsSkeleton';
 import Pagination from '../components/common/Pagination';
+import { motion } from 'framer-motion';
+import useDebounce from '../hooks/useDebounce';
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
   ? import.meta.env.VITE_API_URL 
@@ -47,7 +49,7 @@ const VehiclesStats = ({ loading, stats }) => (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-violet-100 rounded-lg">
+            <div className="p-3 bg-(--color-primary)/15 rounded-lg">
               <Car className="w-6 h-6 text-(--color-primary)" />
             </div>
             <div>
@@ -58,8 +60,8 @@ const VehiclesStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-(--color-verde)/15 rounded-lg">
-              <Car className="w-6 h-6 text-(--color-verde)" />
+            <div className="p-3 bg-verde/15 rounded-lg">
+              <Car className="w-6 h-6 text-verde" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.ingresosHoy}</p>
@@ -69,8 +71,8 @@ const VehiclesStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-(--color-naranja)/15 rounded-lg">
-              <Car className="w-6 h-6 text-(--color-naranja)" />
+            <div className="p-3 bg-naranja/15 rounded-lg">
+              <Car className="w-6 h-6 text-naranja" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.totalDepositos}</p>
@@ -80,8 +82,8 @@ const VehiclesStats = ({ loading, stats }) => (
         </div>
         <div className="bg-white rounded-xl p-4 md:p-6 shadow-sm border border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-(--color-rojo)/15 rounded-lg">
-              <Car className="w-6 h-6 text-(--color-rojo)" />
+            <div className="p-3 bg-rojo/15 rounded-lg">
+              <Car className="w-6 h-6 text-rojo" />
             </div>
             <div>
               <p className="text-2xl font-bold text-gray-900">{stats.liberadosMes}</p>
@@ -171,9 +173,22 @@ const VehiclesTable = ({
               <th className="px-4 py-3 sm:px-6 sm:py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <motion.tbody 
+            key={pagination.currentPage}
+            className="divide-y divide-gray-100"
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0 },
+              visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+            }}
+          >
             {paginatedVehiculos.map((vehiculo) => (
-              <tr key={vehiculo.id} className="hover:bg-gray-50 transition-colors">
+              <motion.tr 
+                key={vehiculo.id} 
+                variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
+                className="hover:bg-gray-50 transition-colors"
+              >
                 <td className="px-4 py-3 sm:px-6 sm:py-4 whitespace-nowrap">
                   <span className="text-sm font-medium text-(--color-primary)">{vehiculo.folioProceso}</span>
                 </td>
@@ -203,21 +218,33 @@ const VehiclesTable = ({
                       options={[
                         { label: 'Ver Detalles', icon: Eye, onClick: () => onShowDetails(vehiculo) },
                         { label: 'Registrar Salida / Entrega', icon: LogOut, onClick: () => onRegisterDeparture && onRegisterDeparture(vehiculo), hidden: currentUser?.rol !== 'ADMINISTRADOR_CONCESIONARIO' },
-                        { label: 'Solicitar Corrección', icon: FileEdit, onClick: () => onRequestEdit && onRequestEdit(vehiculo), hidden: currentUser?.rol === 'SUPER_USUARIO' },
                         { label: 'Eliminar Registro', icon: Trash2, onClick: () => onDeleteVehicle && onDeleteVehicle(vehiculo), danger: true, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
                       ]}
                     />
                   </div>
                 </td>
-              </tr>
+              </motion.tr>
             ))}
-          </tbody>
+          </motion.tbody>
         </table>
         
         {/* Card view for smaller screens */}
-        <div className="md:hidden flex flex-col divide-y divide-gray-100">
+        <motion.div 
+          key={pagination.currentPage}
+          className="md:hidden flex flex-col divide-y divide-gray-100"
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: { opacity: 0 },
+            visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+          }}
+        >
           {paginatedVehiculos.map((vehiculo) => (
-            <div key={vehiculo.id} className="p-4 hover:bg-gray-50 transition-colors">
+            <motion.div 
+              key={vehiculo.id} 
+              variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+              className="p-4 hover:bg-gray-50 transition-colors"
+            >
               {/* Top row: Folio, Placa, Status */}
               <div className="flex justify-between items-start mb-3">
                 <div className="pr-2">
@@ -254,14 +281,13 @@ const VehiclesTable = ({
                   options={[
                     { label: 'Ver Detalles', icon: Eye, onClick: () => onShowDetails(vehiculo) },
                     { label: 'Registrar Salida / Entrega', icon: LogOut, onClick: () => onRegisterDeparture && onRegisterDeparture(vehiculo), hidden: currentUser?.rol !== 'ADMINISTRADOR_CONCESIONARIO' },
-                    { label: 'Solicitar Corrección', icon: FileEdit, onClick: () => onRequestEdit && onRequestEdit(vehiculo), hidden: currentUser?.rol === 'SUPER_USUARIO' },
                     { label: 'Eliminar Registro', icon: Trash2, onClick: () => onDeleteVehicle && onDeleteVehicle(vehiculo), danger: true, hidden: currentUser?.rol !== 'SUPER_USUARIO' }
                   ]}
                 />
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     )}
 
@@ -334,6 +360,7 @@ const VehiclesPage = () => {
   const [searchParams] = useSearchParams();
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isFormOpen, vehiculos, stats, loading, searchTerm, estatusLegalFilter, fechaInicioFilter, fechaFinFilter, isDetailsOpen, selectedVehicle, isCorrectionModalOpen, vehicleForCorrection } = state;
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const getStoredUser = () => {
     try {
@@ -404,10 +431,10 @@ const VehiclesPage = () => {
 
   const filteredVehiculos = useMemo(() => {
     return vehiculos.filter(v => {
-      const matchesSearch = v.placa.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            v.vin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            v.marcaTipo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            v.folioProceso.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesSearch = v.placa.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                            v.vin.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                            v.marcaTipo.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+                            v.folioProceso.toLowerCase().includes(debouncedSearchTerm.toLowerCase());
       
       const matchesEstatus = estatusLegalFilter ? v.estatusLegal === estatusLegalFilter : true;
       
@@ -422,7 +449,7 @@ const VehiclesPage = () => {
       
       return matchesSearch && matchesEstatus && matchesFecha;
     });
-  }, [vehiculos, searchTerm, estatusLegalFilter, fechaInicioFilter, fechaFinFilter]);
+  }, [vehiculos, debouncedSearchTerm, estatusLegalFilter, fechaInicioFilter, fechaFinFilter]);
 
   const paginatedVehiculos = useMemo(() => {
     const start = (state.currentPage - 1) * state.itemsPerPage;

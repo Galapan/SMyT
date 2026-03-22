@@ -1,13 +1,17 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import LandingPage from './pages/LandingPage';
-import Login from './components/auth/Login';
-import Verification from './components/auth/Verification';
-import ForgotPassword from './components/auth/ForgotPassword';
-import ResetPassword from './components/auth/ResetPassword';
-import SecurityAlert from './pages/SecurityAlert';
+
+// Core layout
 import DashboardLayout from './layouts/Layout';
+
+// Refactoring all pages to use React.lazy for automatic code splitting
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const Login = lazy(() => import('./components/auth/Login'));
+const Verification = lazy(() => import('./components/auth/Verification'));
+const ForgotPassword = lazy(() => import('./components/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./components/auth/ResetPassword'));
+const SecurityAlert = lazy(() => import('./pages/SecurityAlert'));
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const AuditDashboard = lazy(() => import('./pages/AuditDashboard'));

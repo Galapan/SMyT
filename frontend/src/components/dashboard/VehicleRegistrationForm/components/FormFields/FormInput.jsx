@@ -15,13 +15,16 @@ const FormInput = ({
   onKeyDown,
   className = '',
   isDuplicate = false,
-  isValidating = false
+  isValidating = false,
+  disabled = false
 }) => {
   const baseClass = "w-full px-4 py-2.5 bg-white border rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all text-sm";
-  
+
   // Determinar el estilo del input
   let inputClass = baseClass;
-  if (isValidating) {
+  if (disabled) {
+    inputClass = `w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed text-sm`;
+  } else if (isValidating) {
     inputClass = `${baseClass} border-yellow-400 focus:ring-yellow-400`;
   } else if (error || isDuplicate) {
     inputClass = `${baseClass} border-(--color-rosa) focus:ring-(--color-rosa)`;
@@ -66,6 +69,7 @@ const FormInput = ({
           maxLength={maxLength}
           min={min}
           max={max}
+          disabled={disabled}
           className={inputClass}
         />
         {isValidating && (

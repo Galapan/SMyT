@@ -1,7 +1,7 @@
 import { useReducer, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
-import { Warehouse, Car, Key, Plus, RefreshCw, Bell, ChevronRight, CheckCircle, XCircle, X, AlertTriangle, Edit2 } from 'lucide-react';
+import { Warehouse, Car, Key, Plus, RefreshCw, Bell, ChevronRight, CheckCircle, XCircle, X, AlertTriangle, Edit2, Loader2 } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import StatCard from '../components/dashboard/StatCard';
 import AuditSearch from '../components/dashboard/AuditSearch';
@@ -21,6 +21,7 @@ const initialState = {
   isEditFormOpen: false,
   vehicleToEdit: null,
   editingNotifId: null,
+  camposIncorrectos: [],
   toast: { show: false, message: '', type: 'success' },
 };
 
@@ -41,9 +42,15 @@ function reducer(state, action) {
     case 'CLOSE_NOTIF':
       return { ...state, selectedNotif: null, vehiculoDetail: null };
     case 'OPEN_EDIT':
-      return { ...state, vehicleToEdit: action.payload.vehicleToEdit, editingNotifId: action.payload.editingNotifId, isEditFormOpen: true };
+      return { 
+        ...state, 
+        vehicleToEdit: action.payload.vehicleToEdit, 
+        editingNotifId: action.payload.editingNotifId, 
+        camposIncorrectos: action.payload.camposIncorrectos || [],
+        isEditFormOpen: true 
+      };
     case 'CLOSE_EDIT':
-      return { ...state, isEditFormOpen: false, vehicleToEdit: null, editingNotifId: null };
+      return { ...state, isEditFormOpen: false, vehicleToEdit: null, editingNotifId: null, camposIncorrectos: [] };
     case 'SHOW_TOAST':
       return { ...state, toast: { show: true, message: action.payload.message, type: action.payload.type } };
     case 'HIDE_TOAST':
@@ -57,8 +64,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
   // Custom state for UI and Modals
   const [selectedDepot, setSelectedDepot] = useState(null);
+  const [loadingEditId, setLoadingEditId] = useState(null);
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { selectedNotif, resolving, loadingDetail, vehiculoDetail, isEditFormOpen, vehicleToEdit, editingNotifId, toast } = state;
+  const { selectedNotif, resolving, loadingDetail, vehiculoDetail, isEditFormOpen, vehicleToEdit, editingNotifId, camposIncorrectos, toast } = state;
 
   // Query Client for invalidating queries later
   const queryClient = useQueryClient();
@@ -84,14 +92,20 @@ const Dashboard = () => {
     ];
 
     if (userRol === 'SUPER_USUARIO' || userRol === 'ADMINISTRADOR') {
+      // Para administradores (rol ADMINISTRADOR), obtenemos tanto PENDIENTE como APROBADA (filtrado por el backend)
+      // Para SUPER_USUARIO, el backend filtrará por PENDIENTE automáticamente
+      const solicitudesUrl = userRol === 'ADMINISTRADOR' 
+        ? `${API_URL}/api/solicitudes` 
+        : `${API_URL}/api/solicitudes?estatus=PENDIENTE`;
+
       fetchPromises.push(
-        fetch(`${API_URL}/api/solicitudes?estatus=PENDIENTE`, {
+        fetch(solicitudesUrl, {
            headers: { 'Authorization': `Bearer ${token}` }
         })
       );
     } else if (user?.id) {
       fetchPromises.push(
-        fetch(`${API_URL}/api/solicitudes?estatus=RESUELTA&solicitanteId=${user.id}`, {
+        fetch(`${API_URL}/api/solicitudes?estatus=APROBADA`, {
            headers: { 'Authorization': `Bearer ${token}` }
         })
       );
@@ -192,17 +206,37 @@ const Dashboard = () => {
   };
 
   const handleEditVehicle = async (notif) => {
+    setLoadingEditId(notif.id);
     try {
       const token = sessionStorage.getItem('token') || localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/vehiculos/${notif.vehiculoId}`, {
+      
+      // Obtener detalles del vehículo
+      const vehicleResponse = await fetch(`${API_URL}/api/vehiculos/${notif.vehiculoId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      const data = await response.json();
-      if (data.success) {
-        dispatch({ type: 'OPEN_EDIT', payload: { vehicleToEdit: data.data, editingNotifId: notif.id } });
+      const vehicleData = await vehicleResponse.json();
+      
+      if (!vehicleData.success) {
+        showNotification('Error al obtener datos del vehículo', 'error');
+        return;
       }
+      
+      // Los campos incorrectos ya vienen en la notificación, no necesitamos volver a pedirlos
+      let camposIncorrectos = notif.camposIncorrectos || [];
+      
+      dispatch({ 
+        type: 'OPEN_EDIT', 
+        payload: { 
+          vehicleToEdit: vehicleData.data, 
+          editingNotifId: notif.id,
+          camposIncorrectos
+        } 
+      });
     } catch (error) {
       console.error('Error fetching vehicle to edit:', error);
+      showNotification('Error al cargar datos para edición', 'error');
+    } finally {
+      setLoadingEditId(null);
     }
   };
 
@@ -214,13 +248,12 @@ const Dashboard = () => {
     // Si estábamos editando desde una notificación, la marcamos como completada
     if (editingNotifId) {
       try {
-        await fetch(`${API_URL}/api/solicitudes/${editingNotifId}/resolve`, {
+        await fetch(`${API_URL}/api/solicitudes/${editingNotifId}/complete`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ estatus: 'COMPLETADA' })
+          }
         });
       } catch (err) {
         console.error('Error al completar la solicitud:', err);
@@ -253,7 +286,7 @@ const Dashboard = () => {
           {(userRol === 'SUPER_USUARIO' || userRol === 'ADMINISTRADOR') && (
             <button
               onClick={() => navigate('/dashboard/deposits')}
-              className="px-4 py-2 bg-(--color-primary) hover:bg-violet-900 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
+              className="px-4 py-2 bg-(--color-primary) hover:brightness-90 text-white rounded-lg shadow-md hover:shadow-lg transition-all active:scale-95 flex items-center justify-center font-medium"
             >
               <Plus size={20} className="mr-2" />
               Nuevo Depósito
@@ -305,7 +338,7 @@ const Dashboard = () => {
           <DepotTable loading={loading} depots={depositos} />
         </div>
 
-        {/* Notificaciones Panel (SUPER_USUARIO ve pendientes, otros ven resueltas) */}
+        {/* Notificaciones Panel (SUPER_USUARIO ve pendientes, otros ven aprobadas) */}
         {userRol === 'SUPER_USUARIO' ? (
           <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in">
             <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
@@ -395,10 +428,12 @@ const Dashboard = () => {
           <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in h-100 xl:h-full">
             <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
               <div className="flex items-center space-x-2">
-                <CheckCircle size={18} className="text-verde" />
-                <h3 className="font-semibold text-gray-800">Mis Solicitudes Aprobadas</h3>
+                <Bell size={18} className="text-(--color-primary)" />
+                <h3 className="font-semibold text-gray-800">
+                  {userRol === 'ADMINISTRADOR' ? 'Mis Solicitudes de Edición' : 'Mis Solicitudes Aprobadas'}
+                </h3>
               </div>
-              <span className="bg-verde/15 text-verde border border-verde/20 text-xs font-bold px-2 py-1 rounded-full">
+              <span className="bg-(--color-primary)/15 text-(--color-primary) border border-(--color-primary)/20 text-xs font-bold px-2 py-1 rounded-full">
                 {notificaciones.length}
               </span>
             </div>
@@ -420,41 +455,62 @@ const Dashboard = () => {
                 </div>
               ) : notificaciones.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
-                  <CheckCircle size={32} className="mb-2 text-verde opacity-50" />
-                  <p className="text-sm">No tienes solicitudes pendientes de edición</p>
+                  <CheckCircle size={32} className="mb-2 text-(--color-primary) opacity-50" />
+                  <p className="text-sm">No tienes solicitudes aprobadas para editar</p>
                 </div>
               ) : (
                 <div className="space-y-4 px-2 pb-2">
                   {notificaciones.map((notif) => (
                     <div 
                       key={notif.id} 
-                      className="p-4 rounded-xl border border-gray-200 bg-[#f9faf9] shadow-sm flex flex-col justify-between"
+                      className="group relative p-5 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-lg hover:border-(--color-primary)/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
                     >
+                      {/* Decorative top border accent */}
+                      <div className={`absolute top-0 left-0 w-full h-1 ${
+                        notif.estatus === 'PENDIENTE' ? 'bg-naranja' : 'bg-verde'
+                      }`}></div>
+
                       <div>
-                        <div className="flex justify-between items-start mb-3">
+                        <div className="flex justify-between items-start mb-4">
                           <div>
-                            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block mb-0.5">Vehículo Aprobado</span>
-                            <p className="text-sm font-bold text-[#1a1f36]">
+                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-2 inline-block shadow-sm ${
+                              notif.estatus === 'PENDIENTE' 
+                                ? 'bg-naranja/10 text-naranja border border-naranja/20' 
+                                : 'bg-verde/10 text-verde border border-verde/20'
+                            }`}>
+                              {notif.estatus === 'PENDIENTE' ? 'Pendiente de Revisión' : 'Solicitud Aprobada'}
+                            </span>
+                            <p className="text-base font-extrabold text-[#1a1f36] tracking-tight">
                               {notif.vehiculo?.placa || 'Sin Placa'} - {notif.vehiculo?.folioProceso}
                             </p>
                           </div>
-                          <span className="text-[10px] font-medium text-gray-400">
+                          <span className="text-[10px] font-semibold text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
                             {new Date(notif.fechaResolucion || notif.fechaSolicitud).toLocaleDateString()}
                           </span>
                         </div>
-                        <div className="mb-4">
-                          <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider block mb-0.5">Tu Solicitud</span>
-                          <p className="text-sm text-gray-600 leading-relaxed">{notif.motivo}</p>
+                        <div className="mb-5 bg-gray-50/50 rounded-xl p-3 border border-gray-50/80">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tu Solicitud</span>
+                          <p className="text-sm text-gray-600 leading-relaxed font-medium">{notif.motivo}</p>
                         </div>
                       </div>
 
-                      <button
-                        onClick={() => handleEditVehicle(notif)}
-                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-(--color-primary) border border-(--color-primary) hover:bg-(--color-primary)/5 rounded-lg text-sm font-semibold transition-colors"
-                      >
-                        <Edit2 size={16} />
-                        Editar Registro
-                      </button>
+                      {notif.estatus === 'APROBADA' ? (
+                        <button
+                          onClick={() => handleEditVehicle(notif)}
+                          disabled={loadingEditId === notif.id}
+                          className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-(--color-primary) border-2 border-(--color-primary) hover:bg-(--color-primary) hover:text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md disabled:bg-gray-100 disabled:border-transparent disabled:text-gray-400 disabled:cursor-wait"
+                        >
+                          {loadingEditId === notif.id ? (
+                            <><Loader2 size={16} className="animate-spin" /> Abriendo...</>
+                          ) : (
+                            <><Edit2 size={16} /> Editar Vehículo</>
+                          )}
+                        </button>
+                      ) : (
+                        <div className="mt-1 w-full text-center py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-400">
+                          Esperando revisión del Super Usuario
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -591,9 +647,9 @@ const Dashboard = () => {
                 {resolving ? 'Procesando...' : 'Rechazar'}
               </button>
               <button
-                onClick={() => handleResolveNotification(selectedNotif.id, 'RESUELTA')}
+                onClick={() => handleResolveNotification(selectedNotif.id, 'APROBADA')}
                 disabled={resolving}
-                className="px-4 py-2 text-sm font-medium text-white bg-(--color-primary) hover:bg-violet-900 rounded-lg shadow-sm flex items-center transition-all active:scale-95 disabled:opacity-50"
+                className="px-4 py-2 text-sm font-medium text-white bg-(--color-primary) hover:brightness-90 rounded-lg shadow-sm flex items-center transition-all active:scale-95 disabled:opacity-50"
               >
                 {resolving ? 'Procesando...' : 'Aprobar Solicitud'}
               </button>
@@ -605,11 +661,12 @@ const Dashboard = () => {
 
       {/* Formulario de Edición Reutilizado */}
       {isEditFormOpen && vehicleToEdit && (
-        <VehicleRegistrationForm 
-          isOpen={isEditFormOpen} 
+        <VehicleRegistrationForm
+          isOpen={isEditFormOpen}
           onClose={() => dispatch({ type: 'SET_EDIT_FORM_OPEN', payload: false })}
           onSuccess={handleEditSuccess}
           initialData={vehicleToEdit}
+          camposIncorrectos={camposIncorrectos}
         />
       )}
 
@@ -628,7 +685,7 @@ const Dashboard = () => {
             </div>
             <div className="p-6 space-y-6 max-h-[calc(100vh-300px)] overflow-y-auto">
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-violet-100 flex items-center justify-center font-bold text-2xl text-(--color-primary)">
+                <div className="h-16 w-16 rounded-full bg-(--color-primary)/15 flex items-center justify-center font-bold text-2xl text-(--color-primary)">
                   {selectedDepot.nombre?.charAt(0) || 'D'}
                 </div>
                 <div>

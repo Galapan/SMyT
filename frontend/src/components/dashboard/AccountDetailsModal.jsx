@@ -23,8 +23,8 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
   const getRoleColor = (rol) => {
     const colors = {
-      'SUPER_USUARIO': 'text-(--color-rojo) bg-(--color-rojo)/10 ring-(--color-rojo)/30',
-      'ADMINISTRADOR': 'text-(--color-azul) bg-(--color-azul)/10 ring-(--color-azul)/30',
+      'SUPER_USUARIO': 'text-(--color-azul) bg-(--color-azul)/10 ring-(--color-azul)/30',
+      'ADMINISTRADOR': 'text-(--color-naranja) bg-(--color-naranja)/10 ring-(--color-naranja)/30',
       'ADMINISTRADOR_CONCESIONARIO': 'text-(--color-verde) bg-(--color-verde)/10 ring-(--color-verde)/30 shadow-sm'
     };
     return colors[rol] || 'text-gray-700 bg-gray-100 ring-gray-200';
@@ -87,8 +87,8 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
               <div className="flex flex-col items-center mb-8 relative mt-2">
                 {/* Status Badge - Floating */}
                 <div className="absolute top-0 w-full flex justify-center -mt-6">
-                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 shadow-[0_4px_10px_rgba(0,0,0,0.05)] text-xs font-semibold rounded-full border ${user.activo ? 'bg-(--color-verde)/5 text-(--color-verde) border-(--color-verde)' : 'bg-(--color-rojo)/10 text-(--color-rojo) border-(--color-rojo)'}`}>
-                    {user.activo ? <CheckCircle size={14} className="text-(--color-verde)"/> : <XCircle size={14} className="text-(--color-rojo)"/>}
+                  <span className={`inline-flex items-center gap-1.5 px-3 py-1 shadow-[0_4px_10px_rgba(0,0,0,0.05)] text-xs font-semibold rounded-full border ${user.activo ? 'bg-verde/5 text-verde border-verde' : 'bg-rojo/10 text-rojo border-rojo'}`}>
+                    {user.activo ? <CheckCircle size={14} className="text-verde"/> : <XCircle size={14} className="text-rojo"/>}
                     {user.activo ? 'Cuenta Activa' : 'Cuenta Inactiva'}
                   </span>
                 </div>
@@ -123,8 +123,8 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
                 {/* Role Card */}
                 <div className="bg-white/60 p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center hover:shadow-md transition-shadow">
                   <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${
-                    user.rol === 'SUPER_USUARIO' ? 'bg-(--color-rojo)/15 text-(--color-rojo)' :
-                    user.rol === 'ADMINISTRADOR' ? 'bg-(--color-azul)/15 text-(--color-azul)' : 'bg-(--color-verde)/20 text-(--color-verde)'
+                    user.rol === 'SUPER_USUARIO' ? 'bg-azul/15 text-azul' :
+                    user.rol === 'ADMINISTRADOR' ? 'bg-naranja/15 text-naranja' : 'bg-verde/20 text-verde'
                   }`}>
                     <Shield className="w-6 h-6" />
                   </div>

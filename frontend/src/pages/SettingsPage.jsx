@@ -4,6 +4,7 @@ import { User, Lock, Save, Camera, AlertCircle, CheckCircle, Loader2 } from 'luc
 import ImageCropper from '../components/common/ImageCropper';
 import Toast from '../components/common/Toast';
 import PasswordValidation from '../components/common/PasswordValidation';
+import Skeleton from '../components/common/Skeleton';
 
 const initialState = {
   activeTab: 'profile',
@@ -240,9 +241,46 @@ const SettingsPage = () => {
 
       {/* Profile Content */}
       {activeTab === 'profile' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 animate-fade-in">
-          <form onSubmit={handleProfileSubmit}>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 animate-fade-in min-h-100">
+          {loading ? (
             <div className="flex flex-col md:flex-row gap-8">
+              {/* Avatar Skeleton */}
+              <div className="flex flex-col items-center space-y-4">
+                <Skeleton width="8rem" height="8rem" circle={true} />
+              </div>
+              
+              {/* Form Fields Skeleton */}
+              <div className="flex-1 space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Skeleton width="4rem" height="1rem" className="mb-2" />
+                    <Skeleton height="2.625rem" />
+                  </div>
+                  <div>
+                    <Skeleton width="5rem" height="1rem" className="mb-2" />
+                    <Skeleton height="2.625rem" />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Skeleton width="3.5rem" height="1rem" className="mb-2" />
+                    <Skeleton height="2.625rem" />
+                  </div>
+                  <div>
+                    <Skeleton width="2rem" height="1rem" className="mb-2" />
+                    <Skeleton height="2.625rem" />
+                  </div>
+                </div>
+
+                <div className="pt-4 flex justify-end">
+                  <Skeleton width="13rem" height="2.75rem" />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleProfileSubmit} className="animate-fade-in">
+              <div className="flex flex-col md:flex-row gap-8">
               {/* Avatar Section */}
               <div className="flex flex-col items-center space-y-4">
                 <div className="relative group">
@@ -317,7 +355,7 @@ const SettingsPage = () => {
                   <button
                     type="submit"
                     disabled={isSubmittingProfile}
-                    className="flex items-center space-x-2 bg-(--color-primary) text-white px-8 py-2.5 rounded-lg hover:bg-violet-900 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+                    className="flex items-center space-x-2 bg-(--color-primary) text-white px-8 py-2.5 rounded-lg hover:brightness-90 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
                   >
                     {isSubmittingProfile ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                     <span>Guardar Cambios</span>
@@ -326,6 +364,7 @@ const SettingsPage = () => {
               </div>
             </div>
           </form>
+          )}
         </div>
       )}
 
@@ -376,7 +415,7 @@ const SettingsPage = () => {
               <button
                 type="submit"
                 disabled={isSubmittingPassword}
-                className="flex items-center space-x-2 bg-(--color-primary) text-white px-8 py-2.5 rounded-lg hover:bg-violet-900 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+                className="flex items-center space-x-2 bg-(--color-primary) text-white px-8 py-2.5 rounded-lg hover:brightness-90 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
               >
                 {isSubmittingPassword ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                 <span>Actualizar Contraseña</span>

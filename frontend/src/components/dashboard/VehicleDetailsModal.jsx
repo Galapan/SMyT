@@ -2,6 +2,7 @@ import React from 'react';
 import { createPortal } from 'react-dom';
 import { m, LazyMotion, domAnimation, AnimatePresence } from 'framer-motion';
 import { X, Calendar, MapPin, Search, Maximize2, FileText, CheckCircle, ShieldAlert, Image as ImageIcon, Car } from 'lucide-react';
+import VehicleImageModal from './VehicleDetail/VehicleImageModal';
 
 const VehicleDetailsModal = ({ isOpen, onClose, vehiculo }) => {
   const [selectedPhoto, setSelectedPhoto] = React.useState(null);
@@ -44,7 +45,7 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehiculo }) => {
 
                         <button
                             onClick={onClose}
-                            className="p-2 sm:p-2.5 bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 rounded-full transition-colors"
+                            className="p-2 sm:p-2.5 bg-gray-50 hover:bg-gray-100 text-gray-400 hover:text-gray-600 rounded-full transition-colors"
                             aria-label="Cerrar detalles"
                         >
                             <X size={20} />
@@ -206,34 +207,10 @@ const VehicleDetailsModal = ({ isOpen, onClose, vehiculo }) => {
                 </m.div>
 
                 {/* Expanded Photo Viewer */}
-                <AnimatePresence>
-                    {selectedPhoto && (
-                        <m.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm"
-                            onClick={() => setSelectedPhoto(null)}
-                        >
-                            <button
-                                onClick={() => setSelectedPhoto(null)}
-                                className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 text-white rounded-full transition-colors backdrop-blur-md"
-                            >
-                                <X size={24} />
-                            </button>
-                            <m.img
-                                initial={{ scale: 0.9, y: 20 }}
-                                animate={{ scale: 1, y: 0 }}
-                                exit={{ scale: 0.9, y: 20 }}
-                                transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                                src={selectedPhoto}
-                                alt="Foto ampliada del vehículo"
-                                className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
-                                onClick={(e) => e.stopPropagation()}
-                            />
-                        </m.div>
-                    )}
-                </AnimatePresence>
+                <VehicleImageModal
+                  selectedImage={selectedPhoto}
+                  onClose={() => setSelectedPhoto(null)}
+                />
             </div>
         </LazyMotion>
       )}

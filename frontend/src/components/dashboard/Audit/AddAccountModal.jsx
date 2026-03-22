@@ -22,7 +22,6 @@ const initialState = {
     password: "",
     confirmPassword: "",
   },
-  availableUsers: [],
   selectedUserId: null,
   searchTerm: "",
   loadingUsers: false,
@@ -42,8 +41,6 @@ function reducer(state, action) {
       return { ...state, formData: { ...state.formData, ...action.payload } };
     case 'CLEAR_FIELD_ERROR':
       return { ...state, errors: { ...state.errors, [action.payload]: undefined } };
-    case 'SET_AVAILABLE_USERS':
-      return { ...state, availableUsers: action.payload };
     case 'SET_LOADING_USERS':
       return { ...state, loadingUsers: action.payload };
     case 'SET_SELECTED_USER':
@@ -77,13 +74,6 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
     },
     enabled: isOpen && activeTab === 'existente',
   });
-
-  // Sync availableUsers desde React Query al reducer local
-  useEffect(() => {
-    if (usersData) {
-      dispatch({ type: 'SET_AVAILABLE_USERS', payload: usersData });
-    }
-  }, [usersData]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -179,7 +169,8 @@ const AddAccountModal = ({ isOpen, onClose, onSuccess, depositoId, depositoNombr
     onClose();
   };
 
-  const filteredUsers = availableUsers.filter(u => 
+  const users = usersData || [];
+  const filteredUsers = users.filter(u => 
     u.nombre.toLowerCase().includes(searchTerm.toLowerCase()) || 
     u.apellido.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.email.toLowerCase().includes(searchTerm.toLowerCase())

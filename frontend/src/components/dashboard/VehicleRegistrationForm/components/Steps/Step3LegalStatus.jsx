@@ -2,7 +2,16 @@ import FormSelect from '../FormFields/FormSelect';
 import FormCheckbox from '../FormFields/FormCheckbox';
 import FormInput from '../FormFields/FormInput';
 
-const Step3LegalStatus = ({ formData, errors, onChange }) => {
+const Step3LegalStatus = ({ formData, errors, onChange, isCampoEditable }) => {
+  // Verificar si los campos son editables
+  const editable = {
+    estatusLegal: isCampoEditable ? isCampoEditable('estatusLegal') : true,
+    tieneActaBaja: isCampoEditable ? isCampoEditable('tieneActaBaja') : true,
+    noOficio: isCampoEditable ? isCampoEditable('noOficio') : true,
+    fechaActaBaja: isCampoEditable ? isCampoEditable('fechaActaBaja') : true,
+    tieneTituloFactura: isCampoEditable ? isCampoEditable('tieneTituloFactura') : true
+  };
+
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
@@ -22,6 +31,7 @@ const Step3LegalStatus = ({ formData, errors, onChange }) => {
             { value: 'OBSOLETO', label: 'Obsoleto' },
             { value: 'SINIESTRADO', label: 'Siniestrado' }
           ]}
+          disabled={!editable.estatusLegal}
         />
         <FormCheckbox
           label="Tiene Acta de Baja"
@@ -29,6 +39,7 @@ const Step3LegalStatus = ({ formData, errors, onChange }) => {
           checked={formData.tieneActaBaja}
           onChange={onChange}
           className="pt-6"
+          disabled={!editable.tieneActaBaja}
         />
       </div>
 
@@ -41,6 +52,7 @@ const Step3LegalStatus = ({ formData, errors, onChange }) => {
             onChange={onChange}
             error={errors.noOficio}
             placeholder="Ej. OF-2026-0001"
+            disabled={!editable.noOficio}
           />
           <FormInput
             label="Fecha de Acta de Baja *"
@@ -49,6 +61,7 @@ const Step3LegalStatus = ({ formData, errors, onChange }) => {
             value={formData.fechaActaBaja}
             onChange={onChange}
             error={errors.fechaActaBaja}
+            disabled={!editable.fechaActaBaja}
           />
         </div>
       )}
@@ -59,6 +72,7 @@ const Step3LegalStatus = ({ formData, errors, onChange }) => {
           name="tieneTituloFactura"
           checked={formData.tieneTituloFactura}
           onChange={onChange}
+          disabled={!editable.tieneTituloFactura}
         />
       </div>
     </div>

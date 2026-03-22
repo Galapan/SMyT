@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { RefreshCw, Search, Warehouse, Users, Car, MapPin, Eye, Phone, ShieldCheck, Mail } from 'lucide-react';
+import { motion } from 'framer-motion';
+import useDebounce from '../hooks/useDebounce';
 import AuditConcesionarioCard from '../components/dashboard/Audit/AuditConcesionarioCard';
 import Pagination from '../components/common/Pagination';
 
@@ -326,12 +328,23 @@ const AdminEmptyState = ({ searchTerm }) => (
   </div>
 );
 
-const AdminGrid = ({ paginatedDepositos }) => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+const AdminGrid = ({ paginatedDepositos, currentPage }) => (
+  <motion.div 
+    key={currentPage}
+    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    initial="hidden"
+    animate="visible"
+    variants={{
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+    }}
+  >
     {paginatedDepositos.map(deposito => (
-      <AuditConcesionarioCard key={deposito.id} deposito={deposito} />
+      <motion.div key={deposito.id} variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}>
+        <AuditConcesionarioCard deposito={deposito} />
+      </motion.div>
     ))}
-  </div>
+  </motion.div>
 );
 
 const AdminPagination = ({ totalItems, itemsPerPage, currentPage, onPageChange }) => (
@@ -371,7 +384,7 @@ const AdminView = ({
         <AdminEmptyState searchTerm={searchTerm} />
       ) : (
         <>
-          <AdminGrid paginatedDepositos={paginatedDepositos} />
+          <AdminGrid paginatedDepositos={paginatedDepositos} currentPage={currentPage} />
           <AdminPagination
             totalItems={filteredDepositos.length}
             itemsPerPage={itemsPerPage}
@@ -390,6 +403,7 @@ const AuditDashboard = () => {
   const itemsPerPage = 6;
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const handleSearch = useCallback((e) => {
     setSearchTerm(e.target.value);
@@ -425,14 +439,14 @@ const AuditDashboard = () => {
   const loading = isLoading || isFetching;
 
   const filteredDepositos = useMemo(() => {
-    const term = searchTerm.toLowerCase();
+    const term = debouncedSearchTerm.toLowerCase();
     if (!term) return depositos;
     return depositos.filter(dep => 
       dep.nombre.toLowerCase().includes(term) || 
       dep.municipio.toLowerCase().includes(term) ||
       dep.nombrePropietario.toLowerCase().includes(term)
     );
-  }, [depositos, searchTerm]);
+  }, [depositos, debouncedSearchTerm]);
 
   const paginatedDepositos = useMemo(() => {
     return filteredDepositos.slice(

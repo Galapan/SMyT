@@ -9,16 +9,21 @@ const API_URL = import.meta.env.VITE_API_URL !== undefined
 function SecurityAlert() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [status, setStatus] = useState('loading'); // loading, success-confirm, success-reject, error
-  const [errorMessage, setErrorMessage] = useState('');
+  const [state, setState] = useState({
+    status: 'loading', // loading, success-confirm, success-reject, error
+    errorMessage: ''
+  });
+  const hasProcessedRef = useRef(false);
 
   const action = searchParams.get('action');
   const token = searchParams.get('token');
 
   useEffect(() => {
+    if (hasProcessedRef.current) return;
+    hasProcessedRef.current = true;
+
     if (!action || !token) {
-      setStatus('error');
-      setErrorMessage('Enlace inválido o incompleto.');
+      setState({ status: 'error', errorMessage: 'Enlace inválido o incompleto.' });
       return;
     }
 
@@ -38,19 +43,16 @@ function SecurityAlert() {
         }
 
         if (action === 'confirm') {
-          setStatus('success-confirm');
+          setState({ status: 'success-confirm', errorMessage: '' });
         } else {
-          // If deactivated successfully, ensure local storage is cleared
           localStorage.removeItem('token');
           localStorage.removeItem('user');
           sessionStorage.removeItem('token');
           sessionStorage.removeItem('user');
-          setStatus('success-reject');
+          setState({ status: 'success-reject', errorMessage: '' });
         }
-
       } catch (err) {
-        setStatus('error');
-        setErrorMessage(err.message);
+        setState({ status: 'error', errorMessage: err.message });
       }
     };
 
@@ -73,14 +75,14 @@ function SecurityAlert() {
         </div>
 
         <div className="text-center">
-          {status === 'loading' && (
+          {state.status === 'loading' && (
             <div className="flex flex-col items-center py-6">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#572671] mb-6"></div>
               <p className="text-sm font-medium text-gray-600">Procesando solicitud de seguridad...</p>
             </div>
           )}
 
-          {status === 'success-confirm' && (
+          {state.status === 'success-confirm' && (
             <div className="flex flex-col items-center animate-fade-in py-2">
               <CheckCircle2 className="h-16 w-16 text-emerald-500 mb-6 drop-shadow-sm" />
               <h3 className="text-xl font-bold text-gray-800 mb-3">Cambio Confirmado</h3>
@@ -94,7 +96,7 @@ function SecurityAlert() {
             </div>
           )}
 
-          {status === 'success-reject' && (
+          {state.status === 'success-reject' && (
             <div className="flex flex-col items-center animate-fade-in py-2">
               <ShieldAlert className="h-16 w-16 text-red-500 mb-6 drop-shadow-sm" />
               <h3 className="text-xl font-bold text-gray-800 mb-3">Cuenta Asegurada</h3>
@@ -108,13 +110,13 @@ function SecurityAlert() {
             </div>
           )}
 
-          {status === 'error' && (
+          {state.status === 'error' && (
             <div className="flex flex-col items-center animate-fade-in py-2">
               <div className="h-16 w-16 text-red-500 mb-6 flex items-center justify-center border-4 border-red-500 rounded-full shadow-sm bg-red-50">
                 <span className="text-4xl font-bold">!</span>
               </div>
               <h3 className="text-xl font-bold text-gray-800 mb-3">Error de Verificación</h3>
-              <p className="text-sm font-medium text-red-600 mb-4">{errorMessage}</p>
+              <p className="text-sm font-medium text-red-600 mb-4">{state.errorMessage}</p>
               <p className="text-xs text-gray-500 mb-8 px-4">Este enlace de seguridad puede haber expirado por superar las 24 horas, o ya fue utilizado por ti u otra persona.</p>
               <button
                 onClick={() => navigate('/login')}

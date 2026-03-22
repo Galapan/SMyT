@@ -1,7 +1,21 @@
 import FormInput from '../FormFields/FormInput';
 import FormSelect from '../FormFields/FormSelect';
 
-const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFields, validatingFields }) => {
+const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFields, validatingFields, isCampoEditable }) => {
+  // Verificar si los campos son editables
+  const editable = {
+    noInventario: isCampoEditable ? isCampoEditable('noInventario') : true,
+    marcaTipo: isCampoEditable ? isCampoEditable('marcaTipo') : true,
+    anio: isCampoEditable ? isCampoEditable('anio') : true,
+    tipoServicio: isCampoEditable ? isCampoEditable('tipoServicio') : true,
+    vin: isCampoEditable ? isCampoEditable('vin') : true,
+    placa: isCampoEditable ? isCampoEditable('placa') : true,
+    noMotor: isCampoEditable ? isCampoEditable('noMotor') : true,
+    colorOriginal: isCampoEditable ? isCampoEditable('colorOriginal') : true,
+    colorActual: isCampoEditable ? isCampoEditable('colorActual') : true,
+    odometro: isCampoEditable ? isCampoEditable('odometro') : true
+  };
+
   return (
     <div className="space-y-6">
       <h3 className="text-xl font-semibold text-(--color-primary) mb-4">
@@ -18,6 +32,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
           isDuplicate={duplicateFields?.noInventario}
           isValidating={validatingFields?.noInventario}
           placeholder="Ej. INV-2026-0001"
+          disabled={!editable.noInventario}
         />
         <FormInput
           label="Marca/Tipo *"
@@ -26,6 +41,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
           onChange={onChange}
           error={errors.marcaTipo}
           placeholder="Ej. Toyota Corolla"
+          disabled={!editable.marcaTipo}
         />
       </div>
 
@@ -41,6 +57,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
           placeholder="Ej. 2020"
           min="1900"
           max="2030"
+          disabled={!editable.anio}
         />
         <FormSelect
           label="Tipo de Servicio *"
@@ -52,6 +69,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
             { value: 'PARTICULAR', label: 'Particular' },
             { value: 'PUBLICO', label: 'Público' }
           ]}
+          disabled={!editable.tipoServicio}
         />
       </div>
 
@@ -66,6 +84,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
         placeholder="17 caracteres alfanuméricos"
         maxLength={17}
         helperText={`${formData.vin.length}/17 caracteres`}
+        disabled={!editable.vin}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -78,6 +97,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
           isDuplicate={duplicateFields?.placa}
           isValidating={validatingFields?.placa}
           placeholder="Ej. ABC-123-D"
+          disabled={!editable.placa}
         />
         <FormInput
           label="No. Motor *"
@@ -88,6 +108,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
           isDuplicate={duplicateFields?.noMotor}
           isValidating={validatingFields?.noMotor}
           placeholder="Número de motor"
+          disabled={!editable.noMotor}
         />
       </div>
 
@@ -99,6 +120,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
           onChange={onChange}
           error={errors.colorOriginal}
           placeholder="Ej. Blanco"
+          disabled={!editable.colorOriginal}
         />
         <FormInput
           label="Color Actual *"
@@ -107,6 +129,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
           onChange={onChange}
           error={errors.colorActual}
           placeholder="Ej. Blanco"
+          disabled={!editable.colorActual}
         />
       </div>
 
@@ -120,6 +143,7 @@ const Step2VehicleData = ({ formData, errors, onChange, onKeyDown, duplicateFiel
         error={errors.odometro}
         placeholder="Ej. 85000"
         min="0"
+        disabled={!editable.odometro}
       />
     </div>
   );

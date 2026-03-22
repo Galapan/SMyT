@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middleware/authMiddleware');
-const { createSolicitud, getSolicitudes, resolveSolicitud } = require('../controllers/solicitudController');
+const { createSolicitud, getSolicitudes, resolveSolicitud, completeSolicitud } = require('../controllers/solicitudController');
 
 // Protegemos todas las rutas
 router.use(verifyToken);
@@ -14,5 +14,8 @@ router.post('/', createSolicitud);
 
 // PUT /api/solicitudes/:id/resolve
 router.put('/:id/resolve', resolveSolicitud);
+
+// PUT /api/solicitudes/:id/complete
+router.put('/:id/complete', completeSolicitud);
 
 module.exports = router;

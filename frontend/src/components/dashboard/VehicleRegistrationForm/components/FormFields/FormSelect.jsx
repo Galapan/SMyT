@@ -1,19 +1,25 @@
 const EMPTY_OPTIONS = [];
 
-const FormSelect = ({ 
-  label, 
-  name, 
-  value, 
-  onChange, 
-  error, 
+const FormSelect = ({
+  label,
+  name,
+  value,
+  onChange,
+  error,
   options = EMPTY_OPTIONS,
   placeholder = 'Seleccionar...',
-  className = ''
+  className = '',
+  disabled = false
 }) => {
   const baseClass = "w-full px-4 py-2.5 bg-white border rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent outline-none transition-all text-sm";
-  const selectClass = error 
-    ? `${baseClass} border-gob-rosa focus:ring-gob-rosa` 
-    : `${baseClass} border-gray-300`;
+  let selectClass = baseClass;
+  if (disabled) {
+    selectClass = `w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-gray-500 cursor-not-allowed text-sm`;
+  } else if (error) {
+    selectClass = `${baseClass} border-gob-rosa focus:ring-gob-rosa`;
+  } else {
+    selectClass = `${baseClass} border-gray-300`;
+  }
 
   return (
     <div className={className}>
@@ -25,6 +31,7 @@ const FormSelect = ({
         name={name}
         value={value}
         onChange={onChange}
+        disabled={disabled}
         className={selectClass}
       >
         <option value="">{placeholder}</option>

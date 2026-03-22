@@ -34,15 +34,6 @@ export default function VehicleHeader({ vehiculo, userRol, onBack, onEditRequest
         </div>
       </div>
 
-      {userRol !== 'SUPER_USUARIO' && (
-        <button
-          onClick={onEditRequest}
-          className="flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-700 hover:bg-red-100 hover:shadow-sm border border-red-200 rounded-lg text-sm font-semibold transition-all"
-        >
-          <AlertTriangle size={16} />
-          Solicitar Corrección de Datos
-        </button>
-      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { memo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { MapPin } from 'lucide-react';
 import TableSkeleton from '../common/TableSkeleton';
 import Pagination from '../common/Pagination';
@@ -8,10 +9,13 @@ const EMPTY_DEPOTS = [];
 // Memoized Desktop Row Component
 const DesktopDepotRow = memo(({ depot }) => {
   return (
-    <tr className="hover:bg-gray-50 transition-colors group">
+    <motion.tr 
+      variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
+      className="hover:bg-gray-50 transition-colors group"
+    >
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
-          <div className="h-10 w-10 rounded-full bg-(--color-secondary) shrink-0 flex items-center justify-center text-(--color-primary) font-bold text-lg">
+          <div className="h-10 w-10 rounded-full bg-secondary shrink-0 flex items-center justify-center text-(--color-primary) font-bold text-lg">
             {depot.nombre?.charAt(0) || 'D'}
           </div>
           <div className="ml-4">
@@ -29,13 +33,13 @@ const DesktopDepotRow = memo(({ depot }) => {
       <td className="px-6 py-4 whitespace-nowrap">
         <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
           depot.activo
-            ? 'bg-(--color-verde)/15 text-(--color-verde)'
-            : 'bg-(--color-rosa)/15 text-(--color-rosa)'
+            ? 'bg-verde/15 text-verde'
+            : 'bg-rosa/15 text-rosa'
         }`}>
           {depot.activo ? 'Activo' : 'Inactivo'}
         </span>
       </td>
-    </tr>
+    </motion.tr>
   );
 });
 
@@ -44,10 +48,13 @@ DesktopDepotRow.displayName = 'DesktopDepotRow';
 // Memoized Mobile Card Component
 const MobileDepotCard = memo(({ depot }) => {
   return (
-    <div className="p-4 hover:bg-gray-50 transition-colors">
+    <motion.div 
+      variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}
+      className="p-4 hover:bg-gray-50 transition-colors"
+    >
       <div className="flex justify-between items-start mb-2">
         <div className="flex items-center">
-          <div className="h-8 w-8 rounded-full bg-(--color-secondary) shrink-0 flex items-center justify-center text-(--color-primary) font-bold text-sm">
+          <div className="h-8 w-8 rounded-full bg-secondary shrink-0 flex items-center justify-center text-(--color-primary) font-bold text-sm">
             {depot.nombre?.charAt(0) || 'D'}
           </div>
           <div className="ml-3">
@@ -57,8 +64,8 @@ const MobileDepotCard = memo(({ depot }) => {
         </div>
         <span className={`shrink-0 ml-2 px-2 py-0.5 inline-flex text-[10px] font-semibold rounded-full ${
           depot.activo
-            ? 'bg-(--color-verde)/15 text-(--color-verde)'
-            : 'bg-(--color-rosa)/15 text-(--color-rosa)'
+            ? 'bg-verde/15 text-verde'
+            : 'bg-rosa/15 text-rosa'
         }`}>
           {depot.activo ? 'Activo' : 'Inactivo'}
         </span>
@@ -70,7 +77,7 @@ const MobileDepotCard = memo(({ depot }) => {
           <span className="truncate">{depot.municipio}</span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 });
 
@@ -114,26 +121,44 @@ const DepotTable = ({ loading = false, depots = EMPTY_DEPOTS }) => {
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50/50 backdrop-blur-sm">Estatus</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <motion.tbody 
+                  key={currentPage}
+                  className="divide-y divide-gray-100"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+                  }}
+                >
                   {paginatedDepots.map((depot) => (
                     <DesktopDepotRow
                       key={depot.id}
                       depot={depot}
                     />
                   ))}
-                </tbody>
+                </motion.tbody>
               </table>
             </div>
 
             {/* Mobile Card View */}
-            <div className="sm:hidden flex flex-col divide-y divide-gray-100">
+            <motion.div 
+              key={currentPage}
+              className="sm:hidden flex flex-col divide-y divide-gray-100"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
+              }}
+            >
               {paginatedDepots.map((depot) => (
                 <MobileDepotCard
                   key={depot.id}
                   depot={depot}
                 />
               ))}
-            </div>
+            </motion.div>
             {depots.length > 0 && (
               <Pagination
                 totalItems={depots.length}

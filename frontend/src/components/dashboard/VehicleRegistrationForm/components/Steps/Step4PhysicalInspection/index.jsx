@@ -4,7 +4,7 @@ import InteriorSection from './InteriorSection';
 import EnvironmentalSection from './EnvironmentalSection';
 import InventorySection from './InventorySection';
 
-const Step4PhysicalInspection = ({ formData, setFormData, errors, onChange, onKeyDown, getInputClass }) => {
+const Step4PhysicalInspection = ({ formData, setFormData, errors, onChange, onKeyDown, getInputClass, isCampoEditable }) => {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between mb-4">
@@ -15,44 +15,49 @@ const Step4PhysicalInspection = ({ formData, setFormData, errors, onChange, onKe
           Cumplimiento Normativo Estricto
         </span>
       </div>
-      
-      <ExteriorSection 
+
+      <ExteriorSection
         formData={formData}
         errors={errors}
         onChange={onChange}
         onKeyDown={onKeyDown}
         getInputClass={getInputClass}
+        isCampoEditable={isCampoEditable}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <MechanicalSection 
+        <MechanicalSection
           formData={formData}
           errors={errors}
           onChange={onChange}
           getInputClass={getInputClass}
+          isCampoEditable={isCampoEditable}
         />
 
-        <InteriorSection 
+        <InteriorSection
           formData={formData}
           errors={errors}
           onChange={onChange}
           getInputClass={getInputClass}
+          isCampoEditable={isCampoEditable}
         />
       </div>
 
-      <EnvironmentalSection 
+      <EnvironmentalSection
         formData={formData}
         errors={errors}
         onChange={onChange}
         getInputClass={getInputClass}
+        isCampoEditable={isCampoEditable}
       />
 
-      <InventorySection 
+      <InventorySection
         formData={formData}
         setFormData={setFormData}
         errors={errors}
         onChange={onChange}
         getInputClass={getInputClass}
+        isCampoEditable={isCampoEditable}
       />
     </div>
   );
