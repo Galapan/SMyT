@@ -9,30 +9,29 @@ datasource db {
 }
 
 model Usuario {
-  id                   String             @id @default(uuid())
-  email                String             @unique
-  password             String
-  nombre               String
-  apellido             String
-  rol                  Rol
-  activo               Boolean            @default(true)
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-  depositoId           String?
-  creadoPorId          String?
-  fotoUrl              String?            @default("https://ui-avatars.com/api/?background=random&color=fff&name=User")
-  codigoVerificacion   String?
-  expiracionCodigo     DateTime?
-  verificado           Boolean            @default(true)
-  tokenSesion          String?
-  solicitudesResueltas SolicitudEdicion[] @relation("UsuarioResolutor")
-  solicitudesCreadas   SolicitudEdicion[] @relation("UsuarioSolicitante")
-  solicitudesAprobadas SolicitudEdicion[] @relation("UsuarioAprobador")
+  id                     String             @id @default(uuid())
+  email                  String             @unique
+  password               String
+  nombre                 String
+  apellido               String
+  rol                    Rol
+  activo                 Boolean            @default(true)
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  depositoId             String?
+  creadoPorId            String?
+  fotoUrl                String?            @default("https://ui-avatars.com/api/?background=random&color=fff&name=User")
+  codigoVerificacion     String?
+  verificado             Boolean            @default(true)
+  tokenSesion            String?
+  solicitudesAprobadas   SolicitudEdicion[] @relation("UsuarioAprobador")
   solicitudesCompletadas SolicitudEdicion[] @relation("UsuarioCompletador")
-  creadoPor            Usuario?           @relation("UsuarioCreador", fields: [creadoPorId], references: [id])
-  usuariosCreados      Usuario[]          @relation("UsuarioCreador")
-  deposito             Deposito?          @relation(fields: [depositoId], references: [id])
-  vehiculos            Vehiculo[]
+  solicitudesResueltas   SolicitudEdicion[] @relation("UsuarioResolutor")
+  solicitudesCreadas     SolicitudEdicion[] @relation("UsuarioSolicitante")
+  creadoPor              Usuario?           @relation("UsuarioCreador", fields: [creadoPorId], references: [id])
+  usuariosCreados        Usuario[]          @relation("UsuarioCreador")
+  deposito               Deposito?          @relation(fields: [depositoId], references: [id])
+  vehiculos              Vehiculo[]
 
   @@map("usuarios")
 }
@@ -117,22 +116,22 @@ model Vehiculo {
 }
 
 model SolicitudEdicion {
-  id                String          @id @default(uuid())
+  id                String           @id @default(uuid())
   motivo            String
-  camposIncorrectos String[]
-  estatus           EstatusSolicitud @default(PENDIENTE)
-  fechaSolicitud    DateTime        @default(now())
+  fechaSolicitud    DateTime         @default(now())
   fechaResolucion   DateTime?
   vehiculoId        String
   solicitanteId     String?
   resolutorId       String?
+  camposIncorrectos String[]
+  estatus           EstatusSolicitud @default(PENDIENTE)
   aprobadoPorId     String?
   completadoPorId   String?
-  resolutor         Usuario?        @relation("UsuarioResolutor", fields: [resolutorId], references: [id])
-  solicitante       Usuario?        @relation("UsuarioSolicitante", fields: [solicitanteId], references: [id])
-  aprobadoPor       Usuario?        @relation("UsuarioAprobador", fields: [aprobadoPorId], references: [id])
-  completadoPor     Usuario?        @relation("UsuarioCompletador", fields: [completadoPorId], references: [id])
-  vehiculo          Vehiculo        @relation(fields: [vehiculoId], references: [id])
+  aprobadoPor       Usuario?         @relation("UsuarioAprobador", fields: [aprobadoPorId], references: [id])
+  completadoPor     Usuario?         @relation("UsuarioCompletador", fields: [completadoPorId], references: [id])
+  resolutor         Usuario?         @relation("UsuarioResolutor", fields: [resolutorId], references: [id])
+  solicitante       Usuario?         @relation("UsuarioSolicitante", fields: [solicitanteId], references: [id])
+  vehiculo          Vehiculo         @relation(fields: [vehiculoId], references: [id])
 
   @@map("solicitudes_edicion")
 }
