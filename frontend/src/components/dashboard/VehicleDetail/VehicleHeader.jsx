@@ -1,11 +1,12 @@
-import { m } from 'framer-motion';
-import { ArrowLeft, MapPin, Calendar, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, MapPin, Calendar, FileEdit } from 'lucide-react';
 import dayjs from 'dayjs';
 
 /**
  * Header del expediente de vehículo
  */
 export default function VehicleHeader({ vehiculo, userRol, onBack, onEditRequest }) {
+  const canRequestEdit = userRol === 'ADMINISTRADOR' || userRol === 'ADMINISTRADOR_CONCESIONARIO';
+
   return (
     <div className="shrink-0 bg-white rounded-xl border border-gray-200 p-4 md:px-6 md:py-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm z-10 relative">
       <div className="flex items-center gap-4">
@@ -34,6 +35,16 @@ export default function VehicleHeader({ vehiculo, userRol, onBack, onEditRequest
         </div>
       </div>
 
+      {canRequestEdit && (
+        <button
+          onClick={onEditRequest}
+          className="px-4 py-2.5 bg-naranja/10 text-naranja hover:bg-naranja/20 border border-naranja/25 rounded-lg transition-all flex items-center gap-2 font-semibold text-sm active:scale-95 shadow-sm"
+          title="Solicitar edición de este registro"
+        >
+          <FileEdit size={18} />
+          <span>Solicitar Edición</span>
+        </button>
+      )}
     </div>
   );
 }
