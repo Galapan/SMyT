@@ -15,7 +15,7 @@ router.get('/', authenticateToken, async (req, res) => {
       include: {
         _count: {
           select: {
-            vehiculos: true,
+            vehiculos: { where: { activo: true } },
             usuarios: true
           }
         }
@@ -103,7 +103,7 @@ router.get('/audit', authenticateToken, async (req, res) => {
           }
         },
         _count: {
-          select: { vehiculos: true }
+          select: { vehiculos: { where: { activo: true } } }
         }
       },
       orderBy: { createdAt: 'desc' }

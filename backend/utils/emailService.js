@@ -47,8 +47,8 @@ const sendVerificationEmail = async (email, codigo) => {
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #572671; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
-            <h2 style="color: #572671; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
+            <h1 style="color: #42147D; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
+            <h2 style="color: #42147D; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
           </div>
           
           <div style="background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 25px;">
@@ -56,7 +56,7 @@ const sendVerificationEmail = async (email, codigo) => {
             <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 25px;">Usa el siguiente código de 6 dígitos para verificar tu cuenta.</p>
             
             <div style="background-color: #fdfdfd; border: 2px dashed #e0e0e0; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-              <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #572671;">${codigo}</span>
+              <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #42147D;">${codigo}</span>
             </div>
             <p style="color: #999; font-size: 12px; margin-top: 15px;">Este código expirará en 24 horas.</p>
           </div>
@@ -90,8 +90,8 @@ const sendPasswordResetEmail = async (email, codigo) => {
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #572671; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
-            <h2 style="color: #572671; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
+            <h1 style="color: #42147D; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
+            <h2 style="color: #42147D; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
           </div>
           
           <div style="background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 25px;">
@@ -99,7 +99,7 @@ const sendPasswordResetEmail = async (email, codigo) => {
             <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 25px;">Usa el siguiente código de 6 dígitos para restablecer tu contraseña.</p>
             
             <div style="background-color: #fdfdfd; border: 2px dashed #e0e0e0; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
-              <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #572671;">${codigo}</span>
+              <span style="font-size: 36px; font-weight: 700; letter-spacing: 8px; color: #42147D;">${codigo}</span>
             </div>
             <p style="color: #999; font-size: 12px; margin-top: 15px; line-height: 1.4;">Este código expirará en 1 hora.<br>Si no solicitaste este cambio, puedes ignorar este correo.</p>
           </div>
@@ -137,15 +137,15 @@ const sendSecurityAlertEmail = async (email, token) => {
       html: `
         <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
           <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #572671; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
-            <h2 style="color: #572671; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
+            <h1 style="color: #42147D; font-size: 20px; font-weight: 600; margin: 15px 0 5px 0;">Control de Inventarios</h1>
+            <h2 style="color: #42147D; font-size: 20px; font-weight: 700; margin: 0;">SMyT</h2>
           </div>
 
           <div style="background-color: #fafafa; border: 1px solid #f0f0f0; border-radius: 12px; padding: 30px; text-align: center; margin-bottom: 25px;">
             <h3 style="color: #333; font-size: 16px; margin-top: 0; margin-bottom: 15px;">Aviso de Cambio de Contraseña</h3>
             <p style="color: #666; font-size: 14px; line-height: 1.5; margin-bottom: 25px;">Hola, recientemente se cambió la contraseña de tu cuenta en el sistema SMyT. Si fuiste tú, por favor confirma el cambio.</p>
 
-            <a href="${confirmUrl}" style="display: inline-block; background-color: #572671; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(87, 38, 113, 0.2);">Sí, fui yo</a>
+            <a href="${confirmUrl}" style="display: inline-block; background-color: #42147D; color: #ffffff; padding: 12px 30px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(87, 38, 113, 0.2);">Sí, fui yo</a>
 
             <hr style="border: 0; border-top: 1px solid #eaeaea; margin: 0 0 25px 0;" />
 

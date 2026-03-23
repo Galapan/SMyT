@@ -198,7 +198,7 @@ function ResetPassword() {
               className="w-full h-full object-contain"
             />
           </div>
-          <h2 className="text-2xl font-bold text-[#572671] text-center mb-2">
+          <h2 className="text-2xl font-bold text-primary text-center mb-2">
             {step === 1 ? "Verificar Código" : "Nueva Contraseña"}
           </h2>
           <p className="text-xs text-center text-gray-500 max-w-xs mx-auto">
@@ -226,7 +226,7 @@ function ResetPassword() {
                   value={code[idx]}
                   onChange={(e) => handleCodeChange(idx, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(idx, e)}
-                  className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-[#572671]"
+                  className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-primary"
                   required
                   disabled={loading}
                 />
@@ -237,7 +237,7 @@ function ResetPassword() {
               <button
                 type="submit"
                 disabled={loading || code.some(d => d === "")}
-                className="w-full bg-[#572671] text-white py-3 rounded-lg hover:bg-[#451e5a] transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-95 duration-200"
+                className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/85 transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-95 duration-200"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -247,7 +247,7 @@ function ResetPassword() {
               </button>
               <Link
                 to="/forgot-password"
-                className="w-full text-center text-xs font-medium text-gray-500 hover:text-[#572671] hover:underline"
+                className="w-full text-center text-xs font-medium text-gray-500 hover:text-primary hover:underline"
               >
                 Volver a solicitar código
               </Link>
@@ -265,7 +265,7 @@ function ResetPassword() {
                 value={newPassword}
                 onChange={(e) => dispatch({ type: "SET_NEW_PASSWORD", payload: e.target.value })}
                 placeholder="••••••••"
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
                 required
                 disabled={loading}
                 minLength={8}
@@ -283,7 +283,7 @@ function ResetPassword() {
                 value={confirmPassword}
                 onChange={(e) => dispatch({ type: "SET_CONFIRM_PASSWORD", payload: e.target.value })}
                 placeholder="Repite tu contraseña"
-                className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
+                className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
                 required
                 disabled={loading}
                 minLength={8}
@@ -294,7 +294,7 @@ function ResetPassword() {
               <button
                 type="submit"
                 disabled={loading || !newPassword || !confirmPassword}
-                className="w-full bg-[#572671] text-white py-3 rounded-lg hover:bg-[#451e5a] transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-95 duration-200"
+                className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/85 transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-95 duration-200"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>

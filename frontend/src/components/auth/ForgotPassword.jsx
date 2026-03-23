@@ -54,6 +54,17 @@ function ForgotPassword() {
         type={toast.type}
         onClose={() => setToast({ ...toast, show: false })}
       />
+      {/* Botón regresar */}
+      <button
+        type="button"
+        onClick={() => navigate("/login")}
+        className="absolute top-4 left-4 z-10 flex items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-primary transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Regresar
+      </button>
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
         <div className="flex flex-col items-center mb-10">
           <div className="w-24 h-24 mb-4 flex items-center justify-center">
@@ -63,7 +74,7 @@ function ForgotPassword() {
               className="w-full h-full object-contain"
             />
           </div>
-          <h2 className="text-2xl font-bold text-[#572671] text-center mb-2">
+          <h2 className="text-2xl font-bold text-primary text-center mb-2">
             Recuperar Contraseña
           </h2>
           <p className="text-xs text-center text-gray-500 max-w-xs mx-auto">
@@ -82,7 +93,7 @@ function ForgotPassword() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="usuario@tlaxcala.gob.mx"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
+              className="w-full px-3 py-2 border border-gray-300 rounded focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-gray-700 text-sm placeholder-gray-300"
               required
               disabled={loading}
             />
@@ -92,7 +103,7 @@ function ForgotPassword() {
             <button
               type="submit"
               disabled={loading || !email}
-              className="w-full bg-[#572671] text-white py-3 rounded hover:bg-[#451e5a] transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-95 duration-200"
+              className="w-full bg-primary text-white py-3 rounded hover:bg-primary/85 transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-95 duration-200"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -102,7 +113,7 @@ function ForgotPassword() {
             </button>
             <Link
               to="/login"
-              className="w-full text-center text-xs font-medium text-gray-500 hover:text-[#572671] hover:underline"
+              className="w-full text-center text-xs font-medium text-gray-500 hover:text-primary hover:underline"
             >
               Volver al inicio de sesión
             </Link>

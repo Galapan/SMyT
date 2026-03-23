@@ -138,15 +138,15 @@ const AccountDetailsModal = ({ isOpen, onClose, user }) => {
 
                 {/* Deposit Card (Conditional) */}
                 {user.rol === 'ADMINISTRADOR_CONCESIONARIO' && (
-                  <div className={`bg-white/60 p-4 rounded-2xl border flex items-center shadow-sm hover:shadow-md transition-shadow ${user.deposito ? 'border-gray-100' : 'border-gob-rosa bg-orange-50/30'}`}>
-                    <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${user.deposito ? 'bg-gray-50 text-gray-500' : 'bg-gob-rosa/15 text-gob-rosa'}`}>
+                  <div className={`bg-white/60 p-4 rounded-2xl border border-gray-100 flex items-center shadow-sm hover:shadow-md transition-shadow`}>
+                    <div className={`p-3 rounded-xl shrink-0 mr-4 flex items-center justify-center ${user.deposito ? 'bg-naranja/15 text-naranja' : 'bg-amber-50 text-amber-500'}`}>
                       <Warehouse className="w-6 h-6" />
                     </div>
                     <div>
-                      <p className={`text-[11px] font-bold uppercase tracking-widest mb-1 ${user.deposito ? 'text-gray-400' : 'text-gob-rosa'}`}>
-                        {user.deposito ? 'Depósito Asignado' : 'Asignación Pendiente'}
+                      <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-1">
+                        {user.deposito ? 'Depósito Asignado' : 'Depósito'}
                       </p>
-                      <p className={`text-[15px] font-bold ${user.deposito ? 'text-gray-900' : 'text-gob-rosa'}`}>
+                      <p className={`text-[15px] font-bold ${user.deposito ? 'text-gray-900' : 'text-gray-500'}`}>
                         {user.deposito ? user.deposito.nombre : 'Sin asignación actual'}
                       </p>
                     </div>

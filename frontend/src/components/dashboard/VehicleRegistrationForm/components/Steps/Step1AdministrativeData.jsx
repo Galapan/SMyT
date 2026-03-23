@@ -32,7 +32,15 @@ const Step1AdministrativeData = ({ formData, errors, onChange, duplicateFields, 
       if (result.success) {
         return result.data
           .filter(d => d.activo) // Solo permitir registrar en depósitos activos
-          .map(d => ({ value: d.id, label: `${d.nombre} - ${d.municipio}` }));
+          .map(d => {
+            const vehiculosActuales = d._count?.vehiculos || 0;
+            const isFull = vehiculosActuales >= d.capacidad;
+            return {
+              value: d.id,
+              label: `${d.nombre} - ${d.municipio} (${vehiculosActuales}/${d.capacidad})`,
+              disabled: isFull
+            };
+          });
       }
       return [];
     },

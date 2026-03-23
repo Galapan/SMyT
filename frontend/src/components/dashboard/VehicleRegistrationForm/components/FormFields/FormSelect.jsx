@@ -36,8 +36,13 @@ const FormSelect = ({
       >
         <option value="">{placeholder}</option>
         {options.map(opt => (
-          <option key={opt.value || opt} value={opt.value || opt}>
-            {opt.label || opt}
+          <option
+            key={opt.value || opt}
+            value={opt.value || opt}
+            disabled={opt.disabled || false}
+            style={opt.disabled ? { color: '#9ca3af' } : undefined}
+          >
+            {opt.label || opt}{opt.disabled ? ' — LLENO' : ''}
           </option>
         ))}
       </select>

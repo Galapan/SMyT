@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import logoTlax from "../../assets/LogoTlax.png";
 import Toast from "../common/Toast";
 
 const API_URL = import.meta.env.VITE_API_URL !== undefined 
@@ -115,8 +116,15 @@ function Verification() {
       />
       
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
-        <div className="flex flex-col items-center mb-6">
-          <h1 className="text-2xl font-bold text-[#572671] text-center leading-tight mb-2">
+        <div className="flex flex-col items-center mb-8">
+          <div className="w-20 h-20 mb-4 flex items-center justify-center">
+            <img
+              src={logoTlax}
+              alt="Logo Tlaxcala"
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <h1 className="text-2xl font-bold text-primary text-center leading-tight mb-2">
             Verifica tu cuenta
           </h1>
           <p className="text-sm text-gray-500 text-center px-4">
@@ -141,7 +149,7 @@ function Verification() {
                 value={code[idx]}
                 onChange={(e) => handleChange(idx, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(idx, e)}
-                className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#572671] focus:border-[#572671] outline-none transition-all text-[#572671]"
+                className="w-12 h-14 text-center text-2xl font-semibold border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-primary"
                 required
               />
             ))}
@@ -151,7 +159,7 @@ function Verification() {
             <button
               type="submit"
               disabled={loading || code.some(d => d === "")}
-              className="w-full bg-[#572671] text-white py-3 rounded-lg hover:bg-[#451e5a] transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-95 duration-200"
+              className="w-full bg-primary text-white py-3 rounded-lg hover:bg-primary/85 transition-colors font-medium text-sm flex justify-center items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-70 disabled:cursor-not-allowed transform active:scale-95 duration-200"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -166,7 +174,7 @@ function Verification() {
            <button
               type="button"
               onClick={() => navigate('/login')}
-              className="text-xs font-medium text-gray-500 hover:text-[#572671] hover:underline transition-colors"
+              className="text-xs font-medium text-gray-500 hover:text-primary hover:underline transition-colors"
             >
               Volver al inicio de sesión
             </button>

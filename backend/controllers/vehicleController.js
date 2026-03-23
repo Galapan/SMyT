@@ -209,6 +209,18 @@ const createVehicle = async (req, res) => {
       });
     }
 
+    // Verificar capacidad del depósito
+    const vehiculosActivos = await prisma.vehiculo.count({
+      where: { depositoId: deposito.id, activo: true }
+    });
+
+    if (vehiculosActivos >= deposito.capacidad) {
+      return res.status(400).json({
+        success: false,
+        message: `El depósito "${deposito.nombre}" está lleno (${vehiculosActivos}/${deposito.capacidad} vehículos). No se pueden registrar más vehículos.`
+      });
+    }
+
     // Crear el vehículo
     const vehiculo = await prisma.vehiculo.create({
       data: {

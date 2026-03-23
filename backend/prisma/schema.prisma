@@ -22,6 +22,7 @@ model Usuario {
   creadoPorId            String?
   fotoUrl                String?            @default("https://ui-avatars.com/api/?background=random&color=fff&name=User")
   codigoVerificacion     String?
+  expiracionCodigo       DateTime?
   verificado             Boolean            @default(true)
   tokenSesion            String?
   solicitudesAprobadas   SolicitudEdicion[] @relation("UsuarioAprobador")
