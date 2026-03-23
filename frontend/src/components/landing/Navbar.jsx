@@ -103,14 +103,20 @@ export default function Navbar() {
 
   const scrollToSection = (e, href) => {
     e.preventDefault();
+    const wasOpen = isOpen;
     setIsOpen(false);
     const section = document.querySelector(href);
     if (section) {
-      // Esperar a que termine la animación de cierre antes de hacer scroll
-      setTimeout(() => {
-        document.body.style.overflow = "";
+      if (wasOpen) {
+        // Esperar a que termine la animación de cierre del menú móvil
+        setTimeout(() => {
+          document.body.style.overflow = "";
+          section.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 450);
+      } else {
+        // Desktop: scroll instantáneo, sin retraso
         section.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 450);
+      }
     }
   };
 
