@@ -26,7 +26,7 @@ const verifyToken = async (req, res, next) => {
     // IMPORTANT: Verify that the user still exists and is active
     const usuario = await prisma.usuario.findUnique({
       where: { id: decoded.id },
-      select: { activo: true }
+      select: { activo: true, tokenSesion: true } // <-- Add tokenSesion
     });
 
     if (!usuario || !usuario.activo) {
@@ -34,6 +34,15 @@ const verifyToken = async (req, res, next) => {
         success: false,
         errorCode: 'ACCOUNT_DEACTIVATED',
         message: 'Tu cuenta ha sido desactivada por un administrador.'
+      });
+    }
+
+    // Verify that the token matches the active session token
+    if (usuario.tokenSesion && usuario.tokenSesion !== token) {
+      return res.status(401).json({
+        success: false,
+        errorCode: 'SESSION_REPLACED',
+        message: 'Tu sesión fue cerrada porque se inició sesión en otro dispositivo.'
       });
     }
 

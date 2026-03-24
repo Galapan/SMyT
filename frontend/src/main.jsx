@@ -16,19 +16,23 @@ window.fetch = async (...args) => {
     const clonedResponse = response.clone();
     try {
       const data = await clonedResponse.json();
-      if (data && data.errorCode === 'ACCOUNT_DEACTIVATED') {
-        // User is deactivated: clear session and local storage
+      if (data && (data.errorCode === 'ACCOUNT_DEACTIVATED' || data.errorCode === 'SESSION_REPLACED')) {
+        // User is deactivated or session replaced: clear session and local storage
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         sessionStorage.removeItem('token');
         sessionStorage.removeItem('user');
         
         // Set a flag for the login page to show a toast
-        localStorage.setItem('account_deactivated_msg', data.message || 'Tu cuenta ha sido desactivada por un administrador.');
+        const message = data.errorCode === 'SESSION_REPLACED' 
+          ? 'Tu sesión fue cerrada porque se inició sesión en otro dispositivo.'
+          : (data.message || 'Tu cuenta ha sido desactivada por un administrador.');
+          
+        localStorage.setItem('account_deactivated_msg', message);
         
         // Redirect to login if not already there
-        if (window.location.pathname !== '/login') {
-          window.location.href = '/login';
+        if (!window.location.href.includes('/login')) {
+          window.location.hash = '/login';
         }
       }
     } catch (error) {

@@ -67,25 +67,8 @@ const login = async (req, res) => {
       });
     }
 
-    // Verificar si ya hay una sesión activa (token válido)
-    if (usuario.tokenSesion) {
-      try {
-        // Verificar si el token almacenado aún es válido
-        jwt.verify(usuario.tokenSesion, JWT_SECRET);
-        // Si el token es válido, bloquear el login
-        return res.status(401).json({
-          success: false,
-          message: 'Ya hay una sesión activa con esta cuenta. Si crees que esto es un error, cierra sesión en el otro dispositivo o contacta al administrador.',
-          sessionActive: true
-        });
-      } catch (jwtError) {
-        // El token expiró o es inválido, limpiar el tokenSesion y continuar
-        await prisma.usuario.update({
-          where: { id: usuario.id },
-          data: { tokenSesion: null }
-        });
-      }
-    }
+    // Ya no se bloquea si hay un tokenSesion existente (reemplazo de sesión)
+    // El nuevo token sobreescribirá el anterior en la DB, invalidando la sesión vieja.
 
     // Generar JWT con información del usuario
     const token = jwt.sign(

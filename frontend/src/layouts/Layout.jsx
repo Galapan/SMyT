@@ -62,6 +62,35 @@ const DashboardLayout = () => {
     return () => window.removeEventListener('storage', loadUser);
   }, [navigate]);
 
+  // Verificación periódica de sesión (Heartbeat) automática
+  useEffect(() => {
+    const token = sessionStorage.getItem('token') || localStorage.getItem('token');
+    if (!token) return;
+
+    // Verificar cada 15 segundos si la sesión sigue activa en el servidor
+    const checkSession = async () => {
+      try {
+        await fetch(`${API_URL}/api/auth/me`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        // Si el servidor responde 401 SESSION_REPLACED, el interceptor global 
+        // en main.jsx tomará el control automáticamente y expulsará al usuario.
+      } catch (error) {
+        // Errores de red silenciosos
+      }
+    };
+
+    const interval = setInterval(checkSession, 10000); 
+    
+    // Llamar la primera vez con un pequeño retraso para no bloquear la carga inicial
+    const timeout = setTimeout(checkSession, 2000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
+  }, []);
+
   const handleLogout = async () => {
     const token = sessionStorage.getItem('token') || localStorage.getItem('token');
     
