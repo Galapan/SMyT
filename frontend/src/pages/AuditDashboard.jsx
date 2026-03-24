@@ -292,7 +292,7 @@ const AdminHeader = ({ loading, searchTerm, onSearch, onRefresh }) => (
 );
 
 const AdminLoadingGrid = () => (
-  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
     {[1, 2, 3, 4, 5, 6].map((item) => (
       <div key={`skeleton-${item}`} className="w-full h-64 bg-white rounded-2xl border border-gray-100 p-6 flex flex-col justify-between animate-pulse">
         <div>
@@ -331,7 +331,7 @@ const AdminEmptyState = ({ searchTerm }) => (
 const AdminGrid = ({ paginatedDepositos, currentPage }) => (
   <motion.div 
     key={currentPage}
-    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6"
     initial="hidden"
     animate="visible"
     variants={{

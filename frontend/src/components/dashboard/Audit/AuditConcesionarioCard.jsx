@@ -59,20 +59,20 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
 
         {/* Cifras rápidas (footer del front) */}
         <div className="grid grid-cols-2 gap-3 pt-4 border-t border-gray-100">
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Car size={12} /> Vehículos
+          <div className="flex flex-col min-w-0">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1 truncate">
+              <Car size={12} className="shrink-0" /> <span className="truncate">Vehículos</span>
             </span>
-            <span className="text-lg font-bold text-gray-800">
-              {deposito._count.vehiculos} <span className="text-sm font-medium text-gray-400 block sm:inline">/ {deposito.capacidad} max</span>
+            <span className="text-base font-bold text-gray-800 truncate">
+              {deposito._count.vehiculos} <span className="text-xs font-medium text-gray-400 block xl:inline">/ {deposito.capacidad} max</span>
             </span>
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1">
-              <Users size={12} /> Cuentas
+          <div className="flex flex-col min-w-0">
+            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1 flex items-center gap-1 truncate">
+              <Users size={12} className="shrink-0" /> <span className="truncate">Cuentas</span>
             </span>
-            <span className="text-lg font-bold text-gray-800">
-              {deposito.usuarios?.length || 0} vinculadas
+            <span className="text-base font-bold text-gray-800 truncate">
+              {deposito.usuarios?.length || 0} <span className="text-xs font-medium text-gray-400 block xl:inline">vinculadas</span>
             </span>
           </div>
         </div>
@@ -84,25 +84,25 @@ const AuditConcesionarioCard = ({ deposito, onUpdate }) => {
       >
         
         {/* Cabecera del reverso */}
-        <div className="bg-gray-50/80 px-4 py-3 border-b border-gray-100 rounded-t-xl shrink-0 flex items-center justify-between">
-            <h4 className="font-bold text-gray-800 text-sm flex items-center gap-2">
-                <ShieldCheck size={16} className="text-(--color-primary)" />
-                Cuentas Autorizadas
+        <div className="bg-gray-50/80 px-3 py-3 border-b border-gray-100 rounded-t-xl shrink-0 flex items-center justify-between gap-2 overflow-hidden">
+            <h4 className="font-bold text-gray-800 text-sm flex items-center gap-1.5 truncate">
+                <ShieldCheck size={16} className="text-(--color-primary) shrink-0" />
+                <span className="truncate">Autorizadas</span>
             </h4>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-xs bg-white border border-gray-200 px-2 py-0.5 rounded text-gray-600 font-medium hidden sm:inline-block">
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="text-[10px] bg-white border border-gray-200 px-1.5 py-0.5 rounded text-gray-600 font-medium hidden md:inline-block truncate">
                   {deposito.usuarios?.length || 0} vinculadas
               </span>
               <button
                 onClick={(e) => { e.stopPropagation(); setIsAddAccountOpen(true); }}
-                className="p-1 px-2 text-white bg-(--color-primary) hover:bg-violet-900 rounded-md transition-colors text-xs font-semibold flex items-center gap-1 shadow-sm h-6.5"
+                className="p-1 px-1.5 text-white bg-(--color-primary) hover:bg-violet-900 rounded-md transition-colors text-[10px] font-semibold flex items-center gap-1 shadow-sm h-6 shrink-0"
                 title="Añadir Cuenta"
               >
-                <Plus size={14} /> Añadir
+                <Plus size={12} className="shrink-0" /> <span className="hidden sm:inline">Añadir</span>
               </button>
               <button 
                 onClick={(e) => { e.stopPropagation(); setIsFlipped(false); }}
-                className="p-1 text-gray-400 hover:text-gray-700 hover:bg-white rounded-md transition-colors"
+                className="p-1 text-gray-400 hover:text-gray-700 hover:bg-white rounded-md transition-colors shrink-0"
                 title="Cerrar detalles"
               >
                 <X size={16} />
