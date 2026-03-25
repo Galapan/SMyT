@@ -84,11 +84,12 @@ const getSolicitudes = async (req, res) => {
         // Y también las APROBADAS donde ellos son los solicitantes (para editar)
         if (req.user.rol === 'SUPER_USUARIO') {
           whereClause.estatus = 'PENDIENTE';
+          whereClause.solicitante = { rol: 'ADMINISTRADOR' };
         } else {
-          // ADMINISTRADOR: ve PENDIENTES (para que el super usuario apruebe) 
+          // ADMINISTRADOR: ve PENDIENTES de ADMINISTRADOR_CONCESIONARIO 
           // y APROBADAS donde él es el solicitante (para editar)
           whereClause.OR = [
-            { estatus: 'PENDIENTE' },
+            { estatus: 'PENDIENTE', solicitante: { rol: 'ADMINISTRADOR_CONCESIONARIO' } },
             { estatus: 'APROBADA', solicitanteId: req.user.id }
           ];
         }
@@ -103,7 +104,7 @@ const getSolicitudes = async (req, res) => {
       where: whereClause,
       include: {
         vehiculo: { select: { id: true, folioProceso: true, placa: true, anio: true, marcaTipo: true } },
-        solicitante: { select: { nombre: true, email: true } },
+        solicitante: { select: { nombre: true, email: true, rol: true, apellido: true } },
         resolutor: { select: { nombre: true, email: true } },
         aprobadoPor: { select: { nombre: true, email: true } },
         completadoPor: { select: { nombre: true, email: true } }

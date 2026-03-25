@@ -338,186 +338,143 @@ const Dashboard = () => {
           <DepotTable loading={loading} depots={depositos} />
         </div>
 
-        {/* Notificaciones Panel (SUPER_USUARIO ve pendientes, otros ven aprobadas) */}
-        {userRol === 'SUPER_USUARIO' ? (
-          <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in">
-            <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <div className="flex items-center space-x-2">
-                <Bell size={18} className="text-(--color-primary)" />
-                <h3 className="font-semibold text-gray-800">Solicitudes de Edición</h3>
-              </div>
-              <span className="bg-(--color-primary)/15 text-(--color-primary) border border-(--color-primary)/20 text-xs font-bold px-2 py-1 rounded-full">
-                {notificaciones.length}
-              </span>
+        {/* Notifications Panel */}
+        <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in h-100 xl:h-full">
+          <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+            <div className="flex items-center space-x-2">
+              <Bell size={18} className="text-(--color-primary)" />
+              <h3 className="font-semibold text-gray-800">Solicitudes de Edición</h3>
             </div>
-
-            <div className="flex-1 overflow-y-auto p-2 lg:overflow-visible">
-              {loading ? (
-                <div className="space-y-2 animate-pulse">
-                  {[1, 2, 3].map((item) => (
-                    <div key={`skeleton-desktop-${item}`} className="p-4 rounded-lg border border-gray-100 bg-white">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <div className="h-3 w-16 bg-gray-200 rounded mb-1"></div>
-                          <div className="h-4 w-32 bg-gray-200 rounded"></div>
-                        </div>
-                        <div className="h-3 w-16 bg-gray-200 rounded"></div>
-                      </div>
-                      
-                      <div className="mb-3">
-                        <div className="h-3 w-12 bg-gray-200 rounded mb-1"></div>
-                        <div className="h-3 w-full bg-gray-200 rounded mb-1"></div>
-                        <div className="h-3 w-3/4 bg-gray-200 rounded"></div>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2 border-t border-gray-50">
-                        <div className="h-3 w-24 bg-gray-200 rounded"></div>
-                        <div className="h-3 w-12 bg-gray-200 rounded"></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : notificaciones.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
-                  <CheckCircle size={32} className="mb-2 text-(--color-primary) opacity-50" />
-                  <p className="text-sm">No hay solicitudes pendientes</p>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {notificaciones.map((notif) => (
-                    <div 
-                      key={notif.id}
-                      role="button"
-                      tabIndex={0} 
-                      className="p-3 sm:p-4 rounded-lg border border-gray-100 bg-white hover:border-(--color-primary) hover:shadow-md transition-all cursor-pointer group"
-                      onClick={() => handleOpenNotif(notif)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') handleOpenNotif(notif);
-                      }}
-                    >
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <span className="text-xs font-semibold text-gray-500 block">Vehículo</span>
-                          <p className="text-sm font-bold text-(--color-primary)">{notif.vehiculo?.placa || 'Sin Placa'} - {notif.vehiculo?.folioProceso}</p>
-                        </div>
-                        <span className="text-[10px] text-gray-400">
-                          {new Date(notif.fechaSolicitud).toLocaleDateString()}
-                        </span>
-                      </div>
-                      
-                      <div className="mb-3">
-                        <span className="text-xs font-semibold text-gray-500 block">Motivo</span>
-                        <p className="text-sm text-gray-700 line-clamp-2">{notif.motivo}</p>
-                      </div>
-
-                      <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-2">
-                        <div className="flex items-center text-xs text-gray-500">
-                           <span className="truncate w-32">De: {notif.solicitante?.nombre}</span>
-                        </div>
-                        <div className="text-(--color-primary) opacity-0 group-hover:opacity-100 transition-opacity">
-                          <span className="text-xs font-medium">Revisar</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <span className="bg-(--color-primary)/15 text-(--color-primary) border border-(--color-primary)/20 text-xs font-bold px-2 py-1 rounded-full">
+              {notificaciones.length}
+            </span>
           </div>
-        ) : (
-          <div className="xl:w-1/3 flex flex-col bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden shrink-0 animate-fade-in h-100 xl:h-full">
-            <div className="p-4 sm:p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <div className="flex items-center space-x-2">
-                <Bell size={18} className="text-(--color-primary)" />
-                <h3 className="font-semibold text-gray-800">
-                  {userRol === 'ADMINISTRADOR' ? 'Mis Solicitudes de Edición' : 'Mis Solicitudes Aprobadas'}
-                </h3>
-              </div>
-              <span className="bg-(--color-primary)/15 text-(--color-primary) border border-(--color-primary)/20 text-xs font-bold px-2 py-1 rounded-full">
-                {notificaciones.length}
-              </span>
-            </div>
 
-            <div className="flex-1 overflow-y-auto p-2 lg:overflow-visible">
-              {loading ? (
-                <div className="space-y-4 animate-pulse px-2 pb-2">
-                  {[1, 2, 3].map((item) => (
-                    <div key={`skeleton-mobile-${item}`} className="p-4 rounded-xl border border-gray-200 bg-white">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <div className="h-3 w-16 bg-gray-200 rounded mb-1"></div>
-                          <div className="h-4 w-32 bg-gray-200 rounded"></div>
-                        </div>
-                        <div className="h-3 w-16 bg-gray-200 rounded"></div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : notificaciones.length === 0 ? (
-                <div className="h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
-                  <CheckCircle size={32} className="mb-2 text-(--color-primary) opacity-50" />
-                  <p className="text-sm">No tienes solicitudes aprobadas para editar</p>
-                </div>
-              ) : (
-                <div className="space-y-4 px-2 pb-2">
-                  {notificaciones.map((notif) => (
-                    <div 
-                      key={notif.id} 
-                      className="group relative p-5 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-lg hover:border-(--color-primary)/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
-                    >
-                      {/* Decorative top border accent */}
-                      <div className={`absolute top-0 left-0 w-full h-1 ${
-                        notif.estatus === 'PENDIENTE' ? 'bg-naranja' : 'bg-verde'
-                      }`}></div>
-
+          <div className="flex-1 overflow-y-auto p-2 lg:overflow-visible">
+            {loading ? (
+              <div className="space-y-4 animate-pulse px-2 pb-2">
+                {[1, 2, 3].map((item) => (
+                  <div key={`skeleton-${item}`} className="p-4 rounded-xl border border-gray-200 bg-white">
+                    <div className="flex justify-between items-start mb-2">
                       <div>
-                        <div className="flex justify-between items-start mb-4">
+                        <div className="h-3 w-16 bg-gray-200 rounded mb-1"></div>
+                        <div className="h-4 w-32 bg-gray-200 rounded"></div>
+                      </div>
+                      <div className="h-3 w-16 bg-gray-200 rounded"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : notificaciones.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-gray-400 p-6 text-center">
+                <CheckCircle size={32} className="mb-2 text-(--color-primary) opacity-50" />
+                <p className="text-sm">No hay solicitudes pendientes</p>
+              </div>
+            ) : (
+              <div className="space-y-4 px-2 pb-2 mt-2">
+                {notificaciones.map((notif) => {
+                  const isToReview = notif.estatus === 'PENDIENTE' && notif.solicitanteId !== user?.id;
+
+                  if (isToReview) {
+                    return (
+                      <div 
+                        key={notif.id}
+                        role="button"
+                        tabIndex={0} 
+                        className="p-4 rounded-xl border border-gray-100 bg-white shadow-sm hover:border-(--color-primary) hover:shadow-md transition-all cursor-pointer group"
+                        onClick={() => handleOpenNotif(notif)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') handleOpenNotif(notif);
+                        }}
+                      >
+                        <div className="flex justify-between items-start mb-2">
                           <div>
-                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-2 inline-block shadow-sm ${
-                              notif.estatus === 'PENDIENTE' 
-                                ? 'bg-naranja/10 text-naranja border border-naranja/20' 
-                                : 'bg-verde/10 text-verde border border-verde/20'
-                            }`}>
-                              {notif.estatus === 'PENDIENTE' ? 'Pendiente de Revisión' : 'Solicitud Aprobada'}
+                            <span className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-2 inline-block shadow-sm bg-naranja/10 text-naranja border border-naranja/20">
+                              Para Revisar
                             </span>
-                            <p className="text-base font-extrabold text-[#1a1f36] tracking-tight">
-                              {notif.vehiculo?.placa || 'Sin Placa'} - {notif.vehiculo?.folioProceso}
-                            </p>
+                            <p className="text-sm font-bold text-(--color-primary)">{notif.vehiculo?.placa || 'Sin Placa'} - {notif.vehiculo?.folioProceso}</p>
                           </div>
-                          <span className="text-[10px] font-semibold text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
-                            {new Date(notif.fechaResolucion || notif.fechaSolicitud).toLocaleDateString()}
+                          <span className="text-[10px] text-gray-400">
+                            {new Date(notif.fechaSolicitud).toLocaleDateString()}
                           </span>
                         </div>
-                        <div className="mb-5 bg-gray-50/50 rounded-xl p-3 border border-gray-50/80">
-                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tu Solicitud</span>
-                          <p className="text-sm text-gray-600 leading-relaxed font-medium">{notif.motivo}</p>
+                        
+                        <div className="mb-3">
+                          <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Motivo</span>
+                          <p className="text-sm text-gray-700 line-clamp-2">{notif.motivo}</p>
+                        </div>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-50 mt-2">
+                          <div className="flex items-center text-xs text-gray-500">
+                             <span className="truncate w-32">De: {notif.solicitante?.nombre}</span>
+                          </div>
+                          <div className="text-(--color-primary) opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                            <span className="text-xs font-medium">Revisar</span>
+                            <ChevronRight size={14} />
+                          </div>
                         </div>
                       </div>
+                    );
+                  } else {
+                    return (
+                      <div 
+                        key={notif.id} 
+                        className="group relative p-5 rounded-2xl border border-gray-100 bg-white shadow-sm hover:shadow-lg hover:border-(--color-primary)/30 transition-all duration-300 flex flex-col justify-between overflow-hidden"
+                      >
+                        {/* Decorative top border accent */}
+                        <div className={`absolute top-0 left-0 w-full h-1 ${
+                          notif.estatus === 'PENDIENTE' ? 'bg-naranja' : 'bg-verde'
+                        }`}></div>
 
-                      {notif.estatus === 'APROBADA' ? (
-                        <button
-                          onClick={() => handleEditVehicle(notif)}
-                          disabled={loadingEditId === notif.id}
-                          className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-(--color-primary) border-2 border-(--color-primary) hover:bg-(--color-primary) hover:text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md disabled:bg-gray-100 disabled:border-transparent disabled:text-gray-400 disabled:cursor-wait"
-                        >
-                          {loadingEditId === notif.id ? (
-                            <><Loader2 size={16} className="animate-spin" /> Abriendo...</>
-                          ) : (
-                            <><Edit2 size={16} /> Editar Vehículo</>
-                          )}
-                        </button>
-                      ) : (
-                        <div className="mt-1 w-full text-center py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-400">
-                          Esperando revisión del Super Usuario
+                        <div>
+                          <div className="flex justify-between items-start mb-4">
+                            <div>
+                              <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full mb-2 inline-block shadow-sm ${
+                                notif.estatus === 'PENDIENTE' 
+                                  ? 'bg-naranja/10 text-naranja border border-naranja/20' 
+                                  : 'bg-verde/10 text-verde border border-verde/20'
+                              }`}>
+                                {notif.estatus === 'PENDIENTE' ? 'Pendiente de Revisión' : 'Solicitud Aprobada'}
+                              </span>
+                              <p className="text-base font-extrabold text-[#1a1f36] tracking-tight">
+                                {notif.vehiculo?.placa || 'Sin Placa'} - {notif.vehiculo?.folioProceso}
+                              </p>
+                            </div>
+                            <span className="text-[10px] font-semibold text-gray-400 bg-gray-50 px-2 py-1 rounded-md">
+                              {new Date(notif.fechaResolucion || notif.fechaSolicitud).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="mb-5 bg-gray-50/50 rounded-xl p-3 border border-gray-50/80">
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-1">Tu Solicitud</span>
+                            <p className="text-sm text-gray-600 leading-relaxed font-medium">{notif.motivo}</p>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+
+                        {notif.estatus === 'APROBADA' ? (
+                          <button
+                            onClick={() => handleEditVehicle(notif)}
+                            disabled={loadingEditId === notif.id}
+                            className="mt-1 w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-(--color-primary) border-2 border-(--color-primary) hover:bg-(--color-primary) hover:text-white rounded-xl text-sm font-bold transition-all duration-300 shadow-sm hover:shadow-md disabled:bg-gray-100 disabled:border-transparent disabled:text-gray-400 disabled:cursor-wait"
+                          >
+                            {loadingEditId === notif.id ? (
+                              <><Loader2 size={16} className="animate-spin" /> Abriendo...</>
+                            ) : (
+                              <><Edit2 size={16} /> Editar Vehículo</>
+                            )}
+                          </button>
+                        ) : (
+                          <div className="mt-1 w-full text-center py-2.5 bg-gray-50 border border-gray-100 rounded-xl text-xs font-semibold text-gray-400">
+                            Esperando revisión superior
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                })}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
 
       {/* Notification Modal Overlay */}
@@ -628,10 +585,36 @@ const Dashboard = () => {
                     </div>
                   </div>
                   
+                  {/* Campos a editar */}
+                  {selectedNotif.camposIncorrectos && selectedNotif.camposIncorrectos.length > 0 && (
+                    <div>
+                      <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 block">Campos a editar</span>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedNotif.camposIncorrectos.map(campo => (
+                           <span key={campo} className="px-2.5 py-1 bg-gray-100 border border-gray-200 text-gray-700 text-xs rounded-lg font-medium">
+                             {campo}
+                           </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
                   {/* Applicant */}
-                  <div className="flex items-center justify-between py-2 border-t border-gray-50">
-                    <span className="text-xs font-semibold text-gray-500">Solicitado por:</span>
-                    <span className="text-sm font-medium text-gray-900">{selectedNotif.solicitante?.nombre} {selectedNotif.solicitante?.apellido}</span>
+                  <div className="flex items-center justify-between py-3 border-t border-gray-50">
+                    <div>
+                      <span className="text-xs font-semibold text-gray-500 block mb-1.5">Solicitado por:</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md bg-(--color-primary)/10 text-(--color-primary) border border-(--color-primary)/20">
+                        {
+                          selectedNotif.solicitante?.rol === 'ADMINISTRADOR_CONCESIONARIO' ? 'Admin. Concesionario' :
+                          selectedNotif.solicitante?.rol === 'ADMINISTRADOR' ? 'Admin. SMyT' :
+                          selectedNotif.solicitante?.rol === 'SUPER_USUARIO' ? 'Super Usuario' : 
+                          selectedNotif.solicitante?.rol || 'Usuario'
+                        }
+                      </span>
+                    </div>
+                    <span className="text-sm font-bold text-gray-900 items-end flex flex-col justify-end text-right">
+                      {selectedNotif.solicitante?.nombre} {selectedNotif.solicitante?.apellido}
+                    </span>
                   </div>
                 </>
               )}
