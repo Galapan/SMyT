@@ -603,7 +603,12 @@ const Dashboard = () => {
                   <div className="flex items-center justify-between py-3 border-t border-gray-50">
                     <div>
                       <span className="text-xs font-semibold text-gray-500 block mb-1.5">Solicitado por:</span>
-                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md bg-(--color-primary)/10 text-(--color-primary) border border-(--color-primary)/20">
+                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md border ${
+                        selectedNotif.solicitante?.rol === 'ADMINISTRADOR_CONCESIONARIO' ? 'bg-(--color-verde)/15 text-(--color-verde) border-(--color-verde)/20' :
+                        selectedNotif.solicitante?.rol === 'ADMINISTRADOR' ? 'bg-(--color-naranja)/10 text-(--color-naranja) border-(--color-naranja)/20' :
+                        selectedNotif.solicitante?.rol === 'SUPER_USUARIO' ? 'bg-(--color-azul)/10 text-(--color-azul) border-(--color-azul)/20' :
+                        'bg-gray-100 text-gray-700 border-gray-200'
+                      }`}>
                         {
                           selectedNotif.solicitante?.rol === 'ADMINISTRADOR_CONCESIONARIO' ? 'Admin. Concesionario' :
                           selectedNotif.solicitante?.rol === 'ADMINISTRADOR' ? 'Admin. SMyT' :
