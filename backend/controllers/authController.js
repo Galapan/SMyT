@@ -495,7 +495,8 @@ const rejectSecurityAlert = async (req, res) => {
       data: { 
         activo: false,
         codigoVerificacion: null,
-        expiracionCodigo: null
+        expiracionCodigo: null,
+        tokenSesion: null
       }
     });
 

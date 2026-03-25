@@ -127,8 +127,8 @@ const sendPasswordResetEmail = async (email, codigo) => {
 const sendSecurityAlertEmail = async (email, token) => {
   try {
     const frontendUrl = process.env.VITE_FRONTEND_URL || 'https://smyt-project.vercel.app';
-    const confirmUrl = `${frontendUrl}/security?action=confirm&token=${token}`;
-    const rejectUrl = `${frontendUrl}/security?action=reject&token=${token}`;
+    const confirmUrl = `${frontendUrl}/#/security?action=confirm&token=${token}`;
+    const rejectUrl = `${frontendUrl}/#/security?action=reject&token=${token}`;
 
     const mailOptions = {
       from: `"SMyT Seguridad" <${process.env.SMTP_USER || 'noreply@smyt.com'}>`,

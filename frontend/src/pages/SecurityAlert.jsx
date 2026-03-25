@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { CheckCircle2, ShieldAlert } from 'lucide-react';
 
@@ -13,6 +13,7 @@ function SecurityAlert() {
     status: 'loading', // loading, success-confirm, success-reject, error
     errorMessage: ''
   });
+  const [countdown, setCountdown] = useState(5);
   const hasProcessedRef = useRef(false);
 
   const action = searchParams.get('action');
@@ -59,6 +60,23 @@ function SecurityAlert() {
     processAction();
   }, [action, token]);
 
+  useEffect(() => {
+    let timer;
+    if (state.status === 'success-reject' || state.status === 'success-confirm') {
+      timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            navigate('/login');
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [state.status, navigate]);
+
   return (
     <div className="h-dvh w-full flex items-center justify-center bg-gray-50 relative overflow-hidden">
       <div className="bg-white w-full max-w-md p-8 rounded-2xl shadow-xl relative z-10 mx-4 animate-slide-up-fade">
@@ -89,9 +107,10 @@ function SecurityAlert() {
               <p className="text-sm text-gray-600 mb-8 px-2">Hemos verificado que fuiste tú quien realizó el cambio de contraseña. Tu cuenta está segura.</p>
               <button
                 onClick={() => navigate('/login')}
-                className="w-full bg-[#572671] text-white py-3 rounded hover:bg-[#451e5a] transition-colors font-medium text-sm shadow-md hover:shadow-lg transform active:scale-95 duration-200"
+                className="w-full bg-[#572671] text-white py-3 rounded hover:bg-[#451e5a] transition-colors font-medium text-sm shadow-md hover:shadow-lg transform active:scale-95 duration-200 flex flex-col items-center justify-center"
               >
-                Volver al Inicio
+                <span>Volver al Inicio</span>
+                <span className="text-xs text-purple-200 mt-1">Redirigiendo en {countdown} segundos...</span>
               </button>
             </div>
           )}
@@ -103,9 +122,10 @@ function SecurityAlert() {
               <p className="text-sm text-gray-600 mb-8 px-2 leading-relaxed">Hemos bloqueado y desactivado tu cuenta de inmediato por precaución. Por favor, contacta a un administrador para recuperar el acceso a tu sistema.</p>
               <button
                 onClick={() => navigate('/login')}
-                className="w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 rounded hover:bg-gray-200 transition-colors font-medium text-sm shadow-sm hover:shadow transform active:scale-95 duration-200"
+                className="w-full bg-gray-100 border border-gray-200 text-gray-700 py-3 rounded hover:bg-gray-200 transition-colors font-medium text-sm shadow-sm hover:shadow transform active:scale-95 duration-200 flex flex-col items-center justify-center"
               >
-                Entendido
+                <span>Entendido</span>
+                <span className="text-xs text-gray-500 mt-1">Redirigiendo en {countdown} segundos...</span>
               </button>
             </div>
           )}
