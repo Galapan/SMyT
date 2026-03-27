@@ -2,6 +2,18 @@ const cron = require('node-cron');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+/**
+ * CRON JOB PARA LIMPIEZA DE CUENTAS NO VERIFICADAS
+ * 
+ * IMPORTANTE: En producción (Vercel), este cron job NO se ejecuta porque
+ * Vercel es serverless y no hay proceso persistente.
+ * 
+ * En producción, la limpieza se realiza mediante pg_cron en Supabase.
+ * Ver: Supabase Dashboard → SQL Editor → Job: 'cleanup-unverified-accounts'
+ * 
+ * Este archivo solo se usa para desarrollo local.
+ */
+
 // Ejecutar cada hora: '0 * * * *'
 // Para pruebas (cada minuto): '* * * * *'
 const startAccountCleanupJob = () => {
