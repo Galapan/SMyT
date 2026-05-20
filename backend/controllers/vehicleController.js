@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 // Validar datos duplicados (para usar en tiempo real durante el registro)
 const validateDuplicateData = async (req, res) => {
   try {
-    const { folioProceso, vin, placa, noMotor, noInventario, excludeId } = req.body;
+    const { folioProceso, vin, placa, noSerie, noInventario, excludeId } = req.body;
 
     if (!folioProceso && !vin && !placa && !noMotor && !noInventario) {
       return res.status(400).json({
@@ -24,8 +24,8 @@ const validateDuplicateData = async (req, res) => {
     if (placa) {
       whereConditions.push({ placa: placa.toUpperCase() });
     }
-    if (noMotor) {
-      whereConditions.push({ noMotor: noMotor.toUpperCase() });
+    if (noSerie) {
+      whereConditions.push({ noSerie: noSerie.toUpperCase() });
     }
     if (noInventario) {
       whereConditions.push({ noInventario: noInventario.toUpperCase() });
@@ -55,7 +55,7 @@ const validateDuplicateData = async (req, res) => {
         folioProceso: true,
         vin: true,
         placa: true,
-        noMotor: true,
+        noSerie: true,
         noInventario: true
       }
     });
@@ -65,7 +65,7 @@ const validateDuplicateData = async (req, res) => {
         folioProceso: duplicateVehicle.folioProceso === folioProceso?.toUpperCase(),
         vin: duplicateVehicle.vin === vin?.toUpperCase(),
         placa: duplicateVehicle.placa === placa?.toUpperCase(),
-        noMotor: duplicateVehicle.noMotor === noMotor?.toUpperCase(),
+        noSerie: duplicateVehicle.noSerie === noSerie?.toUpperCase(),
         noInventario: duplicateVehicle.noInventario === noInventario?.toUpperCase()
       };
 
@@ -237,7 +237,7 @@ const createVehicle = async (req, res) => {
         tipoServicio,
         vin: vin.toUpperCase(),
         placa: placa.toUpperCase(),
-        noMotor,
+        noSerie,
         colorOriginal,
         colorActual,
         odometro: parseInt(odometro),
@@ -458,7 +458,7 @@ const updateVehicle = async (req, res) => {
     // Obtener datos del body (similar a createVehicle)
     const {
       folioProceso, fechaIngreso, autoridad, documentosAdjuntos, fotos,
-      noInventario, marcaTipo, anio, tipoServicio, vin, placa, noMotor, colorOriginal, colorActual, odometro,
+      noInventario, marcaTipo, anio, tipoServicio, vin, placa, noSerie, colorOriginal, colorActual, odometro,
       estatusLegal, tieneActaBaja, noOficio, fechaActaBaja, tieneTituloFactura,
       estadoCarroceria, estadoCristales, estadoEspejos, estadoLlantasDelanteras, estadoLlantasTraseras,
       motorCompleto, bateriaPresente, tipoTransmision, estadoAsientos, estadoCinturones, estadoVolanteTablero,
@@ -492,7 +492,7 @@ const updateVehicle = async (req, res) => {
       tipoServicio,
       vin: vin ? vin.toUpperCase() : undefined,
       placa: placa ? placa.toUpperCase() : undefined,
-      noMotor,
+      noSerie,
       colorOriginal,
       colorActual,
       odometro: odometro ? parseInt(odometro) : undefined,
